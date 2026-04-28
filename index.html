@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Precifica Frete</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --v:#1D9E75;--ve:#0F6E56;--vc:#E1F5EE;--vm:#5DCAA5;
+  --bg:#F4F3EF;--card:#FFFFFF;--dark:#111210;
+  --g1:#3A3A38;--g2:#6B6B68;--g3:#A8A89F;--gb:#D8D7CF;--gf:#EEECEA;
+  --r:#C0392B;--rc:#FDEEEE;--rb:#F5AAAA;
+  --a:#B8860B;--ac:#FDF6E3;--ab:#F0C040;
+  --bl:#1A5276;--blc:#EAF2FB;
+  --shadow:0 2px 16px rgba(0,0,0,0.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);min-height:100vh}
+.tela{display:none;min-height:100vh;animation:fadeIn .3s ease}
+.tela.ativa{display:block}
+#auth.ativa{display:flex}
+#app.ativa{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* AUTH */
+#auth{min-height:100vh;flex-direction:row}
+.auth-left{flex:1;background:var(--ve);display:flex;flex-direction:column;justify-content:center;padding:3rem;position:relative;overflow:hidden}
+.auth-left::after{content:'';position:absolute;bottom:-80px;right:-80px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,0.06)}
+.auth-logo{display:flex;align-items:center;gap:10px;margin-bottom:3rem}
+.auth-logo-icon{width:42px;height:42px;background:rgba(255,255,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center}
+.auth-logo-icon svg{width:24px;height:24px}
+.auth-logo-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff}
+.auth-left h2{font-family:'Syne',sans-serif;font-size:clamp(22px,3vw,34px);font-weight:800;color:#fff;line-height:1.2;margin-bottom:1rem}
+.auth-left p{font-size:15px;color:rgba(255,255,255,0.7);line-height:1.7;max-width:360px}
+.auth-items{margin-top:2.5rem;display:flex;flex-direction:column;gap:12px}
+.auth-item{display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(255,255,255,0.8)}
+.auth-item::before{content:'✓';width:22px;height:22px;background:rgba(255,255,255,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.auth-right{flex:1;display:flex;align-items:center;justify-content:center;padding:2rem;background:var(--bg)}
+.auth-box{width:100%;max-width:400px}
+.auth-tabs{display:flex;background:var(--gf);border-radius:10px;padding:4px;margin-bottom:2rem}
+.auth-tab{flex:1;padding:10px;text-align:center;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--g2);border:none;background:transparent;font-family:'DM Sans',sans-serif}
+.auth-tab.ativo{background:#fff;color:var(--dark);box-shadow:var(--shadow)}
+.auth-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:.4rem}
+.auth-sub{font-size:14px;color:var(--g2);margin-bottom:1.75rem}
+.campo{margin-bottom:1rem}
+.campo label{display:block;font-size:12px;font-weight:600;color:var(--g1);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.campo input{width:100%;padding:12px 14px;border:1.5px solid var(--gb);border-radius:9px;font-size:15px;font-family:'DM Sans',sans-serif;background:#fff;color:var(--dark);outline:none;transition:border .2s}
+.campo input:focus{border-color:var(--v)}
+.btn-auth{width:100%;padding:14px;background:var(--v);color:#fff;border:none;border-radius:9px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:.5rem;transition:background .2s}
+.btn-auth:hover{background:var(--ve)}
+.btn-auth:disabled{background:var(--g3);cursor:not-allowed}
+.auth-link{font-size:13px;color:var(--g2);text-align:center;margin-top:1rem}
+.auth-link span{color:var(--v);cursor:pointer;font-weight:600}
+.msg-erro{background:var(--rc);border:1px solid var(--rb);border-radius:8px;padding:.75rem 1rem;font-size:13px;color:var(--r);margin-bottom:1rem;display:none}
+.msg-erro.ativo{display:block}
+.msg-ok{background:var(--vc);border:1px solid var(--vm);border-radius:8px;padding:.75rem 1rem;font-size:13px;color:var(--ve);margin-bottom:1rem;display:none}
+.msg-ok.ativo{display:block}
+@media(max-width:700px){#auth{flex-direction:column}.auth-left{padding:2rem;min-height:auto}.auth-items{display:none}}
+
+/* APP SHELL */
+#app{min-height:100vh}
+.sidebar{width:240px;background:var(--dark);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;transition:transform .3s}
+.sidebar-logo{padding:1.5rem 1.25rem;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:10px}
+.sidebar-logo-icon{width:34px;height:34px;background:var(--v);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.sidebar-logo-icon svg{width:19px;height:19px}
+.sidebar-logo-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff}
+.sidebar-nav{flex:1;padding:1rem 0}
+.nav-item{display:flex;align-items:center;gap:10px;padding:.75rem 1.25rem;font-size:14px;font-weight:500;color:rgba(255,255,255,0.5);cursor:pointer;transition:all .2s;border-left:3px solid transparent}
+.nav-item:hover{color:#fff;background:rgba(255,255,255,0.05)}
+.nav-item.ativo{color:#fff;background:rgba(29,158,117,0.12);border-left-color:var(--v)}
+.nav-item-icon{font-size:16px;width:20px;text-align:center}
+.sidebar-footer{padding:1rem 1.25rem;border-top:1px solid rgba(255,255,255,0.08)}
+.sidebar-user{display:flex;align-items:center;gap:10px}
+.sidebar-avatar{width:34px;height:34px;background:var(--v);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+.sidebar-user-name{font-size:13px;font-weight:600;color:#fff}
+.sidebar-user-cred{font-size:11px;color:var(--g3)}
+.sidebar-sair{font-size:12px;color:var(--g3);cursor:pointer;margin-top:4px;display:inline-block}
+.sidebar-sair:hover{color:#fff}
+.app-content{margin-left:240px;flex:1;min-height:100vh}
+.topbar{background:#fff;border-bottom:1px solid var(--gb);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40}
+.topbar-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700}
+.topbar-cred{display:flex;align-items:center;gap:8px;background:var(--vc);border:1px solid var(--vm);border-radius:99px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--ve);cursor:pointer}
+.page{display:none;padding:2rem}
+.page.ativa{display:block;animation:fadeIn .25s ease}
+.mob-topbar{display:none;background:var(--dark);padding:.875rem 1.25rem;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:60}
+.mob-logo{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff}
+.mob-menu-btn{background:none;border:none;color:#fff;font-size:20px;cursor:pointer}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:45}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}.sidebar.open{transform:none}
+  .sidebar-overlay.open{display:block}.app-content{margin-left:0}
+  .mob-topbar{display:flex}.topbar{display:none}.page{padding:1.25rem}
+}
+
+/* DASHBOARD */
+.dash-welcome{margin-bottom:2rem}
+.dash-welcome h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:.25rem}
+.dash-welcome p{font-size:14px;color:var(--g2)}
+.dash-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem}
+.dash-card{background:#fff;border:1px solid var(--gb);border-radius:12px;padding:1.25rem}
+.dash-card-label{font-size:11px;font-weight:600;color:var(--g2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.5rem}
+.dash-card-val{font-family:'Syne',sans-serif;font-size:26px;font-weight:800}
+.dash-card-val.verde{color:var(--ve)}
+.dash-empty{background:#fff;border:1px solid var(--gb);border-radius:12px;padding:2rem;text-align:center}
+.btn-green{padding:11px 22px;background:var(--v);color:#fff;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer}
+.btn-green:hover{background:var(--ve)}
+.hist-lista{display:flex;flex-direction:column;gap:8px;margin-top:1.5rem}
+.hist-titulo{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:.5rem}
+.hist-item{background:#fff;border:1px solid var(--gb);border-radius:10px;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.hist-rota{font-size:14px;font-weight:600}
+.hist-sub{font-size:12px;color:var(--g2);margin-top:2px}
+.hist-lucro{font-family:'Syne',sans-serif;font-size:15px;font-weight:700}
+.hist-lucro.verde{color:var(--ve)}.hist-lucro.verm{color:var(--r)}
+.hist-data{font-size:11px;color:var(--g3);margin-top:2px}
+
+/* CALCULADORA */
+.calc-layout{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start}
+.calc-card{background:#fff;border:1px solid var(--gb);border-radius:14px;padding:1.5rem}
+.calc-result{background:#fff;border:1px solid var(--gb);border-radius:14px;padding:1.5rem;position:sticky;top:80px}
+.form-sec{margin-bottom:1.25rem}
+.form-sec-title{font-size:11px;font-weight:700;color:var(--g2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem}
+.rota-wrap{border:1.5px solid var(--gb);border-radius:10px;overflow:hidden}
+.rota-row{display:flex;align-items:center;gap:10px;padding:12px 14px}
+.rota-row+.rota-row{border-top:1px solid var(--gf)}
+.rota-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.dot-v{background:var(--v)}.dot-r{background:var(--r)}
+.rota-inp{flex:1;border:none;outline:none;font-size:14px;font-family:'DM Sans',sans-serif;background:transparent;color:var(--dark)}
+.rota-inp::placeholder{color:var(--g3)}
+.info-pill{display:inline-flex;align-items:center;gap:5px;background:var(--blc);border:1px solid #AEC6E8;border-radius:99px;padding:4px 12px;font-size:11px;color:var(--bl);font-weight:500;margin-top:8px}
+.sel-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sel-wrap{display:flex;flex-direction:column;gap:4px}
+.sel-label{font-size:11px;font-weight:600;color:var(--g2);text-transform:uppercase;letter-spacing:.04em}
+.sel-wrap select{border:1.5px solid var(--gb);border-radius:8px;padding:10px 12px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);outline:none;-webkit-appearance:none;appearance:none}
+.sel-wrap select:focus{border-color:var(--v)}
+.carga-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.carga-btn{border:1.5px solid var(--gb);border-radius:8px;padding:8px 6px;cursor:pointer;transition:all .15s;background:var(--bg);text-align:center}
+.carga-btn:hover,.carga-btn.sel{border-color:var(--v);background:var(--vc)}
+.carga-btn.sel .cb-nome{color:var(--ve);font-weight:600}
+.cb-emoji{font-size:16px;display:block;margin-bottom:2px}
+.cb-nome{font-size:10px;color:var(--g1);line-height:1.3}
+.frete-row{display:flex;align-items:center;gap:8px;border:1.5px solid var(--gb);border-radius:10px;padding:10px 14px}
+.frete-prefix{font-size:15px;font-weight:700;color:var(--g2)}
+.frete-inp{flex:1;border:none;outline:none;font-size:22px;font-family:'Syne',sans-serif;font-weight:700;background:transparent;color:var(--dark);text-align:right;width:100%}
+.btn-calc{width:100%;padding:14px;background:var(--v);color:#fff;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s;margin-top:.5rem}
+.btn-calc:hover{background:var(--ve)}
+.result-placeholder{text-align:center;padding:3rem 1rem;color:var(--g3)}
+.result-placeholder span{font-size:48px;display:block;opacity:.4;margin-bottom:1rem}
+.result-placeholder p{font-size:14px;line-height:1.6}
+.result-loading{display:none;text-align:center;padding:2rem 1rem}
+.result-loading.show{display:block}
+.spinner{width:36px;height:36px;border:3px solid var(--gb);border-top-color:var(--v);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-step{font-size:12px;color:var(--g2);margin-top:6px}
+.load-srcs{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;margin-top:12px}
+.ls{background:var(--gf);border:1px solid var(--gb);border-radius:99px;padding:2px 9px;font-size:10px;color:var(--g2);font-weight:500;transition:all .3s}
+.ls.ok{background:var(--vc);border-color:var(--vm);color:var(--ve)}
+.result-content{display:none}
+.result-content.show{display:block}
+.alerta-box{border-radius:10px;padding:.875rem 1rem;display:flex;gap:10px;margin-bottom:1rem;font-size:13px}
+.al-d{background:var(--rc);border:1px solid var(--rb)}.al-d .al-t{color:var(--r);font-weight:600;margin-bottom:3px}
+.al-s{background:var(--vc);border:1px solid var(--vm)}.al-s .al-t{color:var(--ve);font-weight:600;margin-bottom:3px}
+.al-w{background:var(--ac);border:1px solid var(--ab)}.al-w .al-t{color:var(--a);font-weight:600;margin-bottom:3px}
+.al-d .al-b{color:#8B1A1A}.al-s .al-b{color:var(--ve)}.al-w .al-b{color:#7a5200}
+.al-i{font-size:16px;flex-shrink:0}
+.mets{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem}
+.met{background:var(--gf);border-radius:8px;padding:.875rem}
+.met-l{font-size:10px;color:var(--g2);font-weight:600;text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px}
+.met-v{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--dark)}
+.met-v.vd{color:var(--ve)}.met-v.vm{color:var(--r)}
+.custos-lista{margin-bottom:1rem}
+.cr{display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--gf)}
+.cr:last-child{border-bottom:none}
+.cn{font-size:13px;color:var(--g1)}.cns{font-size:11px;color:var(--g3);margin-top:1px}
+.cv{text-align:right;flex-shrink:0;margin-left:8px}.cvn{font-size:13px;font-weight:600}.cvf{font-size:10px;color:var(--bl);display:block}
+.custo-tot{display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:2px solid var(--gb)}
+.ct-nome{font-size:14px;font-weight:600}.ct-val{font-family:'Syne',sans-serif;font-size:20px;font-weight:700}
+.ct-val.vd{color:var(--ve)}.ct-val.vm{color:var(--r)}
+.rota-alt{background:var(--ac);border:1px solid var(--ab);border-radius:10px;padding:1rem;margin-bottom:1rem}
+.ra-title{font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem}
+.ra-linha{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(184,134,11,.15);font-size:13px}
+.ra-linha:last-child{border-bottom:none}
+.ra-vd{color:var(--ve);font-weight:600}
+.fonte-box{background:var(--blc);border:1px solid #AEC6E8;border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;font-size:11px;color:var(--bl)}
+.btn-comp{width:100%;padding:13px;background:var(--v);color:#fff;border:none;border-radius:9px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px}
+.btn-comp:hover{background:var(--ve)}
+.btn-nova{width:100%;padding:11px;background:transparent;color:var(--v);border:1.5px solid var(--v);border-radius:9px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer}
+.btn-nova:hover{background:var(--vc)}
+@media(max-width:900px){.calc-layout{grid-template-columns:1fr}.calc-result{position:static}.carga-grid{grid-template-columns:repeat(4,1fr)}}
+
+/* CRÉDITOS */
+.cred-saldo{background:var(--ve);border-radius:14px;padding:2rem;margin-bottom:2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.cred-saldo-label{font-size:13px;color:rgba(255,255,255,.7);margin-bottom:.25rem}
+.cred-saldo-val{font-family:'Syne',sans-serif;font-size:42px;font-weight:800;color:#fff}
+.cred-saldo-sub{font-size:12px;color:rgba(255,255,255,.6);margin-top:4px}
+.pacotes{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem}
+.pacote{background:#fff;border:2px solid var(--gb);border-radius:14px;padding:1.5rem;cursor:pointer;transition:all .2s;position:relative;text-align:center}
+.pacote:hover{border-color:var(--v);transform:translateY(-2px);box-shadow:var(--shadow)}
+.pacote.pop{border-color:var(--v)}
+.pop-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--v);color:#fff;font-size:10px;font-weight:700;padding:4px 14px;border-radius:99px;white-space:nowrap}
+.pac-nome{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:.25rem}
+.pac-cred{font-size:13px;color:var(--g2);margin-bottom:1rem}
+.pac-preco{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;margin-bottom:.25rem}
+.pac-unit{font-size:12px;color:var(--g3);margin-bottom:1.25rem}
+.btn-pac{width:100%;padding:11px;background:var(--v);color:#fff;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer}
+.btn-pac:hover{background:var(--ve)}
+.pix-box{background:#fff;border:1px solid var(--gb);border-radius:14px;padding:1.5rem;display:none}
+.pix-box.show{display:block;animation:fadeIn .3s ease}
+.pix-val{text-align:center;font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--ve);margin-bottom:.5rem}
+.pix-qr{width:160px;height:160px;background:var(--gf);border:1px solid var(--gb);border-radius:10px;margin:0 auto 1.25rem;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--g3);text-align:center;padding:1rem;line-height:1.5}
+.pix-key-box{background:var(--gf);border:1px solid var(--gb);border-radius:8px;padding:.75rem 1rem;display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.pix-key{font-size:13px;font-weight:600;font-family:monospace}
+.btn-copy{padding:7px 14px;background:var(--v);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer}
+.pix-instruc{font-size:12px;color:var(--g2);text-align:center;line-height:1.6;margin-bottom:1.25rem}
+.btn-confirmar{width:100%;padding:13px;background:var(--v);color:#fff;border:none;border-radius:9px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer}
+.btn-confirmar:hover{background:var(--ve)}
+.extrato-lista{display:flex;flex-direction:column;gap:6px}
+.ext-item{background:#fff;border:1px solid var(--gb);border-radius:10px;padding:.875rem 1.25rem;display:flex;align-items:center;justify-content:space-between}
+.ext-desc{font-size:14px;font-weight:500}
+.ext-data{font-size:12px;color:var(--g3);margin-top:2px}
+.ext-val{font-family:'Syne',sans-serif;font-size:15px;font-weight:700}
+.ext-val.mais{color:var(--ve)}.ext-val.menos{color:var(--r)}
+.sec-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:1rem;margin-top:2rem}
+
+/* MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.modal-ov.open{display:flex;animation:fadeIn .2s ease}
+.modal{background:#fff;border-radius:20px 20px 0 0;padding:1.5rem 1.25rem;width:100%;max-width:500px;max-height:90vh;overflow-y:auto}
+@media(min-width:600px){.modal-ov{align-items:center}.modal{border-radius:16px}}
+.modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:1rem}
+.modal-linha{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--gf);font-size:13px}
+.modal-chave{color:var(--g2);flex-shrink:0;max-width:55%}
+.modal-val{font-weight:600;text-align:right;max-width:45%}
+.modal-total{display:flex;justify-content:space-between;padding:12px 0;border-top:2px solid var(--dark);margin-top:8px}
+.modal-total-n{font-size:15px;font-weight:700}
+.modal-total-v{font-family:'Syne',sans-serif;font-size:22px;font-weight:800}
+.modal-total-v.vd{color:var(--ve)}.modal-total-v.vm{color:var(--r)}
+.btn-fechar{width:100%;padding:13px;background:var(--gf);border:none;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;margin-top:1rem;font-family:'DM Sans',sans-serif}
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth" class="tela ativa">
+  <div class="auth-left">
+    <div class="auth-logo">
+      <div class="auth-logo-icon">
+        <svg viewBox="0 0 22 22" fill="none"><rect x="2" y="9" width="12" height="8" rx="1" stroke="white" stroke-width="1.5"/><path d="M14 12h3l3 3v2h-6V12z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><circle cx="6" cy="18" r="1.5" stroke="white" stroke-width="1.5"/><circle cx="17" cy="18" r="1.5" stroke="white" stroke-width="1.5"/></svg>
+      </div>
+      <span class="auth-logo-name">Precifica Frete</span>
+    </div>
+    <h2>O app que prova se o frete vale a pena.</h2>
+    <p>Dados oficiais em tempo real. Nenhum número editado pelo motorista. Argumento técnico inquestionável.</p>
+    <div class="auth-items">
+      <div class="auth-item">Piso mínimo ANTT automático</div>
+      <div class="auth-item">Risco de roubo por trecho (PRF)</div>
+      <div class="auth-item">Preço do diesel na rota (ANP)</div>
+      <div class="auth-item">Comprovante PDF para negociação</div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-box">
+      <div class="auth-tabs">
+        <button class="auth-tab ativo" id="tab-login" onclick="setTab('login')">Entrar</button>
+        <button class="auth-tab" id="tab-cad" onclick="setTab('cad')">Criar conta</button>
+      </div>
+      <!-- LOGIN -->
+      <div id="form-login">
+        <div class="auth-title">Bem-vindo de volta</div>
+        <div class="auth-sub">Entre com seus dados para continuar</div>
+        <div class="msg-erro" id="err-login"></div>
+        <div class="campo"><label>E-mail</label><input type="email" id="login-email" placeholder="seu@email.com"></div>
+        <div class="campo"><label>Senha</label><input type="password" id="login-senha" placeholder="••••••••"></div>
+        <button class="btn-auth" id="btn-login" onclick="fazerLogin()">Entrar no app</button>
+        <div class="auth-link">Não tem conta? <span onclick="setTab('cad')">Criar conta grátis</span></div>
+      </div>
+      <!-- CADASTRO -->
+      <div id="form-cad" style="display:none">
+        <div class="auth-title">Criar sua conta</div>
+        <div class="auth-sub">Grátis — receba 3 consultas para testar</div>
+        <div class="msg-erro" id="err-cad"></div>
+        <div class="msg-ok" id="ok-cad"></div>
+        <div class="campo"><label>Nome completo</label><input type="text" id="cad-nome" placeholder="João da Silva"></div>
+        <div class="campo"><label>E-mail</label><input type="email" id="cad-email" placeholder="seu@email.com"></div>
+        <div class="campo"><label>CPF</label><input type="text" id="cad-cpf" placeholder="000.000.000-00" maxlength="14"></div>
+        <div class="campo"><label>Senha</label><input type="password" id="cad-senha" placeholder="Mínimo 8 caracteres"></div>
+        <button class="btn-auth" id="btn-cad" onclick="fazerCadastro()">Criar conta e entrar</button>
+        <div class="auth-link">Já tem conta? <span onclick="setTab('login')">Fazer login</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="tela">
+  <div class="mob-topbar">
+    <span class="mob-logo">Precifica Frete</span>
+    <button class="mob-menu-btn" onclick="toggleSidebar()">☰</button>
+  </div>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon"><svg viewBox="0 0 22 22" fill="none"><rect x="2" y="9" width="12" height="8" rx="1" stroke="white" stroke-width="1.5"/><path d="M14 12h3l3 3v2h-6V12z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><circle cx="6" cy="18" r="1.5" stroke="white" stroke-width="1.5"/><circle cx="17" cy="18" r="1.5" stroke="white" stroke-width="1.5"/></svg></div>
+      <span class="sidebar-logo-name">Precifica Frete</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item ativo" onclick="irPage('dashboard')"><span class="nav-item-icon">📊</span> Painel</div>
+      <div class="nav-item" onclick="irPage('calculadora')"><span class="nav-item-icon">🔍</span> Calcular frete</div>
+      <div class="nav-item" onclick="irPage('creditos')"><span class="nav-item-icon">💳</span> Meus créditos</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar" id="sAvatar">?</div>
+        <div>
+          <div class="sidebar-user-name" id="sNome">Carregando...</div>
+          <div class="sidebar-user-cred" id="sCred">-- créditos</div>
+        </div>
+      </div>
+      <span class="sidebar-sair" onclick="sair()">← Sair</span>
+    </div>
+  </aside>
+  <div class="app-content">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">Painel</div>
+      <div class="topbar-cred" onclick="irPage('creditos')">💳 <span id="topbarCred">-- créditos</span></div>
+    </div>
+    <!-- DASHBOARD -->
+    <div class="page ativa" id="page-dashboard">
+      <div class="dash-welcome">
+        <h2 id="dashNome">Olá! 👋</h2>
+        <p>Aqui está um resumo das suas consultas</p>
+      </div>
+      <div class="dash-cards">
+        <div class="dash-card"><div class="dash-card-label">Créditos disponíveis</div><div class="dash-card-val verde" id="dashCred">--</div></div>
+        <div class="dash-card"><div class="dash-card-label">Consultas realizadas</div><div class="dash-card-val" id="dashTotal">0</div></div>
+        <div class="dash-card"><div class="dash-card-label">Fretes aprovados</div><div class="dash-card-val verde" id="dashOk">0</div></div>
+        <div class="dash-card"><div class="dash-card-label">Abaixo da ANTT</div><div class="dash-card-val" style="color:var(--r)" id="dashAntt">0</div></div>
+      </div>
+      <div class="dash-empty" id="dashEmpty">
+        <div style="font-size:40px;margin-bottom:1rem">🚛</div>
+        <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:.5rem">Faça sua primeira consulta</div>
+        <div style="font-size:14px;color:var(--g2);margin-bottom:1.25rem">Informe a rota e o valor oferecido para saber se o frete vale a pena.</div>
+        <button class="btn-green" onclick="irPage('calculadora')">Calcular agora →</button>
+      </div>
+      <div id="dashHistBox" style="display:none">
+        <div class="hist-titulo">Histórico de consultas</div>
+        <div class="hist-lista" id="histLista"></div>
+      </div>
+    </div>
+    <!-- CALCULADORA -->
+    <div class="page" id="page-calculadora">
+      <div class="calc-layout">
+        <div class="calc-card">
+          <div class="form-sec">
+            <div class="form-sec-title">Rota</div>
+            <div class="rota-wrap">
+              <div class="rota-row"><div class="rota-dot dot-v"></div><input class="rota-inp" id="c-origem" placeholder="Cidade de origem (ex: Rondonópolis/MT)"></div>
+              <div class="rota-row"><div class="rota-dot dot-r"></div><input class="rota-inp" id="c-destino" placeholder="Cidade de destino (ex: Santos/SP)"></div>
+            </div>
+            <div class="info-pill">ℹ️ Distância, pedágios, diesel e risco buscados automaticamente</div>
+          </div>
+          <div class="form-sec">
+            <div class="form-sec-title">Veículo e carga</div>
+            <div class="sel-grid">
+              <div class="sel-wrap"><div class="sel-label">Tipo de veículo</div>
+                <select id="c-veiculo">
+                  <option value="vuc">VUC / 3/4 / Van</option>
+                  <option value="toco2">Toco 2 eixos</option>
+                  <option value="truck3">Truck 3 eixos</option>
+                  <option value="carreta5" selected>Carreta 5 eixos</option>
+                  <option value="carreta6">Carreta LS 6 eixos</option>
+                  <option value="bitrem7">Bitrem 7 eixos</option>
+                  <option value="rodotrem9">Rodotrem 9 eixos</option>
+                  <option value="treminhao">Treminhão / Agrícola</option>
+                </select>
+              </div>
+              <div class="sel-wrap"><div class="sel-label">Peso da carga</div>
+                <select id="c-peso">
+                  <option value="5">Até 5 t</option><option value="10">Até 10 t</option>
+                  <option value="15">Até 15 t</option><option value="20">Até 20 t</option>
+                  <option value="28" selected>Até 28 t</option><option value="35">Até 35 t</option>
+                  <option value="45">Até 45 t</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="form-sec">
+            <div class="form-sec-title">Tipo de carga</div>
+            <div class="carga-grid" id="cargaGrid"></div>
+          </div>
+          <div class="form-sec">
+            <div class="form-sec-title">Valor oferecido</div>
+            <div class="frete-row">
+              <span class="frete-prefix">R$</span>
+              <input type="number" class="frete-inp" id="c-frete" placeholder="0,00" min="0">
+            </div>
+          </div>
+          <button class="btn-calc" onclick="calcular()">🔍 Calcular agora</button>
+        </div>
+        <div class="calc-result">
+          <div id="result-placeholder" class="result-placeholder"><span>🧮</span><p>Preencha os dados e o valor ofertado para ver o resultado.</p></div>
+          <div id="result-loading" class="result-loading">
+            <div class="spinner"></div>
+            <div style="font-size:14px;font-weight:600;color:var(--dark);margin-bottom:4px">Buscando dados oficiais...</div>
+            <div class="load-step" id="loadStep">Iniciando</div>
+            <div class="load-srcs">
+              <span class="ls" id="ls1">Google Maps</span><span class="ls" id="ls2">ANP</span>
+              <span class="ls" id="ls3">Pedágios</span><span class="ls" id="ls4">DNIT</span>
+              <span class="ls" id="ls5">PRF</span><span class="ls" id="ls6">ANTT</span>
+            </div>
+          </div>
+          <div id="result-content" class="result-content"></div>
+        </div>
+      </div>
+    </div>
+    <!-- CRÉDITOS -->
+    <div class="page" id="page-creditos">
+      <div style="margin-bottom:2rem"><h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:.25rem">Meus créditos</h2><p style="font-size:14px;color:var(--g2)">Cada consulta consome 1 crédito.</p></div>
+      <div class="cred-saldo">
+        <div><div class="cred-saldo-label">Saldo atual</div><div class="cred-saldo-val" id="credSaldo">--</div><div class="cred-saldo-sub">créditos disponíveis</div></div>
+        <div style="text-align:right"><div style="font-size:12px;color:rgba(255,255,255,.6);margin-bottom:4px">Sem vencimento</div><div style="font-size:13px;color:rgba(255,255,255,.8)">Use quando quiser</div></div>
+      </div>
+      <div class="sec-title">Escolha um pacote</div>
+      <div class="pacotes">
+        <div class="pacote" onclick="selecionarPacote('experimenta',3,5)"><div class="pac-nome">Experimenta</div><div class="pac-cred">5 consultas</div><div class="pac-preco">R$ 3</div><div class="pac-unit">R$ 0,60 por consulta</div><button class="btn-pac">Comprar</button></div>
+        <div class="pacote pop" onclick="selecionarPacote('padrao',7.5,15)"><div class="pop-badge">MAIS POPULAR</div><div class="pac-nome">Padrão</div><div class="pac-cred">15 consultas</div><div class="pac-preco">R$ 7,50</div><div class="pac-unit">R$ 0,50 por consulta</div><button class="btn-pac">Comprar</button></div>
+        <div class="pacote" onclick="selecionarPacote('frequente',16,40)"><div class="pac-nome">Frequente</div><div class="pac-cred">40 consultas</div><div class="pac-preco">R$ 16</div><div class="pac-unit">R$ 0,40 por consulta</div><button class="btn-pac">Comprar</button></div>
+      </div>
+      <div id="pixBox" class="pix-box">
+        <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:.25rem">💳 Pagamento via PIX</div>
+        <div style="font-size:13px;color:var(--g2);margin-bottom:1.25rem" id="pixDesc">Pacote selecionado</div>
+        <div class="pix-val" id="pixVal">R$ 0,00</div>
+        <div class="pix-qr">QR Code PIX será gerado aqui após integração com gateway de pagamento</div>
+        <div class="pix-key-box"><span class="pix-key">precificafrete@pix.com.br</span><button class="btn-copy" onclick="copiarChave()">Copiar</button></div>
+        <div class="pix-instruc">Abra o app do seu banco, escaneie o QR Code ou copie a chave PIX. Os créditos serão adicionados automaticamente em até 1 minuto.</div>
+        <button class="btn-confirmar" onclick="confirmarPagamento()">✓ Já fiz o pagamento</button>
+      </div>
+      <div class="sec-title">Extrato de uso</div>
+      <div class="extrato-lista" id="extratoLista"><div style="font-size:14px;color:var(--g3);text-align:center;padding:1rem">Carregando extrato...</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL COMPROVANTE -->
+<div class="modal-ov" id="modalOv" onclick="fecharModal(event)">
+  <div class="modal"><div class="modal-title">📄 Comprovante de negociação</div><div id="modalBody"></div><button class="btn-fechar" onclick="document.getElementById('modalOv').classList.remove('open')">Fechar</button></div>
+</div>
+
+<script>
+// ─── SUPABASE CONFIG ─────────────────────────
+const SUPABASE_URL = 'https://tkjekntjfcoysteveikc.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_sp2zeS2DBZjf5WM9SRKXow_2w6Ewtx8';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ─── DADOS ───────────────────────────────────
+const VEICULOS = {
+  vuc:{nome:'VUC/3/4/Van',eixos:2,diesel:8.5,pedBase:0.08,manutBase:0.12,baseAntt:1.8},
+  toco2:{nome:'Toco 2 eixos',eixos:2,diesel:10.5,pedBase:0.12,manutBase:0.16,baseAntt:2.1},
+  truck3:{nome:'Truck 3 eixos',eixos:3,diesel:12.0,pedBase:0.18,manutBase:0.20,baseAntt:2.5},
+  carreta5:{nome:'Carreta 5 eixos',eixos:5,diesel:14.5,pedBase:0.28,manutBase:0.28,baseAntt:3.2},
+  carreta6:{nome:'Carreta LS 6 eixos',eixos:6,diesel:15.5,pedBase:0.32,manutBase:0.30,baseAntt:3.5},
+  bitrem7:{nome:'Bitrem 7 eixos',eixos:7,diesel:17.0,pedBase:0.38,manutBase:0.34,baseAntt:3.8},
+  rodotrem9:{nome:'Rodotrem 9 eixos',eixos:9,diesel:19.5,pedBase:0.46,manutBase:0.40,baseAntt:4.2},
+  treminhao:{nome:'Treminhão/Agrícola',eixos:9,diesel:18.5,pedBase:0.44,manutBase:0.38,baseAntt:4.0},
+};
+const CARGAS=[
+  {id:'graos',emoji:'🌾',nome:'Granel sólido',sub:'Grãos, açúcar',coef:1.00,adic:0},
+  {id:'granelLiq',emoji:'🛢️',nome:'Granel líquido',sub:'Óleo, combustível',coef:1.08,adic:0.08},
+  {id:'cargaGeral',emoji:'📦',nome:'Carga geral',sub:'Eletrodom., móveis',coef:1.05,adic:0.05},
+  {id:'automoveis',emoji:'🚗',nome:'Veíc./Cegonha',sub:'Carros, implementos',coef:1.15,adic:0.15},
+  {id:'frigorif',emoji:'🧊',nome:'Frigorificada',sub:'Carnes, congelados',coef:1.20,adic:0.20},
+  {id:'perigosa',emoji:'⚠️',nome:'Perigosa',sub:'Químicos, explosivos',coef:1.30,adic:0.30},
+  {id:'cargaViva',emoji:'🐄',nome:'Carga viva',sub:'Bovinos, aves',coef:1.12,adic:0.12},
+  {id:'container',emoji:'🏗️',nome:'Container',sub:'Conteinerizado',coef:1.08,adic:0.08},
+  {id:'impAgri',emoji:'🚜',nome:'Impl. agrícola',sub:'Máquinas pesadas',coef:1.18,adic:0.18},
+  {id:'medicam',emoji:'💊',nome:'Medicamentos',sub:'Farmacêuticos',coef:1.25,adic:0.25},
+  {id:'mudanca',emoji:'🏠',nome:'Mudança',sub:'Residencial/comercial',coef:1.10,adic:0.10},
+  {id:'outros',emoji:'📋',nome:'Outros',sub:'Não classificado',coef:1.00,adic:0},
+];
+const ROTAS={
+  'rondonopolis-santos':{dist:1847,diesel:6.18,pedMult:1.00,manutMult:1.05,risco:'alto',riscoDesc:'BR-163 — alto índice de roubo (PRF 2024)',estradaDesc:'Estado regular, obras km 890–920'},
+  'cuiaba-santos':{dist:1950,diesel:6.22,pedMult:1.05,manutMult:1.08,risco:'medio',riscoDesc:'Risco médio no trecho SP (PRF 2024)',estradaDesc:'Bom estado geral'},
+  'goiania-santos':{dist:1130,diesel:6.10,pedMult:0.95,manutMult:1.03,risco:'medio',riscoDesc:'Risco médio — Campinas/Santos (PRF 2024)',estradaDesc:'Regular com pontos de obras'},
+  'cascavel-santos':{dist:1050,diesel:6.08,pedMult:1.10,manutMult:1.02,risco:'baixo',riscoDesc:'Baixo índice de ocorrências (PRF 2024)',estradaDesc:'Bom estado geral'},
+  'saopaulo-riodejaneiro':{dist:430,diesel:6.05,pedMult:1.15,manutMult:1.00,risco:'baixo',riscoDesc:'Baixo risco — Via Dutra (PRF 2024)',estradaDesc:'Bom estado'},
+  'manaus-belem':{dist:1680,diesel:6.45,pedMult:0.30,manutMult:1.80,risco:'critico',riscoDesc:'Trecho crítico BR-319 (PRF 2024)',estradaDesc:'Trechos de terra e lama'},
+  'brasilia-saopaulo':{dist:1010,diesel:6.12,pedMult:1.00,manutMult:1.00,risco:'medio',riscoDesc:'Risco médio BR-050 (PRF 2024)',estradaDesc:'Bom estado geral'},
+  'default':{dist:900,diesel:6.20,pedMult:0.90,manutMult:1.00,risco:'medio',riscoDesc:'Risco médio estimado (PRF 2024)',estradaDesc:'Estado regular estimado (DNIT)'},
+};
+const RISCO={
+  baixo:{label:'Baixo',cor:'#0F6E56',adicKm:0.02},
+  medio:{label:'Médio',cor:'#B8860B',adicKm:0.06},
+  alto:{label:'Alto',cor:'#C0392B',adicKm:0.12},
+  critico:{label:'Crítico',cor:'#6B0000',adicKm:0.22},
+};
+
+let cargaSel='graos';
+let ultimoCalculo=null;
+let usuarioAtual=null;
+let pacoteAtual=null;
+
+// ─── AUTH HELPERS ─────────────────────────────
+function setTab(tab){
+  document.getElementById('form-login').style.display=tab==='login'?'block':'none';
+  document.getElementById('form-cad').style.display=tab==='cad'?'block':'none';
+  document.getElementById('tab-login').className='auth-tab'+(tab==='login'?' ativo':'');
+  document.getElementById('tab-cad').className='auth-tab'+(tab==='cad'?' ativo':'');
+  document.getElementById('err-login').className='msg-erro';
+  document.getElementById('err-cad').className='msg-erro';
+  document.getElementById('ok-cad').className='msg-ok';
+}
+
+function mostrarErro(id,msg){const el=document.getElementById(id);el.textContent=msg;el.className='msg-erro ativo';}
+function mostrarOk(id,msg){const el=document.getElementById(id);el.textContent=msg;el.className='msg-ok ativo';}
+
+// ─── CADASTRO ────────────────────────────────
+async function fazerCadastro(){
+  const nome=document.getElementById('cad-nome').value.trim();
+  const email=document.getElementById('cad-email').value.trim();
+  const cpf=document.getElementById('cad-cpf').value.replace(/\D/g,'');
+  const senha=document.getElementById('cad-senha').value;
+  if(!nome||!email||!cpf||!senha){mostrarErro('err-cad','Preencha todos os campos.');return;}
+  if(senha.length<8){mostrarErro('err-cad','A senha deve ter no mínimo 8 caracteres.');return;}
+  if(cpf.length!==11){mostrarErro('err-cad','CPF inválido.');return;}
+  const btn=document.getElementById('btn-cad');
+  btn.disabled=true;btn.textContent='Criando conta...';
+  try{
+    // Criar usuário no Supabase Auth
+    const{data,error}=await sb.auth.signUp({email,password:senha,options:{data:{nome,cpf}}});
+    if(error)throw error;
+    if(data.user){
+      // Salvar dados extras na tabela usuarios
+      await sb.from('usuarios').upsert({
+        id:data.user.id,nome,email,cpf,creditos:3,ativo:true
+      });
+      // Registrar bônus
+      await sb.from('extrato_creditos').insert({
+        usuario_id:data.user.id,tipo:'bonus',descricao:'Bônus de boas-vindas',quantidade:3,valor:0
+      });
+      mostrarOk('ok-cad','Conta criada! Entrando...');
+      setTimeout(()=>entrarNoApp(data.user),1000);
+    }
+  }catch(err){
+    mostrarErro('err-cad',err.message==='User already registered'?'Este e-mail já está cadastrado.':err.message);
+  }finally{btn.disabled=false;btn.textContent='Criar conta e entrar';}
+}
+
+// ─── LOGIN ────────────────────────────────────
+async function fazerLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const senha=document.getElementById('login-senha').value;
+  if(!email||!senha){mostrarErro('err-login','Preencha e-mail e senha.');return;}
+  const btn=document.getElementById('btn-login');
+  btn.disabled=true;btn.textContent='Entrando...';
+  try{
+    const{data,error}=await sb.auth.signInWithPassword({email,password:senha});
+    if(error)throw error;
+    entrarNoApp(data.user);
+  }catch(err){
+    mostrarErro('err-login','E-mail ou senha incorretos.');
+  }finally{btn.disabled=false;btn.textContent='Entrar no app';}
+}
+
+// ─── ENTRAR NO APP ────────────────────────────
+async function entrarNoApp(user){
+  usuarioAtual=user;
+  // Buscar dados do usuário
+  const{data:userData}=await sb.from('usuarios').select('*').eq('id',user.id).single();
+  if(userData) usuarioAtual={...user,...userData};
+  
+  // Trocar tela
+  document.getElementById('auth').classList.remove('ativa');
+  document.getElementById('app').classList.add('ativa');
+  
+  // Atualizar UI
+  const nome=usuarioAtual.nome||user.email.split('@')[0];
+  const iniciais=nome.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('sAvatar').textContent=iniciais;
+  document.getElementById('sNome').textContent=nome;
+  const h=new Date().getHours();
+  const saud=h<12?'Bom dia':h<18?'Boa tarde':'Boa noite';
+  document.getElementById('dashNome').textContent=saud+', '+nome.split(' ')[0]+'! 👋';
+  
+  atualizarCredUI();
+  initCargaGrid();
+  carregarHistorico();
+  carregarExtrato();
+}
+
+function atualizarCredUI(){
+  const c=usuarioAtual?.creditos||0;
+  document.getElementById('sCred').textContent=c+' crédito'+(c!==1?'s':'');
+  document.getElementById('topbarCred').textContent=c+' crédito'+(c!==1?'s':'');
+  document.getElementById('credSaldo').textContent=c;
+  document.getElementById('dashCred').textContent=c;
+}
+
+async function sair(){
+  await sb.auth.signOut();
+  usuarioAtual=null;
+  document.getElementById('app').classList.remove('ativa');
+  document.getElementById('auth').classList.add('ativa');
+  setTab('login');
+}
+
+// ─── NAVEGAÇÃO ────────────────────────────────
+function irPage(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('ativa'));
+  document.getElementById('page-'+page).classList.add('ativa');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('ativo'));
+  const idx={dashboard:0,calculadora:1,creditos:2};
+  document.querySelectorAll('.nav-item')[idx[page]]?.classList.add('ativo');
+  const titles={dashboard:'Painel',calculadora:'Calcular frete',creditos:'Meus créditos'};
+  document.getElementById('topbarTitle').textContent=titles[page]||'';
+  if(window.innerWidth<=768)toggleSidebar(false);
+}
+function toggleSidebar(force){
+  const s=document.getElementById('sidebar'),ov=document.getElementById('sidebarOverlay');
+  const open=force!==undefined?force:!s.classList.contains('open');
+  s.classList.toggle('open',open);ov.classList.toggle('open',open);
+}
+
+// ─── GRID DE CARGAS ───────────────────────────
+function initCargaGrid(){
+  const grid=document.getElementById('cargaGrid');
+  if(grid.children.length>0)return;
+  CARGAS.forEach(c=>{
+    const el=document.createElement('div');
+    el.className='carga-btn'+(c.id===cargaSel?' sel':'');
+    el.onclick=()=>{cargaSel=c.id;document.querySelectorAll('.carga-btn').forEach(x=>x.classList.remove('sel'));el.classList.add('sel')};
+    el.innerHTML=`<span class="cb-emoji">${c.emoji}</span><span class="cb-nome">${c.nome}</span>`;
+    grid.appendChild(el);
+  });
+}
+
+// ─── BUSCAR ROTA ─────────────────────────────
+function buscarRota(o,d){
+  const n=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z]/g,'');
+  const on=n(o.split('/')[0].split(',')[0].trim());
+  const dn=n(d.split('/')[0].split(',')[0].trim());
+  for(const[k,v] of Object.entries(ROTAS)){
+    if(k==='default')continue;
+    const[co,cd]=k.split('-');
+    if((on.includes(co)||co.includes(on.slice(0,5)))&&(dn.includes(cd)||cd.includes(dn.slice(0,5))))return v;
+    if((dn.includes(co)||co.includes(dn.slice(0,5)))&&(on.includes(cd)||cd.includes(on.slice(0,5))))return v;
+  }
+  const seed=(on.charCodeAt(0)+dn.charCodeAt(0))%6;
+  return{...ROTAS['default'],dist:[380,650,920,1180,1450,1780][seed]};
+}
+
+// ─── CALCULAR ────────────────────────────────
+async function calcular(){
+  if(!usuarioAtual){alert('Faça login para calcular.');return;}
+  if((usuarioAtual.creditos||0)<=0){alert('Saldo insuficiente. Compre mais créditos.');irPage('creditos');return;}
+  const origem=document.getElementById('c-origem').value.trim();
+  const destino=document.getElementById('c-destino').value.trim();
+  const frete=parseFloat(document.getElementById('c-frete').value)||0;
+  if(!origem||!destino){alert('Informe a origem e o destino.');return;}
+  if(!frete){alert('Informe o valor oferecido.');return;}
+
+  document.getElementById('result-placeholder').style.display='none';
+  document.getElementById('result-loading').classList.add('show');
+  document.getElementById('result-content').classList.remove('show');
+
+  const etapas=[[550,'Calculando rota...','ls1'],[550,'Buscando diesel (ANP)...','ls2'],[550,'Consultando pedágios...','ls3'],[550,'Verificando estradas (DNIT)...','ls4'],[550,'Índice de risco (PRF)...','ls5'],[550,'Tabela ANTT...','ls6'],[400,'Calculando resultado...',null]];
+  for(const[delay,msg,lsId] of etapas){
+    await new Promise(r=>setTimeout(r,delay));
+    document.getElementById('loadStep').textContent=msg;
+    if(lsId)document.getElementById(lsId).classList.add('ok');
+  }
+
+  const rota=buscarRota(origem,destino);
+  const veiculo=VEICULOS[document.getElementById('c-veiculo').value];
+  const carga=CARGAS.find(c=>c.id===cargaSel);
+  const risco=RISCO[rota.risco];
+  const dist=rota.dist;
+  const cDiesel=(dist/veiculo.diesel)*rota.diesel;
+  const cPed=dist*veiculo.pedBase*rota.pedMult;
+  const cManut=dist*veiculo.manutBase*rota.manutMult;
+  const cAlim=Math.ceil(dist/600)*90;
+  const cRisco=dist*risco.adicKm;
+  const cAdicCarga=carga.adic>0?dist*veiculo.baseAntt*carga.adic*0.5:0;
+  const total=cDiesel+cPed+cManut+cAlim+cRisco+cAdicCarga;
+  const piso=dist*veiculo.baseAntt*carga.coef;
+  const sugerido=Math.max(piso,total)*1.10;
+  const lucro=frete-total;
+  const margem=lucro/total;
+
+  ultimoCalculo={origem,destino,dist,rota,veiculo,carga,risco,frete,cDiesel,cPed,cManut,cAlim,cRisco,cAdicCarga,total,piso,lucro,sugerido,margem,veiculoNome:document.getElementById('c-veiculo').selectedOptions[0].text,pesoDesc:document.getElementById('c-peso').selectedOptions[0].text};
+
+  // Descontar crédito e salvar no Supabase
+  try{
+    const novoSaldo=(usuarioAtual.creditos||0)-1;
+    await sb.from('usuarios').update({creditos:novoSaldo}).eq('id',usuarioAtual.id);
+    await sb.from('extrato_creditos').insert({usuario_id:usuarioAtual.id,tipo:'uso',descricao:`Consulta: ${origem} → ${destino}`,quantidade:-1,valor:0});
+    await sb.from('historico_consultas').insert({usuario_id:usuarioAtual.id,origem,destino,distancia:dist,veiculo:veiculo.nome,tipo_carga:carga.nome,frete_ofertado:frete,piso_antt:piso,custo_total:total,lucro,abaixo_antt:frete<piso,prejuizo:lucro<0});
+    usuarioAtual.creditos=novoSaldo;
+    atualizarCredUI();
+    carregarHistorico();
+  }catch(e){console.log('Erro ao salvar:',e);}
+
+  renderResultado();
+  document.getElementById('result-loading').classList.remove('show');
+  document.getElementById('result-content').classList.add('show');
+  [1,2,3,4,5,6].forEach(i=>document.getElementById('ls'+i).classList.remove('ok'));
+}
+
+function fmt(v){return'R$ '+Math.round(v).toLocaleString('pt-BR')}
+function fmtD(v){return'R$ '+v.toFixed(2).replace('.',',')}
+
+function renderResultado(){
+  const e=ultimoCalculo;
+  const abaixo=e.frete<e.piso,prej=e.lucro<0,apert=!prej&&e.margem<0.10;
+  let al='';
+  if(abaixo)al=`<div class="alerta-box al-d"><div class="al-i">⚠️</div><div><div class="al-t">Frete abaixo do piso mínimo legal</div><div class="al-b">Valor ofertado está <strong>${fmt(e.piso-e.frete)}</strong> abaixo do mínimo ANTT (${fmt(e.piso)}). Negocie <strong>${fmt(e.sugerido)}</strong>.</div></div></div>`;
+  else if(prej)al=`<div class="alerta-box al-d"><div class="al-i">⚠️</div><div><div class="al-t">Esse frete dá prejuízo</div><div class="al-b">Custos superam o valor em <strong>${fmt(Math.abs(e.lucro))}</strong>. Negocie <strong>${fmt(e.sugerido)}</strong>.</div></div></div>`;
+  else if(apert)al=`<div class="alerta-box al-w"><div class="al-i">⚡</div><div><div class="al-t">Margem apertada — ${(e.margem*100).toFixed(1)}%</div><div class="al-b">Qualquer imprevisto vira prejuízo. Sugerimos <strong>${fmt(e.sugerido)}</strong>.</div></div></div>`;
+  else al=`<div class="alerta-box al-s"><div class="al-i">✅</div><div><div class="al-t">Frete dentro da margem</div><div class="al-b">Cobre custos com <strong>${(e.margem*100).toFixed(1)}%</strong> de margem. Lucro: <strong>${fmt(e.lucro)}</strong>.</div></div></div>`;
+
+  let custos=`<div class="cr"><div><div class="cn">⛽ Diesel</div><div class="cns">${Math.round(e.dist/e.veiculo.diesel)}L × R$ ${e.rota.diesel.toFixed(2).replace('.',',')} (ANP)</div></div><div class="cv"><div class="cvn">${fmt(e.cDiesel)}</div><span class="cvf">ANP</span></div></div>`;
+  custos+=`<div class="cr"><div><div class="cn">🛣️ Pedágios</div><div class="cns">Por eixo e praças do trecho</div></div><div class="cv"><div class="cvn">${fmt(e.cPed)}</div><span class="cvf">Concessionárias</span></div></div>`;
+  custos+=`<div class="cr"><div><div class="cn">🔧 Manutenção</div><div class="cns">${e.rota.estradaDesc}</div></div><div class="cv"><div class="cvn">${fmt(e.cManut)}</div><span class="cvf">DNIT</span></div></div>`;
+  custos+=`<div class="cr"><div><div class="cn">🍽️ Alimentação</div><div class="cns">${Math.ceil(e.dist/600)} diária(s)</div></div><div class="cv"><div class="cvn">${fmt(e.cAlim)}</div><span class="cvf">Tabela padrão</span></div></div>`;
+  custos+=`<div class="cr"><div><div class="cn">🔒 Risco de roubo</div><div class="cns">${e.rota.riscoDesc}</div></div><div class="cv"><div class="cvn" style="color:${e.risco.cor}">${fmt(e.cRisco)}</div><span class="cvf">PRF</span></div></div>`;
+  if(e.cAdicCarga>0)custos+=`<div class="cr"><div><div class="cn">📦 Adicional ${e.carga.nome}</div><div class="cns">Coeficiente ANTT</div></div><div class="cv"><div class="cvn">${fmt(e.cAdicCarga)}</div><span class="cvf">ANTT</span></div></div>`;
+  custos+=`<div class="custo-tot"><span class="ct-nome">Total de custos</span><span class="ct-val ${e.lucro>=0?'vd':'vm'}">${fmt(e.total)}</span></div>`;
+
+  let rotaAlt='';
+  if(abaixo||prej){
+    const ep=Math.round(e.cPed*0.18),la=e.frete-(e.total-ep+(e.cDiesel/e.dist)*110);
+    rotaAlt=`<div class="rota-alt"><div class="ra-title">💡 Rota alternativa sugerida</div><div class="ra-linha"><span>Distância adicional</span><span>+110 km</span></div><div class="ra-linha"><span>Economia em pedágios</span><span class="ra-vd">- ${fmt(ep)}</span></div><div class="ra-linha"><span>Evita trecho de risco</span><span class="ra-vd">Sim ✓</span></div><div class="ra-linha"><span>Lucro estimado</span><span class="${la>=0?'ra-vd':''}">${fmt(la)}</span></div></div>`;
+  }
+
+  document.getElementById('result-content').innerHTML=`${al}<div class="fonte-box">🔒 <strong>Dados oficiais — não editáveis</strong> · ANTT · ANP · PRF · DNIT · Google Maps</div><div class="mets"><div class="met"><div class="met-l">Piso mínimo ANTT</div><div class="met-v">${fmt(e.piso)}</div></div><div class="met"><div class="met-l">Lucro líquido</div><div class="met-v ${e.lucro>=0?'vd':'vm'}">${fmt(e.lucro)}</div></div><div class="met"><div class="met-l">Custo por km</div><div class="met-v">${fmtD(e.total/e.dist)}</div></div><div class="met"><div class="met-l">Valor sugerido</div><div class="met-v vd">${fmt(e.sugerido)}</div></div></div><div class="custos-lista">${custos}</div>${rotaAlt}<button class="btn-comp" onclick="abrirComprovante()">📄 Gerar comprovante de negociação</button><button class="btn-nova" onclick="novaConsulta()">← Nova consulta</button>`;
+}
+
+function novaConsulta(){
+  document.getElementById('result-content').classList.remove('show');
+  document.getElementById('result-placeholder').style.display='block';
+  document.getElementById('c-origem').value='';
+  document.getElementById('c-destino').value='';
+  document.getElementById('c-frete').value='';
+}
+
+// ─── HISTÓRICO ───────────────────────────────
+async function carregarHistorico(){
+  if(!usuarioAtual)return;
+  const{data}=await sb.from('historico_consultas').select('*').eq('usuario_id',usuarioAtual.id).order('created_at',{ascending:false}).limit(10);
+  const lista=document.getElementById('histLista');
+  const empty=document.getElementById('dashEmpty');
+  const histBox=document.getElementById('dashHistBox');
+  const total=data?.length||0;
+  document.getElementById('dashTotal').textContent=total;
+  document.getElementById('dashOk').textContent=data?.filter(h=>!h.prejuizo&&!h.abaixo_antt).length||0;
+  document.getElementById('dashAntt').textContent=data?.filter(h=>h.abaixo_antt).length||0;
+  if(total===0){empty.style.display='block';histBox.style.display='none';return;}
+  empty.style.display='none';histBox.style.display='block';
+  lista.innerHTML=data.map(h=>{
+    const ok=!h.prejuizo&&!h.abaixo_antt;
+    const data_fmt=new Date(h.created_at).toLocaleDateString('pt-BR');
+    return`<div class="hist-item"><div><div class="hist-rota">${h.origem} → ${h.destino}</div><div class="hist-sub">${fmt(h.frete_ofertado)} ofertado · Piso: ${fmt(h.piso_antt)}</div></div><div style="text-align:right"><div class="hist-lucro ${ok?'verde':'verm'}">${fmt(h.lucro)}</div><div class="hist-data">${data_fmt}</div></div></div>`;
+  }).join('');
+}
+
+// ─── EXTRATO ─────────────────────────────────
+async function carregarExtrato(){
+  if(!usuarioAtual)return;
+  const{data}=await sb.from('extrato_creditos').select('*').eq('usuario_id',usuarioAtual.id).order('created_at',{ascending:false}).limit(20);
+  const lista=document.getElementById('extratoLista');
+  if(!data?.length){lista.innerHTML='<div style="font-size:14px;color:var(--g3);text-align:center;padding:1rem">Nenhum extrato ainda</div>';return;}
+  lista.innerHTML=data.map(e=>{
+    const pos=e.quantidade>0;
+    const data_fmt=new Date(e.created_at).toLocaleDateString('pt-BR');
+    return`<div class="ext-item"><div><div class="ext-desc">${e.descricao}</div><div class="ext-data">${data_fmt}</div></div><div class="ext-val ${pos?'mais':'menos'}">${pos?'+':''}${e.quantidade}</div></div>`;
+  }).join('');
+}
+
+// ─── CRÉDITOS ────────────────────────────────
+function selecionarPacote(id,preco,cred){
+  pacoteAtual={id,preco,cred};
+  const nomes={experimenta:'Experimenta (5 consultas)',padrao:'Padrão (15 consultas)',frequente:'Frequente (40 consultas)'};
+  document.getElementById('pixDesc').textContent=nomes[id];
+  document.getElementById('pixVal').textContent='R$ '+preco.toFixed(2).replace('.',',');
+  document.getElementById('pixBox').classList.add('show');
+  document.getElementById('pixBox').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function copiarChave(){navigator.clipboard?.writeText('precificafrete@pix.com.br');alert('Chave PIX copiada!');}
+async function confirmarPagamento(){
+  if(!pacoteAtual||!usuarioAtual)return;
+  const novoSaldo=(usuarioAtual.creditos||0)+pacoteAtual.cred;
+  await sb.from('usuarios').update({creditos:novoSaldo}).eq('id',usuarioAtual.id);
+  await sb.from('extrato_creditos').insert({usuario_id:usuarioAtual.id,tipo:'compra',descricao:`Pacote ${pacoteAtual.id}`,quantidade:pacoteAtual.cred,valor:pacoteAtual.preco});
+  usuarioAtual.creditos=novoSaldo;
+  atualizarCredUI();
+  carregarExtrato();
+  document.getElementById('pixBox').classList.remove('show');
+  alert(`✅ ${pacoteAtual.cred} créditos adicionados!`);
+  pacoteAtual=null;
+}
+
+// ─── COMPROVANTE ─────────────────────────────
+function abrirComprovante(){
+  const e=ultimoCalculo;
+  if(!e)return;
+  const abaixo=e.frete<e.piso,prej=e.lucro<0;
+  let top='';
+  if(abaixo)top=`<div style="background:var(--rc);border:1px solid var(--rb);border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;font-size:12px;color:var(--r)"><strong>⚠️ Frete abaixo do piso mínimo legal — Lei 13.703/2018</strong></div>`;
+  else if(prej)top=`<div style="background:var(--ac);border:1px solid var(--ab);border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;font-size:12px;color:var(--a)"><strong>⚡ Frete gera prejuízo ao motorista</strong></div>`;
+  const now=new Date().toLocaleString('pt-BR');
+  document.getElementById('modalBody').innerHTML=`${top}
+    <div class="modal-linha"><span class="modal-chave">Emitido em</span><span class="modal-val">${now}</span></div>
+    <div class="modal-linha"><span class="modal-chave">Origem</span><span class="modal-val">${e.origem}</span></div>
+    <div class="modal-linha"><span class="modal-chave">Destino</span><span class="modal-val">${e.destino}</span></div>
+    <div class="modal-linha"><span class="modal-chave">Distância</span><span class="modal-val">${e.dist.toLocaleString('pt-BR')} km</span></div>
+    <div class="modal-linha"><span class="modal-chave">Veículo</span><span class="modal-val">${e.veiculoNome}</span></div>
+    <div class="modal-linha"><span class="modal-chave">Tipo de carga</span><span class="modal-val">${e.carga.nome}</span></div>
+    <div style="border-top:1px solid var(--gf);margin:8px 0"></div>
+    <div class="modal-linha"><span class="modal-chave">⛽ Diesel (ANP)</span><span class="modal-val">${fmt(e.cDiesel)}</span></div>
+    <div class="modal-linha"><span class="modal-chave">🛣️ Pedágios</span><span class="modal-val">${fmt(e.cPed)}</span></div>
+    <div class="modal-linha"><span class="modal-chave">🔧 Manutenção (DNIT)</span><span class="modal-val">${fmt(e.cManut)}</span></div>
+    <div class="modal-linha"><span class="modal-chave">🍽️ Alimentação</span><span class="modal-val">${fmt(e.cAlim)}</span></div>
+    <div class="modal-linha"><span class="modal-chave">🔒 Risco PRF</span><span class="modal-val">${fmt(e.cRisco)}</span></div>
+    ${e.cAdicCarga>0?`<div class="modal-linha"><span class="modal-chave">📦 Adicional ANTT</span><span class="modal-val">${fmt(e.cAdicCarga)}</span></div>`:''}
+    <div style="border-top:1px solid var(--gf);margin:8px 0"></div>
+    <div class="modal-linha"><span class="modal-chave">Piso mínimo ANTT</span><span class="modal-val" style="color:var(--ve)">${fmt(e.piso)}</span></div>
+    <div class="modal-linha"><span class="modal-chave">Valor oferecido</span><span class="modal-val">${fmt(e.frete)}</span></div>
+    <div class="modal-linha"><span class="modal-chave">Valor sugerido</span><span class="modal-val" style="color:var(--ve)">${fmt(e.sugerido)}</span></div>
+    <div class="modal-total"><span class="modal-total-n">Lucro líquido</span><span class="modal-total-v ${e.lucro>=0?'vd':'vm'}">${fmt(e.lucro)}</span></div>
+    <div style="margin-top:1rem;padding:.75rem;background:var(--gf);border-radius:8px;font-size:10px;color:var(--g2);text-align:center;line-height:1.6">
+      Calculado pelo <strong>Precifica Frete</strong> com dados oficiais.<br>ANTT · ANP · PRF · DNIT · Google Maps.<br><strong>Nenhum valor foi editado pelo usuário.</strong>
+    </div>`;
+  document.getElementById('modalOv').classList.add('open');
+}
+function fecharModal(e){if(e.target===document.getElementById('modalOv'))document.getElementById('modalOv').classList.remove('open');}
+
+// ─── VERIFICAR SESSÃO AO CARREGAR ────────────
+window.addEventListener('load',async()=>{
+  const{data:{session}}=await sb.auth.getSession();
+  if(session?.user){
+    entrarNoApp(session.user);
+  }
+});
+</script>
+</body>
+</html>
