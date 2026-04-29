@@ -423,9 +423,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);min
       </div>
       <div class="sec-title">Escolha um pacote</div>
       <div class="pacotes">
-        <div class="pacote" onclick="selecionarPacote('experimenta',3,5)"><div class="pac-nome">Experimenta</div><div class="pac-cred">5 consultas</div><div class="pac-preco">R$ 3</div><div class="pac-unit">R$ 0,60 por consulta</div><button class="btn-pac">Comprar</button></div>
-        <div class="pacote pop" onclick="selecionarPacote('padrao',7.5,15)"><div class="pop-badge">MAIS POPULAR</div><div class="pac-nome">Padrão</div><div class="pac-cred">15 consultas</div><div class="pac-preco">R$ 7,50</div><div class="pac-unit">R$ 0,50 por consulta</div><button class="btn-pac">Comprar</button></div>
-        <div class="pacote" onclick="selecionarPacote('frequente',16,40)"><div class="pac-nome">Frequente</div><div class="pac-cred">40 consultas</div><div class="pac-preco">R$ 16</div><div class="pac-unit">R$ 0,40 por consulta</div><button class="btn-pac">Comprar</button></div>
+        <div class="pacote" onclick="selecionarPacote('experimenta',4.5,5)"><div class="pac-nome">Experimenta</div><div class="pac-cred">5 consultas</div><div class="pac-preco">R$ 4,50</div><div class="pac-unit">R$ 0,90 por consulta</div><button class="btn-pac">Comprar</button></div>
+        <div class="pacote pop" onclick="selecionarPacote('motorista',17,20)"><div class="pop-badge">MAIS POPULAR</div><div class="pac-nome">Motorista</div><div class="pac-cred">20 consultas</div><div class="pac-preco">R$ 17,00</div><div class="pac-unit">R$ 0,85 por consulta</div><button class="btn-pac">Comprar</button></div>
+        <div class="pacote" onclick="selecionarPacote('empresa',75,100)"><div class="pac-nome">Empresa</div><div class="pac-cred">100 consultas</div><div class="pac-preco">R$ 75,00</div><div class="pac-unit">R$ 0,75 por consulta</div><button class="btn-pac">Comprar</button></div>
       </div>
       <div id="pixBox" class="pix-box">
         <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:.25rem">💳 Pagamento via PIX</div>
@@ -779,7 +779,7 @@ async function carregarExtrato(){
 // ─── CRÉDITOS ────────────────────────────────
 function selecionarPacote(id,preco,cred){
   pacoteAtual={id,preco,cred};
-  const nomes={experimenta:'Experimenta (5 consultas)',padrao:'Padrão (15 consultas)',frequente:'Frequente (40 consultas)'};
+  const nomes={experimenta:'Experimenta (5 consultas)',motorista:'Motorista (20 consultas)',empresa:'Empresa (100 consultas)'};
   document.getElementById('pixDesc').textContent=nomes[id];
   document.getElementById('pixVal').textContent='R$ '+preco.toFixed(2).replace('.',',');
   document.getElementById('pixBox').classList.add('show');
