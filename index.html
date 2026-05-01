@@ -650,34 +650,97 @@ function buscarRotaFallback(o,d){
   return{...ROTAS['default'],dist:[380,650,920,1180,1450,1780][seed]};
 }
 
-// ─── BUSCAR DISTÂNCIA REAL (Google Maps) ─────
-function buscarDistanciaReal(origem, destino){
-  return new Promise((resolve)=>{
-    try{
-      const service = new google.maps.DistanceMatrixService();
-      service.getDistanceMatrix({
-        origins: [origem + ', Brasil'],
-        destinations: [destino + ', Brasil'],
-        travelMode: google.maps.TravelMode.DRIVING,
-        unitSystem: google.maps.UnitSystem.METRIC,
-      }, (response, status)=>{
-        if(status === 'OK'){
-          const element = response.rows[0].elements[0];
-          if(element.status === 'OK'){
-            const distKm = Math.round(element.distance.value / 1000);
-            const duracaoText = element.duration.text;
-            resolve({distKm, duracaoText, sucesso:true});
-          } else {
-            resolve({sucesso:false});
-          }
-        } else {
-          resolve({sucesso:false});
+// ─── BUSCAR ROTA REAL COM PEDÁGIOS (Routes API) ─────
+async function buscarDistanciaReal(origem, destino){
+  try{
+    const GOOGLE_KEY = 'AIzaSyCTYB8UdE9SE7Sl5KTWsvfWMvooiK_UESo';
+    
+    // Geocodificar origem e destino
+    const geocode = async (endereco) => {
+      const resp = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(endereco + ', Brasil')}&key=${GOOGLE_KEY}`);
+      const data = await resp.json();
+      if(data.results && data.results[0]){
+        return data.results[0].geometry.location;
+      }
+      return null;
+    };
+
+    const [locOrigem, locDestino] = await Promise.all([
+      geocode(origem),
+      geocode(destino)
+    ]);
+
+    if(!locOrigem || !locDestino) return {sucesso:false};
+
+    // Chamar Routes API com pedágios
+    const routesResp = await fetch('https://routes.googleapis.com/directions/v2:computeRoutes', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': GOOGLE_KEY,
+        'X-Goog-FieldMask': 'routes.distanceMeters,routes.duration,routes.travelAdvisory.tollInfo,routes.legs.travelAdvisory.tollInfo'
+      },
+      body: JSON.stringify({
+        origin: { location: { latLng: { latitude: locOrigem.lat, longitude: locOrigem.lng } } },
+        destination: { location: { latLng: { latitude: locDestino.lat, longitude: locDestino.lng } } },
+        travelMode: 'DRIVE',
+        routingPreference: 'TRAFFIC_UNAWARE',
+        extraComputations: ['TOLLS'],
+        units: 'METRIC'
+      })
+    });
+
+    const routesData = await routesResp.json();
+
+    if(routesData.routes && routesData.routes[0]){
+      const route = routesData.routes[0];
+      const distKm = Math.round(route.distanceMeters / 1000);
+      const duracaoSeg = parseInt(route.duration?.replace('s','')) || 0;
+      const horas = Math.floor(duracaoSeg / 3600);
+      const mins = Math.floor((duracaoSeg % 3600) / 60);
+      const duracaoText = horas > 24 
+        ? `${Math.floor(horas/24)} dia${Math.floor(horas/24)>1?'s':''} ${horas%24}h`
+        : `${horas}h ${mins}min`;
+
+      // Pedágios reais
+      const tollInfo = route.travelAdvisory?.tollInfo;
+      let pedagioReal = null;
+      let pedagioFonte = 'estimado';
+      
+      if(tollInfo?.estimatedPrice && tollInfo.estimatedPrice.length > 0){
+        const tollBRL = tollInfo.estimatedPrice.find(p => p.currencyCode === 'BRL');
+        if(tollBRL){
+          pedagioReal = parseFloat(tollBRL.units || 0) + (tollBRL.nanos || 0) / 1e9;
+          pedagioFonte = 'Google Maps (oficial)';
         }
-      });
-    } catch(e){
-      resolve({sucesso:false});
+      }
+
+      return { distKm, duracaoText, pedagioReal, pedagioFonte, sucesso: true };
     }
-  });
+
+    return {sucesso:false};
+  } catch(e){
+    console.error('Routes API error:', e);
+    // Fallback para Distance Matrix
+    return new Promise((resolve)=>{
+      try{
+        const service = new google.maps.DistanceMatrixService();
+        service.getDistanceMatrix({
+          origins: [origem + ', Brasil'],
+          destinations: [destino + ', Brasil'],
+          travelMode: google.maps.TravelMode.DRIVING,
+          unitSystem: google.maps.UnitSystem.METRIC,
+        }, (response, status)=>{
+          if(status === 'OK'){
+            const element = response.rows[0].elements[0];
+            if(element.status === 'OK'){
+              resolve({distKm: Math.round(element.distance.value/1000), duracaoText: element.duration.text, pedagioReal: null, sucesso:true});
+            } else resolve({sucesso:false});
+          } else resolve({sucesso:false});
+        });
+      } catch(e){ resolve({sucesso:false}); }
+    });
+  }
 }
 
 // ─── CALCULAR ────────────────────────────────
@@ -715,10 +778,21 @@ async function calcular(){
   const dist = distResult.sucesso ? distResult.distKm : rotaFallback.dist;
   const duracaoViagem = distResult.sucesso ? distResult.duracaoText : null;
   const rota = {...rotaFallback, dist};
-  // Fonte da distância para exibir no resultado
   window._distanciaFonte = distResult.sucesso ? `Google Maps — ${dist.toLocaleString('pt-BR')} km · ${duracaoViagem}` : `Estimado — ${dist.toLocaleString('pt-BR')} km`;
+  
   const cDiesel=(dist/veiculo.diesel)*rota.diesel;
-  const cPed=dist*veiculo.pedBase*rota.pedMult;
+  
+  // Pedágio — usar valor real da Routes API ou estimativa
+  let cPed, pedagioFonte;
+  if(distResult.pedagioReal && distResult.pedagioReal > 0){
+    cPed = distResult.pedagioReal;
+    pedagioFonte = '📍 Google Maps (valor oficial)';
+  } else {
+    cPed = dist*veiculo.pedBase*rota.pedMult;
+    pedagioFonte = 'Estimado por trecho';
+  }
+  window._pedagioFonte = pedagioFonte;
+  
   const cManut=dist*veiculo.manutBase*rota.manutMult;
   const cAlim=Math.ceil(dist/600)*90;
   const cRisco=dist*risco.adicKm;
@@ -761,7 +835,7 @@ function renderResultado(){
   else al=`<div class="alerta-box al-s"><div class="al-i">✅</div><div><div class="al-t">Frete dentro da margem</div><div class="al-b">Cobre custos com <strong>${(e.margem*100).toFixed(1)}%</strong> de margem. Lucro: <strong>${fmt(e.lucro)}</strong>.</div></div></div>`;
 
   let custos=`<div class="cr"><div><div class="cn">⛽ Diesel</div><div class="cns">${Math.round(e.dist/e.veiculo.diesel)}L × R$ ${e.rota.diesel.toFixed(2).replace('.',',')} (ANP)</div></div><div class="cv"><div class="cvn">${fmt(e.cDiesel)}</div><span class="cvf">ANP</span></div></div>`;
-  custos+=`<div class="cr"><div><div class="cn">🛣️ Pedágios</div><div class="cns">Por eixo e praças do trecho</div></div><div class="cv"><div class="cvn">${fmt(e.cPed)}</div><span class="cvf">Concessionárias</span></div></div>`;
+  custos+=`<div class="cr"><div><div class="cn">🛣️ Pedágios</div><div class="cns">${window._pedagioFonte||'Por eixo e praças do trecho'}</div></div><div class="cv"><div class="cvn">${fmt(e.cPed)}</div><span class="cvf">Google Maps</span></div></div>`;
   custos+=`<div class="cr"><div><div class="cn">🔧 Manutenção</div><div class="cns">${e.rota.estradaDesc}</div></div><div class="cv"><div class="cvn">${fmt(e.cManut)}</div><span class="cvf">DNIT</span></div></div>`;
   custos+=`<div class="cr"><div><div class="cn">🍽️ Alimentação</div><div class="cns">${Math.ceil(e.dist/600)} diária(s)</div></div><div class="cv"><div class="cvn">${fmt(e.cAlim)}</div><span class="cvf">Tabela padrão</span></div></div>`;
   custos+=`<div class="cr"><div><div class="cn">🔒 Risco de roubo</div><div class="cns">${e.rota.riscoDesc}</div></div><div class="cv"><div class="cvn" style="color:${e.risco.cor}">${fmt(e.cRisco)}</div><span class="cvf">PRF</span></div></div>`;
