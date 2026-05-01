@@ -655,9 +655,15 @@ async function buscarDistanciaReal(origem, destino){
   try{
     const GOOGLE_KEY = 'AIzaSyCTYB8UdE9SE7Sl5KTWsvfWMvooiK_UESo';
     
-    // Geocodificar origem e destino
+    // Geocodificar origem e destino — limpa o texto antes
+    const limpar = (s) => {
+      // Remove sufixos tipo /MT, /SP, etc mas mantém o nome da cidade
+      return s.replace(/\/[A-Z]{2}$/,'').trim();
+    };
+
     const geocode = async (endereco) => {
-      const resp = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(endereco + ', Brasil')}&key=${GOOGLE_KEY}`);
+      const endLimpo = limpar(endereco);
+      const resp = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(endLimpo + ', Brasil')}&key=${GOOGLE_KEY}&region=br&language=pt-BR`);
       const data = await resp.json();
       if(data.results && data.results[0]){
         return data.results[0].geometry.location;
@@ -672,13 +678,18 @@ async function buscarDistanciaReal(origem, destino){
 
     if(!locOrigem || !locDestino) return {sucesso:false};
 
-    // Chamar Routes API com pedágios
+    // Pegar número de eixos do veículo selecionado
+    const veiculoKey = document.getElementById('c-veiculo').value;
+    const veiculoInfo = VEICULOS[veiculoKey];
+    const numEixos = veiculoInfo ? veiculoInfo.eixos : 5;
+
+    // Chamar Routes API com pedágios e info do veículo
     const routesResp = await fetch('https://routes.googleapis.com/directions/v2:computeRoutes', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': GOOGLE_KEY,
-        'X-Goog-FieldMask': 'routes.distanceMeters,routes.duration,routes.travelAdvisory.tollInfo,routes.legs.travelAdvisory.tollInfo'
+        'X-Goog-FieldMask': 'routes.distanceMeters,routes.duration,routes.travelAdvisory.tollInfo'
       },
       body: JSON.stringify({
         origin: { location: { latLng: { latitude: locOrigem.lat, longitude: locOrigem.lng } } },
@@ -686,11 +697,17 @@ async function buscarDistanciaReal(origem, destino){
         travelMode: 'DRIVE',
         routingPreference: 'TRAFFIC_UNAWARE',
         extraComputations: ['TOLLS'],
+        tollPasses: [],
+        vehicleInfo: {
+          emissionType: 'GASOLINE',
+          axleCount: numEixos >= 7 ? 'MORE_THAN_TWO_AXLES' : (numEixos >= 3 ? 'MORE_THAN_TWO_AXLES' : 'TWO_AXLES')
+        },
         units: 'METRIC'
       })
     });
 
     const routesData = await routesResp.json();
+    console.log('Routes API response:', JSON.stringify(routesData).slice(0,500));
 
     if(routesData.routes && routesData.routes[0]){
       const route = routesData.routes[0];
@@ -698,20 +715,22 @@ async function buscarDistanciaReal(origem, destino){
       const duracaoSeg = parseInt(route.duration?.replace('s','')) || 0;
       const horas = Math.floor(duracaoSeg / 3600);
       const mins = Math.floor((duracaoSeg % 3600) / 60);
-      const duracaoText = horas > 24 
+      const duracaoText = horas >= 24 
         ? `${Math.floor(horas/24)} dia${Math.floor(horas/24)>1?'s':''} ${horas%24}h`
         : `${horas}h ${mins}min`;
 
       // Pedágios reais
       const tollInfo = route.travelAdvisory?.tollInfo;
       let pedagioReal = null;
-      let pedagioFonte = 'estimado';
+      let pedagioFonte = 'Estimado por trecho';
+      
+      console.log('Toll info:', JSON.stringify(tollInfo));
       
       if(tollInfo?.estimatedPrice && tollInfo.estimatedPrice.length > 0){
         const tollBRL = tollInfo.estimatedPrice.find(p => p.currencyCode === 'BRL');
         if(tollBRL){
           pedagioReal = parseFloat(tollBRL.units || 0) + (tollBRL.nanos || 0) / 1e9;
-          pedagioFonte = 'Google Maps (oficial)';
+          pedagioFonte = '📍 Google Maps (valor oficial)';
         }
       }
 
@@ -726,15 +745,15 @@ async function buscarDistanciaReal(origem, destino){
       try{
         const service = new google.maps.DistanceMatrixService();
         service.getDistanceMatrix({
-          origins: [origem + ', Brasil'],
-          destinations: [destino + ', Brasil'],
+          origins: [origem.replace(/\/[A-Z]{2}$/,'').trim() + ', Brasil'],
+          destinations: [destino.replace(/\/[A-Z]{2}$/,'').trim() + ', Brasil'],
           travelMode: google.maps.TravelMode.DRIVING,
           unitSystem: google.maps.UnitSystem.METRIC,
         }, (response, status)=>{
           if(status === 'OK'){
             const element = response.rows[0].elements[0];
             if(element.status === 'OK'){
-              resolve({distKm: Math.round(element.distance.value/1000), duracaoText: element.duration.text, pedagioReal: null, sucesso:true});
+              resolve({distKm: Math.round(element.distance.value/1000), duracaoText: element.duration.text, pedagioReal: null, pedagioFonte: 'Estimado por trecho', sucesso:true});
             } else resolve({sucesso:false});
           } else resolve({sucesso:false});
         });
