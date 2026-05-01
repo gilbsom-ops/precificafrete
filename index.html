@@ -6,6 +6,7 @@
 <title>Precifica Frete</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCTYB8UdE9SE7Sl5KTWsvfWMvooiK_UESo&libraries=places"></script>
 <style>
 :root {
   --v:#1D9E75;--ve:#0F6E56;--vc:#E1F5EE;--vm:#5DCAA5;
@@ -634,8 +635,8 @@ function initCargaGrid(){
   });
 }
 
-// ─── BUSCAR ROTA ─────────────────────────────
-function buscarRota(o,d){
+// ─── BUSCAR ROTA (tabela fallback) ───────────
+function buscarRotaFallback(o,d){
   const n=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z]/g,'');
   const on=n(o.split('/')[0].split(',')[0].trim());
   const dn=n(d.split('/')[0].split(',')[0].trim());
@@ -647,6 +648,36 @@ function buscarRota(o,d){
   }
   const seed=(on.charCodeAt(0)+dn.charCodeAt(0))%6;
   return{...ROTAS['default'],dist:[380,650,920,1180,1450,1780][seed]};
+}
+
+// ─── BUSCAR DISTÂNCIA REAL (Google Maps) ─────
+function buscarDistanciaReal(origem, destino){
+  return new Promise((resolve)=>{
+    try{
+      const service = new google.maps.DistanceMatrixService();
+      service.getDistanceMatrix({
+        origins: [origem + ', Brasil'],
+        destinations: [destino + ', Brasil'],
+        travelMode: google.maps.TravelMode.DRIVING,
+        unitSystem: google.maps.UnitSystem.METRIC,
+      }, (response, status)=>{
+        if(status === 'OK'){
+          const element = response.rows[0].elements[0];
+          if(element.status === 'OK'){
+            const distKm = Math.round(element.distance.value / 1000);
+            const duracaoText = element.duration.text;
+            resolve({distKm, duracaoText, sucesso:true});
+          } else {
+            resolve({sucesso:false});
+          }
+        } else {
+          resolve({sucesso:false});
+        }
+      });
+    } catch(e){
+      resolve({sucesso:false});
+    }
+  });
 }
 
 // ─── CALCULAR ────────────────────────────────
@@ -663,18 +694,29 @@ async function calcular(){
   document.getElementById('result-loading').classList.add('show');
   document.getElementById('result-content').classList.remove('show');
 
-  const etapas=[[550,'Calculando rota...','ls1'],[550,'Buscando diesel (ANP)...','ls2'],[550,'Consultando pedágios...','ls3'],[550,'Verificando estradas (DNIT)...','ls4'],[550,'Índice de risco (PRF)...','ls5'],[550,'Tabela ANTT...','ls6'],[400,'Calculando resultado...',null]];
+  // Etapa 1 - Google Maps distância real
+  document.getElementById('loadStep').textContent='Calculando rota real (Google Maps)...';
+  const distResult = await buscarDistanciaReal(origem, destino);
+  document.getElementById('ls1').classList.add('ok');
+
+  const etapas=[[500,'Buscando diesel (ANP)...','ls2'],[500,'Consultando pedágios...','ls3'],[500,'Verificando estradas (DNIT)...','ls4'],[500,'Índice de risco (PRF)...','ls5'],[500,'Tabela ANTT...','ls6'],[400,'Calculando resultado...',null]];
   for(const[delay,msg,lsId] of etapas){
     await new Promise(r=>setTimeout(r,delay));
     document.getElementById('loadStep').textContent=msg;
     if(lsId)document.getElementById(lsId).classList.add('ok');
   }
 
-  const rota=buscarRota(origem,destino);
+  const rotaFallback=buscarRotaFallback(origem,destino);
   const veiculo=VEICULOS[document.getElementById('c-veiculo').value];
   const carga=CARGAS.find(c=>c.id===cargaSel);
-  const risco=RISCO[rota.risco];
-  const dist=rota.dist;
+  const risco=RISCO[rotaFallback.risco];
+
+  // Usar distância real do Google Maps ou fallback
+  const dist = distResult.sucesso ? distResult.distKm : rotaFallback.dist;
+  const duracaoViagem = distResult.sucesso ? distResult.duracaoText : null;
+  const rota = {...rotaFallback, dist};
+  // Fonte da distância para exibir no resultado
+  window._distanciaFonte = distResult.sucesso ? `Google Maps — ${dist.toLocaleString('pt-BR')} km · ${duracaoViagem}` : `Estimado — ${dist.toLocaleString('pt-BR')} km`;
   const cDiesel=(dist/veiculo.diesel)*rota.diesel;
   const cPed=dist*veiculo.pedBase*rota.pedMult;
   const cManut=dist*veiculo.manutBase*rota.manutMult;
@@ -687,7 +729,7 @@ async function calcular(){
   const lucro=frete-total;
   const margem=lucro/total;
 
-  ultimoCalculo={origem,destino,dist,rota,veiculo,carga,risco,frete,cDiesel,cPed,cManut,cAlim,cRisco,cAdicCarga,total,piso,lucro,sugerido,margem,veiculoNome:document.getElementById('c-veiculo').selectedOptions[0].text,pesoDesc:document.getElementById('c-peso').selectedOptions[0].text};
+  ultimoCalculo={origem,destino,dist,rota,veiculo,carga,risco,frete,cDiesel,cPed,cManut,cAlim,cRisco,cAdicCarga,total,piso,lucro,sugerido,margem,veiculoNome:document.getElementById('c-veiculo').selectedOptions[0].text,pesoDesc:document.getElementById('c-peso').selectedOptions[0].text,duracaoViagem,distanciaFonte:window._distanciaFonte};
 
   // Descontar crédito e salvar no Supabase
   try{
@@ -732,7 +774,7 @@ function renderResultado(){
     rotaAlt=`<div class="rota-alt"><div class="ra-title">💡 Rota alternativa sugerida</div><div class="ra-linha"><span>Distância adicional</span><span>+110 km</span></div><div class="ra-linha"><span>Economia em pedágios</span><span class="ra-vd">- ${fmt(ep)}</span></div><div class="ra-linha"><span>Evita trecho de risco</span><span class="ra-vd">Sim ✓</span></div><div class="ra-linha"><span>Lucro estimado</span><span class="${la>=0?'ra-vd':''}">${fmt(la)}</span></div></div>`;
   }
 
-  document.getElementById('result-content').innerHTML=`${al}<div class="fonte-box">🔒 <strong>Dados oficiais — não editáveis</strong> · ANTT · ANP · PRF · DNIT · Google Maps</div><div class="mets"><div class="met"><div class="met-l">Piso mínimo ANTT</div><div class="met-v">${fmt(e.piso)}</div></div><div class="met"><div class="met-l">Lucro líquido</div><div class="met-v ${e.lucro>=0?'vd':'vm'}">${fmt(e.lucro)}</div></div><div class="met"><div class="met-l">Custo por km</div><div class="met-v">${fmtD(e.total/e.dist)}</div></div><div class="met"><div class="met-l">Valor sugerido</div><div class="met-v vd">${fmt(e.sugerido)}</div></div></div><div class="custos-lista">${custos}</div>${rotaAlt}<button class="btn-comp" onclick="abrirComprovante()">📄 Gerar comprovante de negociação</button><button class="btn-nova" onclick="novaConsulta()">← Nova consulta</button>`;
+  document.getElementById('result-content').innerHTML=`${al}<div class="fonte-box">🔒 <strong>Dados oficiais — não editáveis</strong> · ANTT · ANP · PRF · DNIT · Google Maps<br>📍 <strong>Distância:</strong> ${e.distanciaFonte||e.dist.toLocaleString('pt-BR')+' km'}</div><div class="mets"><div class="met"><div class="met-l">Piso mínimo ANTT</div><div class="met-v">${fmt(e.piso)}</div></div><div class="met"><div class="met-l">Lucro líquido</div><div class="met-v ${e.lucro>=0?'vd':'vm'}">${fmt(e.lucro)}</div></div><div class="met"><div class="met-l">Custo por km</div><div class="met-v">${fmtD(e.total/e.dist)}</div></div><div class="met"><div class="met-l">Valor sugerido</div><div class="met-v vd">${fmt(e.sugerido)}</div></div></div><div class="custos-lista">${custos}</div>${rotaAlt}<button class="btn-comp" onclick="abrirComprovante()">📄 Gerar comprovante de negociação</button><button class="btn-nova" onclick="novaConsulta()">← Nova consulta</button>`;
 }
 
 function novaConsulta(){
