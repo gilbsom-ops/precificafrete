@@ -680,7 +680,7 @@ async function buscarRotasReais(origem, destino){
       headers: {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': GOOGLE_KEY,
-        'X-Goog-FieldMask': 'routes.distanceMeters,routes.duration,routes.travelAdvisory.tollInfo,routes.description,routes.labels'
+        'X-Goog-FieldMask': 'routes.distanceMeters,routes.duration,routes.travelAdvisory.tollInfo,routes.polyline.encodedPolyline'
       },
       body: JSON.stringify({
         origin: { location: { latLng: { latitude: gOrigem.loc.lat, longitude: gOrigem.loc.lng } } },
@@ -709,7 +709,8 @@ async function buscarRotasReais(origem, destino){
         const tollBRL = tollInfo.estimatedPrice.find(p => p.currencyCode === 'BRL');
         if(tollBRL) pedagioReal = parseFloat(tollBRL.units || 0) + (tollBRL.nanos || 0) / 1e9;
       }
-      const desc = route.description || `Rota ${idx+1}`;
+      const labels = ['🛣️ Principal', '🔀 Alternativa 1', '🔀 Alternativa 2', '🔀 Alternativa 3'];
+      const desc = labels[idx] || `Rota ${idx+1}`;
       return { distKm, duracaoText, pedagioReal, desc, idx };
     });
     return { sucesso: true, rotas, estadoOrigem: gOrigem.uf, estadoDestino: gDestino.uf };
@@ -849,20 +850,26 @@ function renderResultado(){
   let rotasComp = '';
   const rotas = window._rotasCalculadas || [];
   if(rotas.length > 1){
-    rotasComp = `<div class="rota-alt" style="background:var(--blc);border-color:#AEC6E8">
-      <div class="ra-title" style="color:var(--bl)">🗺️ Comparação de rotas (${rotas.length} opções)</div>`;
+    rotasComp = `<div style="background:var(--blc);border:1px solid #AEC6E8;border-radius:10px;padding:1rem;margin-bottom:1rem">
+      <div style="font-size:11px;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem">🗺️ Comparação de rotas — ${rotas.length} opções encontradas</div>
+      <div style="display:grid;grid-template-columns:1fr;gap:6px">`;
     rotas.forEach((r, idx) => {
       const melhor = idx === 0;
-      rotasComp += `<div class="ra-linha" style="${melhor?'font-weight:700;color:var(--ve)':''}">
-        <span>${melhor?'✅ ':''}${r.desc||'Rota '+(idx+1)} · ${r.distKm.toLocaleString('pt-BR')} km · ${r.duracaoText}</span>
-        <span style="color:${melhor?'var(--ve)':'inherit'}">${melhor?'🏆 ':''}${fmt(r.total)}</span>
+      const pedStr = r.pedagioReal ? fmt(r.pedagioReal) : 'Estimado';
+      rotasComp += `<div style="background:${melhor?'var(--vc)':'#fff'};border:1.5px solid ${melhor?'var(--vm)':'var(--gb)'};border-radius:8px;padding:.75rem;display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:${melhor?'var(--ve)':'var(--g1)'};">${melhor?'🏆 Melhor opção':r.desc}</div>
+          <div style="font-size:11px;color:var(--g2);margin-top:2px">${r.distKm.toLocaleString('pt-BR')} km · ${r.duracaoText} · Pedágio: ${pedStr}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:${melhor?'var(--ve)':'var(--dark)'}">${fmt(r.total)}</div>
+          <div style="font-size:10px;color:var(--g3)">custo total</div>
+        </div>
       </div>`;
     });
-    if(rotas.length > 1){
-      const economia = rotas[rotas.length-1].total - rotas[0].total;
-      if(economia > 0) rotasComp += `<div style="font-size:11px;color:var(--ve);margin-top:6px">💰 Economia de <strong>${fmt(economia)}</strong> escolhendo a rota mais barata</div>`;
-    }
-    rotasComp += `</div>`;
+    const economia = rotas[rotas.length-1].total - rotas[0].total;
+    if(economia > 10) rotasComp += `<div style="font-size:12px;color:var(--ve);font-weight:600;margin-top:4px;padding:6px 4px">💰 Economia de <strong>${fmt(economia)}</strong> escolhendo a melhor rota</div>`;
+    rotasComp += `</div></div>`;
   }
 
   document.getElementById('result-content').innerHTML=`${al}<div class="fonte-box">🔒 <strong>Dados oficiais — não editáveis</strong> · ANTT · ANP · PRF · DNIT · Google Maps<br>📍 <strong>Distância:</strong> ${e.distanciaFonte||e.dist.toLocaleString('pt-BR')+' km'}</div><div class="mets"><div class="met"><div class="met-l">Piso mínimo ANTT</div><div class="met-v">${fmt(e.piso)}</div></div><div class="met"><div class="met-l">Lucro líquido</div><div class="met-v ${e.lucro>=0?'vd':'vm'}">${fmt(e.lucro)}</div></div><div class="met"><div class="met-l">Custo por km</div><div class="met-v">${fmtD(e.total/e.dist)}</div></div><div class="met"><div class="met-l">Valor sugerido</div><div class="met-v vd">${fmt(e.sugerido)}</div></div></div>${rotasComp}<div class="custos-lista">${custos}</div><button class="btn-comp" onclick="abrirComprovante()">📄 Gerar comprovante de negociação</button><button class="btn-nova" onclick="novaConsulta()">← Nova consulta</button>`;
