@@ -224,7 +224,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);min
 .ext-val.mais{color:var(--ve)}.ext-val.menos{color:var(--r)}
 .sec-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:1rem;margin-top:2rem}
 
-/* MODAL */
+/* SEMÁFORO */
+.sem-item{display:flex;align-items:center;gap:8px;background:var(--gf);border-radius:8px;padding:.6rem .875rem;font-size:12px}
+.sem-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.sem-verde{background:#1D9E75}.sem-amarelo{background:#F0C040}.sem-vermelho{background:#C0392B}
+.sem-nome{font-weight:600;color:var(--g1)}.sem-data{font-size:10px;color:var(--g3);margin-top:1px}
+/* DIESEL GRID ADMIN */
+.d-inp-wrap{display:flex;flex-direction:column;gap:3px}
+.d-inp-label{font-size:10px;font-weight:700;color:var(--g2);text-transform:uppercase}
+.d-inp{border:1.5px solid var(--gb);border-radius:6px;padding:6px 8px;font-size:13px;font-family:'DM Sans',sans-serif;width:100%;outline:none;text-align:right}
+.d-inp:focus{border-color:var(--v)}
+/* RISCO SELECT */
+.risco-wrap{display:flex;flex-direction:column;gap:3px}
+.risco-label{font-size:10px;font-weight:700;color:var(--g2);text-transform:uppercase}
+.risco-sel{border:1.5px solid var(--gb);border-radius:6px;padding:5px 6px;font-size:12px;font-family:'DM Sans',sans-serif;width:100%;outline:none;background:#fff}
+
 .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
 .modal-ov.open{display:flex;animation:fadeIn .2s ease}
 .modal{background:#fff;border-radius:20px 20px 0 0;padding:1.5rem 1.25rem;width:100%;max-width:500px;max-height:90vh;overflow-y:auto}
@@ -309,6 +323,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);min
       <div class="nav-item ativo" onclick="irPage('dashboard')"><span class="nav-item-icon">📊</span> Painel</div>
       <div class="nav-item" onclick="irPage('calculadora')"><span class="nav-item-icon">🔍</span> Calcular frete</div>
       <div class="nav-item" onclick="irPage('creditos')"><span class="nav-item-icon">💳</span> Meus créditos</div>
+      <div class="nav-item" id="navAdmin" style="display:none" onclick="irPage('admin')"><span class="nav-item-icon">⚙️</span> Admin</div>
     </nav>
     <div class="sidebar-footer">
       <div class="sidebar-user">
@@ -440,6 +455,163 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);min
       <div class="sec-title">Extrato de uso</div>
       <div class="extrato-lista" id="extratoLista"><div style="font-size:14px;color:var(--g3);text-align:center;padding:1rem">Carregando extrato...</div></div>
     </div>
+  </div>
+</div>
+
+    <!-- ADMIN -->
+    <div class="page" id="page-admin">
+      <!-- DASHBOARD ADMIN -->
+      <div style="margin-bottom:2rem">
+        <h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:.25rem">⚙️ Painel Administrativo</h2>
+        <p style="font-size:14px;color:var(--g2)">Gerencie dados, monitore indicadores e mantenha o app atualizado.</p>
+      </div>
+
+      <!-- SEMÁFORO DE SAÚDE DOS DADOS -->
+      <div style="background:#fff;border:1px solid var(--gb);border-radius:14px;padding:1.5rem;margin-bottom:1.5rem">
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:1rem">🚦 Saúde dos Dados</div>
+        <div id="semaforoGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px"></div>
+      </div>
+
+      <!-- DASHBOARD KPIs -->
+      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:1rem">📈 Indicadores — Mês atual vs anterior</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:1.5rem">
+        <div style="background:#fff;border:1px solid var(--gb);border-radius:12px;padding:1.25rem">
+          <div style="font-size:11px;font-weight:600;color:var(--g2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.5rem">Consultas este mês</div>
+          <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800" id="kpiConsultasMes">--</div>
+          <div style="font-size:12px;margin-top:4px" id="kpiConsultasComp"></div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--gb);border-radius:12px;padding:1.25rem">
+          <div style="font-size:11px;font-weight:600;color:var(--g2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.5rem">Usuários ativos</div>
+          <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800" id="kpiUsuarios">--</div>
+          <div style="font-size:12px;margin-top:4px" id="kpiUsuariosComp"></div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--gb);border-radius:12px;padding:1.25rem">
+          <div style="font-size:11px;font-weight:600;color:var(--g2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.5rem">Receita créditos</div>
+          <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--ve)" id="kpiReceita">--</div>
+          <div style="font-size:12px;margin-top:4px" id="kpiReceitaComp"></div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--gb);border-radius:12px;padding:1.25rem">
+          <div style="font-size:11px;font-weight:600;color:var(--g2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.5rem">Fretes abaixo ANTT</div>
+          <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--r)" id="kpiAbaixoAntt">--</div>
+          <div style="font-size:12px;color:var(--g2);margin-top:4px">do total consultado</div>
+        </div>
+      </div>
+
+      <!-- ROTAS MAIS CONSULTADAS -->
+      <div style="background:#fff;border:1px solid var(--gb);border-radius:14px;padding:1.5rem;margin-bottom:1.5rem">
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:1rem">🗺️ Rotas mais consultadas</div>
+        <div id="rotasTop" style="display:flex;flex-direction:column;gap:6px"><div style="font-size:13px;color:var(--g3)">Carregando...</div></div>
+      </div>
+
+      <!-- EDITAR DIESEL -->
+      <div style="background:#fff;border:1px solid var(--gb);border-radius:14px;padding:1.5rem;margin-bottom:1.5rem">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700">⛽ Diesel S10 por Estado (ANP)</div>
+          <div style="font-size:11px;color:var(--g3)">Fonte: <a href="https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/precos-revenda-e-de-distribuicao-combustiveis/levantamento-de-precos" target="_blank" style="color:var(--v)">gov.br/anp</a></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px;margin-bottom:1rem" id="dieselGrid"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <div style="flex:1;min-width:160px">
+            <div style="font-size:11px;font-weight:600;color:var(--g2);margin-bottom:4px">Data de referência ANP</div>
+            <input type="text" id="adminDieselData" placeholder="Ex: 25/04/2026" style="border:1.5px solid var(--gb);border-radius:8px;padding:8px 12px;font-size:13px;font-family:'DM Sans',sans-serif;width:100%;outline:none">
+          </div>
+          <button onclick="salvarDiesel()" style="padding:10px 20px;background:var(--v);color:#fff;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-top:18px">💾 Salvar diesel</button>
+        </div>
+      </div>
+
+      <!-- EDITAR VALORES OPERACIONAIS -->
+      <div style="background:#fff;border:1px solid var(--gb);border-radius:14px;padding:1.5rem;margin-bottom:1.5rem">
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:1rem">🔧 Valores Operacionais</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem">
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--g2);text-transform:uppercase;margin-bottom:4px">Manutenção R$/km <span style="font-size:10px;color:var(--g3)">(INPC anual)</span></div>
+            <input type="number" id="adminManutKm" step="0.01" style="border:1.5px solid var(--gb);border-radius:8px;padding:8px 12px;font-size:14px;width:100%;outline:none;font-family:'DM Sans',sans-serif">
+            <div style="font-size:10px;color:var(--g3);margin-top:3px">Referência: R$ 0,74/km (2025)</div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--g2);text-transform:uppercase;margin-bottom:4px">Diária alimentação R$/dia</div>
+            <input type="number" id="adminAlimDiaria" step="1" style="border:1.5px solid var(--gb);border-radius:8px;padding:8px 12px;font-size:14px;width:100%;outline:none;font-family:'DM Sans',sans-serif">
+            <div style="font-size:10px;color:var(--g3);margin-top:3px">Estimativa: R$ 110–130/dia</div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--g2);text-transform:uppercase;margin-bottom:4px">Estadia R$/ton/hora <span style="font-size:10px;color:var(--g3)">(Lei 11.442/07)</span></div>
+            <input type="number" id="adminEstadiaTon" step="0.01" style="border:1.5px solid var(--gb);border-radius:8px;padding:8px 12px;font-size:14px;width:100%;outline:none;font-family:'DM Sans',sans-serif">
+            <div style="font-size:10px;color:var(--g3);margin-top:3px">Atual: R$ 2,29 (INPC mar/2023)</div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--g2);text-transform:uppercase;margin-bottom:4px">Créditos bônus cadastro</div>
+            <input type="number" id="adminBonus" step="1" style="border:1.5px solid var(--gb);border-radius:8px;padding:8px 12px;font-size:14px;width:100%;outline:none;font-family:'DM Sans',sans-serif">
+          </div>
+        </div>
+        <button onclick="salvarOperacional()" style="margin-top:1rem;padding:10px 20px;background:var(--v);color:#fff;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer">💾 Salvar valores operacionais</button>
+      </div>
+
+      <!-- EDITAR PACOTES DE CRÉDITO -->
+      <div style="background:#fff;border:1px solid var(--gb);border-radius:14px;padding:1.5rem;margin-bottom:1.5rem">
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:1rem">💳 Pacotes de Crédito</div>
+        <div id="adminPacotesGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem"></div>
+        <button onclick="salvarPacotes()" style="margin-top:1rem;padding:10px 20px;background:var(--v);color:#fff;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer">💾 Salvar pacotes</button>
+      </div>
+
+      <!-- RISCO POR ESTADO -->
+      <div style="background:#fff;border:1px solid var(--gb);border-radius:14px;padding:1.5rem;margin-bottom:1.5rem">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700">🔒 Risco de Roubo por Estado</div>
+          <div style="font-size:11px;color:var(--g3)">Fonte: <a href="https://www.ntclogistica.org.br" target="_blank" style="color:var(--v)">NTC&Logística</a> — anual</div>
+        </div>
+        <div style="font-size:12px;color:var(--a);background:var(--ac);border:1px solid var(--ab);border-radius:6px;padding:6px 10px;margin-bottom:1rem">⚠️ Atualizar anualmente em dezembro, quando NTC&Logística publicar o relatório.</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px" id="riscoGrid"></div>
+        <button onclick="salvarRisco()" style="margin-top:1rem;padding:10px 20px;background:var(--v);color:#fff;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer">💾 Salvar risco</button>
+      </div>
+
+      <!-- CONDIÇÃO DAS PISTAS -->
+      <div style="background:#fff;border:1px solid var(--gb);border-radius:14px;padding:1.5rem;margin-bottom:1.5rem">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700">🛣️ Condição das Pistas por Estado</div>
+          <div style="font-size:11px;color:var(--g3)">Fonte: <a href="https://pesquisarodovias.cnt.org.br" target="_blank" style="color:var(--v)">CNT Rodovias</a> — anual</div>
+        </div>
+        <div style="font-size:12px;color:var(--a);background:var(--ac);border:1px solid var(--ab);border-radius:6px;padding:6px 10px;margin-bottom:1rem">⚠️ Atualizar anualmente em novembro, após publicação da Pesquisa CNT de Rodovias.</div>
+        <div style="font-size:11px;color:var(--g2);margin-bottom:.75rem">Multiplicador do custo de manutenção: 1.0 = normal · 1.2 = ruim · 1.5 = péssimo</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px" id="pistaGrid"></div>
+        <button onclick="salvarPistas()" style="margin-top:1rem;padding:10px 20px;background:var(--v);color:#fff;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer">💾 Salvar pistas</button>
+      </div>
+
+    </div><!-- fim page-admin -->
+
+<!-- MODAL ESTADIA -->
+<div class="modal-ov" id="modalEstadia" onclick="if(event.target===this)fecharEstadia()">
+  <div class="modal">
+    <div class="modal-title">⏱️ Calculadora de Estadia</div>
+    <div style="font-size:12px;color:var(--bl);background:var(--blc);border:1px solid #AEC6E8;border-radius:8px;padding:.75rem;margin-bottom:1rem;line-height:1.6">
+      <strong>Lei 11.442/07 — Art. 11, §5º</strong><br>
+      Após 5 horas de espera na carga/descarga, você tem direito à estadia de <strong>R$ 2,29 por tonelada por hora</strong> (atualizado pelo INPC).
+    </div>
+    <div class="campo">
+      <label>Horário de chegada</label>
+      <input type="time" id="estChegada" style="border:1.5px solid var(--gb);border-radius:8px;padding:10px 12px;font-size:14px;width:100%;outline:none;font-family:'DM Sans',sans-serif">
+    </div>
+    <div class="campo">
+      <label>Horário de liberação</label>
+      <input type="time" id="estSaida" style="border:1.5px solid var(--gb);border-radius:8px;padding:10px 12px;font-size:14px;width:100%;outline:none;font-family:'DM Sans',sans-serif">
+    </div>
+    <div class="campo">
+      <label>Capacidade do veículo (toneladas)</label>
+      <select id="estTonelagem" style="border:1.5px solid var(--gb);border-radius:8px;padding:10px 12px;font-size:14px;width:100%;outline:none;font-family:'DM Sans',sans-serif;background:#fff">
+        <option value="6">Toco — 6 toneladas</option>
+        <option value="10">Truck — 10 toneladas</option>
+        <option value="27" selected>Carreta — 27 toneladas</option>
+        <option value="32">Carreta LS — 32 toneladas</option>
+        <option value="38">Bitrem — 38 toneladas</option>
+        <option value="45">Rodotrem — 45 toneladas</option>
+      </select>
+    </div>
+    <div class="campo">
+      <label>Local (empresa / cidade)</label>
+      <input type="text" id="estLocal" placeholder="Ex: CD Atacadão, Barueri/SP" style="border:1.5px solid var(--gb);border-radius:8px;padding:10px 12px;font-size:14px;width:100%;outline:none;font-family:'DM Sans',sans-serif">
+    </div>
+    <button onclick="calcularEstadia()" style="width:100%;padding:13px;background:var(--v);color:#fff;border:none;border-radius:9px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px">⏱️ Calcular estadia</button>
+    <div id="estadiaResultado" style="display:none"></div>
+    <button onclick="fecharEstadia()" style="width:100%;padding:11px;background:var(--gf);border:none;border-radius:9px;font-size:13px;cursor:pointer;margin-top:8px;font-family:'DM Sans',sans-serif">Fechar</button>
   </div>
 </div>
 
@@ -587,6 +759,8 @@ async function entrarNoApp(user){
   initCargaGrid();
   carregarHistorico();
   carregarExtrato();
+  await carregarConfig();
+  if(isAdmin()) document.getElementById('navAdmin').style.display='flex';
 }
 
 function atualizarCredUI(){
@@ -610,10 +784,11 @@ function irPage(page){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('ativa'));
   document.getElementById('page-'+page).classList.add('ativa');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('ativo'));
-  const idx={dashboard:0,calculadora:1,creditos:2};
+  const idx={dashboard:0,calculadora:1,creditos:2,admin:3};
   document.querySelectorAll('.nav-item')[idx[page]]?.classList.add('ativo');
-  const titles={dashboard:'Painel',calculadora:'Calcular frete',creditos:'Meus créditos'};
+  const titles={dashboard:'Painel',calculadora:'Calcular frete',creditos:'Meus créditos',admin:'Painel Admin'};
   document.getElementById('topbarTitle').textContent=titles[page]||'';
+  if(page==='admin') carregarAdmin();
   if(window.innerWidth<=768)toggleSidebar(false);
 }
 function toggleSidebar(force){
@@ -651,11 +826,57 @@ function buscarRotaFallback(o,d){
 }
 
 // ─── PREÇO DIESEL POR ESTADO (ANP média) ─────
-const DIESEL_ESTADO = {
-  'AC':6.89,'AL':6.31,'AM':6.52,'AP':6.71,'BA':6.28,'CE':6.24,'DF':6.15,
-  'ES':6.18,'GO':6.12,'MA':6.35,'MG':6.10,'MS':6.18,'MT':6.22,'PA':6.45,
-  'PB':6.27,'PE':6.25,'PI':6.33,'PR':6.08,'RJ':6.20,'RN':6.26,'RO':6.48,
-  'RR':6.75,'RS':6.05,'SC':6.07,'SE':6.30,'SP':6.05,'TO':6.38
+// Diesel S10 — média ponderada por postos pesquisados — ANP semana 19-25/04/2026
+// Atualizado via painel admin — próxima atualização: 02/05/2026
+const DIESEL_ESTADO_DEFAULT = {
+  'AC':8.42,'AL':7.14,'AM':7.56,'AP':7.20,'BA':7.96,'CE':7.13,'DF':7.46,
+  'ES':6.94,'GO':7.25,'MA':7.33,'MG':7.20,'MS':7.35,'MT':7.30,'PA':7.59,
+  'PB':7.12,'PE':7.13,'PI':7.58,'PR':7.40,'RJ':7.26,'RN':7.29,'RO':7.49,
+  'RR':7.76,'RS':7.20,'SC':7.43,'SE':7.34,'SP':7.46,'TO':7.27
+};
+let DIESEL_ESTADO = {...DIESEL_ESTADO_DEFAULT};
+
+// Config global — carregada do Supabase
+let CONFIG = {
+  diesel_ref_data: '25/04/2026',
+  manutencao_km: 0.74,
+  manutencao_ref_data: '01/01/2025',
+  alimentacao_diaria: 110,
+  alimentacao_ref_data: '01/01/2025',
+  estadia_ton_hora: 2.29,
+  estadia_ref_data: '01/03/2023',
+  bonus_cadastro: 3,
+  pacotes: [
+    {id:'experimenta',nome:'Experimenta',cred:5,preco:4.5,popular:false},
+    {id:'motorista',nome:'Motorista',cred:20,preco:17,popular:true},
+    {id:'empresa',nome:'Empresa',cred:100,preco:75,popular:false}
+  ],
+  risco_por_estado: {
+    'SP':'alto','RJ':'critico','MG':'medio','ES':'medio','PR':'medio',
+    'SC':'baixo','RS':'baixo','GO':'medio','MT':'medio','MS':'medio',
+    'BA':'medio','PE':'alto','CE':'medio','PA':'medio','AM':'medio',
+    'RO':'medio','TO':'medio','MA':'medio','PI':'baixo','RN':'baixo',
+    'PB':'baixo','AL':'baixo','SE':'baixo','AC':'baixo','AP':'baixo',
+    'RR':'baixo','DF':'baixo'
+  },
+  pista_por_estado: {
+    'SP':1.0,'RJ':1.15,'MG':1.1,'ES':1.0,'PR':1.0,
+    'SC':0.95,'RS':1.0,'GO':1.05,'MT':1.1,'MS':1.05,
+    'BA':1.15,'PE':1.1,'CE':1.1,'PA':1.2,'AM':1.5,
+    'RO':1.2,'TO':1.15,'MA':1.2,'PI':1.15,'RN':1.1,
+    'PB':1.1,'AL':1.1,'SE':1.05,'AC':1.3,'AP':1.25,
+    'RR':1.25,'DF':0.95
+  },
+  // Datas de vencimento para alertas
+  vencimentos: {
+    diesel: {data:'02/05/2026', dias:7},
+    antt: {data:'01/01/2027', dias:365},
+    manutencao: {data:'01/01/2026', dias:365},
+    alimentacao: {data:'01/01/2026', dias:365},
+    estadia: {data:'01/03/2024', dias:365},
+    roubo: {data:'01/12/2025', dias:365},
+    pistas: {data:'01/11/2025', dias:365}
+  }
 };
 
 // ─── BUSCAR MÚLTIPLAS ROTAS COM PEDÁGIOS ─────
@@ -791,8 +1012,8 @@ async function calcular(){
   window._pedagioFonte = pedagioFonte;
   window._rotasCalculadas = rotasCalculadas;
 
-  const cManut=dist*veiculo.manutBase*rota.manutMult;
-  const cAlim=Math.ceil(dist/600)*90;
+  const cManut=dist*(CONFIG.manutencao_km||0.74)*(CONFIG.pista_por_estado[rotasResult.sucesso?rotasResult.estadoOrigem:'SP']||1.0);
+  const cAlim=Math.ceil(dist/600)*(CONFIG.alimentacao_diaria||110);
   const cRisco=dist*risco.adicKm;
   const cAdicCarga=carga.adic>0?dist*veiculo.baseAntt*carga.adic*0.5:0;
   const total=cDiesel+cPed+cManut+cAlim+cRisco+cAdicCarga;
@@ -835,7 +1056,7 @@ function renderResultado(){
   let custos=`<div class="cr"><div><div class="cn">⛽ Diesel</div><div class="cns">${Math.round(e.dist/e.veiculo.diesel)}L × R$ ${e.rota.diesel.toFixed(2).replace('.',',')} (ANP)</div></div><div class="cv"><div class="cvn">${fmt(e.cDiesel)}</div><span class="cvf">ANP</span></div></div>`;
   custos+=`<div class="cr"><div><div class="cn">🛣️ Pedágios</div><div class="cns">${window._pedagioFonte||'Por eixo e praças do trecho'}</div></div><div class="cv"><div class="cvn">${fmt(e.cPed)}</div><span class="cvf">Google Maps</span></div></div>`;
   custos+=`<div class="cr"><div><div class="cn">🔧 Manutenção</div><div class="cns">${e.rota.estradaDesc}</div></div><div class="cv"><div class="cvn">${fmt(e.cManut)}</div><span class="cvf">DNIT</span></div></div>`;
-  custos+=`<div class="cr"><div><div class="cn">🍽️ Alimentação</div><div class="cns">${Math.ceil(e.dist/600)} diária(s)</div></div><div class="cv"><div class="cvn">${fmt(e.cAlim)}</div><span class="cvf">Tabela padrão</span></div></div>`;
+  custos+=`<div class="cr"><div><div class="cn">🍽️ Alimentação</div><div class="cns">${Math.ceil(e.dist/600)} diária(s) × R$ ${(CONFIG.alimentacao_diaria||110)}</div></div><div class="cv"><div class="cvn">${fmt(e.cAlim)}</div><span class="cvf">Tabela padrão</span></div></div>`;
   custos+=`<div class="cr"><div><div class="cn">🔒 Risco de roubo</div><div class="cns">${e.rota.riscoDesc}</div></div><div class="cv"><div class="cvn" style="color:${e.risco.cor}">${fmt(e.cRisco)}</div><span class="cvf">PRF</span></div></div>`;
   if(e.cAdicCarga>0)custos+=`<div class="cr"><div><div class="cn">📦 Adicional ${e.carga.nome}</div><div class="cns">Coeficiente ANTT</div></div><div class="cv"><div class="cvn">${fmt(e.cAdicCarga)}</div><span class="cvf">ANTT</span></div></div>`;
   custos+=`<div class="custo-tot"><span class="ct-nome">Total de custos</span><span class="ct-val ${e.lucro>=0?'vd':'vm'}">${fmt(e.total)}</span></div>`;
@@ -872,7 +1093,12 @@ function renderResultado(){
     rotasComp += `</div></div>`;
   }
 
-  document.getElementById('result-content').innerHTML=`${al}<div class="fonte-box">🔒 <strong>Dados oficiais — não editáveis</strong> · ANTT · ANP · PRF · DNIT · Google Maps<br>📍 <strong>Distância:</strong> ${e.distanciaFonte||e.dist.toLocaleString('pt-BR')+' km'}</div><div class="mets"><div class="met"><div class="met-l">Piso mínimo ANTT</div><div class="met-v">${fmt(e.piso)}</div></div><div class="met"><div class="met-l">Lucro líquido</div><div class="met-v ${e.lucro>=0?'vd':'vm'}">${fmt(e.lucro)}</div></div><div class="met"><div class="met-l">Custo por km</div><div class="met-v">${fmtD(e.total/e.dist)}</div></div><div class="met"><div class="met-l">Valor sugerido</div><div class="met-v vd">${fmt(e.sugerido)}</div></div></div>${rotasComp}<div class="custos-lista">${custos}</div><button class="btn-comp" onclick="abrirComprovante()">📄 Gerar comprovante de negociação</button><button class="btn-nova" onclick="novaConsulta()">← Nova consulta</button>`;
+  document.getElementById('result-content').innerHTML=`${al}<div class="fonte-box">🔒 <strong>Dados oficiais — não editáveis</strong> · ANTT · ANP · PRF · DNIT · Google Maps<br>📍 <strong>Distância:</strong> ${e.distanciaFonte||e.dist.toLocaleString('pt-BR')+' km'}</div><div class="mets"><div class="met"><div class="met-l">Piso mínimo ANTT</div><div class="met-v">${fmt(e.piso)}</div></div><div class="met"><div class="met-l">Lucro líquido</div><div class="met-v ${e.lucro>=0?'vd':'vm'}">${fmt(e.lucro)}</div></div><div class="met"><div class="met-l">Custo por km</div><div class="met-v">${fmtD(e.total/e.dist)}</div></div><div class="met"><div class="met-l">Valor sugerido</div><div class="met-v vd">${fmt(e.sugerido)}</div></div></div>${rotasComp}<div class="custos-lista">${custos}</div>
+  <div style="background:var(--blc);border:1px solid #AEC6E8;border-radius:10px;padding:.875rem 1rem;margin-bottom:1rem;font-size:12px;color:var(--bl)">
+    <strong>⏱️ Lei 11.442/07 — Estadia:</strong> Se ficar parado +5h na carga/descarga, você tem direito a <strong>R$ ${(CONFIG.estadia_ton_hora||2.29).toFixed(2)}/ton/hora</strong> — cobrado separado do frete.<br>
+    <span style="cursor:pointer;font-weight:700;text-decoration:underline" onclick="abrirEstadia()">→ Calcular estadia agora</span>
+  </div>
+  <button class="btn-comp" onclick="abrirComprovante()">📄 Gerar comprovante de negociação</button><button class="btn-nova" onclick="novaConsulta()">← Nova consulta</button>`;
 }
 
 function novaConsulta(){
@@ -973,6 +1199,322 @@ function abrirComprovante(){
   document.getElementById('modalOv').classList.add('open');
 }
 function fecharModal(e){if(e.target===document.getElementById('modalOv'))document.getElementById('modalOv').classList.remove('open');}
+
+// ─── ADMIN ───────────────────────────────────
+const ADMIN_EMAIL = 'gilbsom@gmail.com';
+const ESTADOS = ['AC','AL','AM','AP','BA','CE','DF','ES','GO','MA','MG','MS','MT','PA','PB','PE','PI','PR','RJ','RN','RO','RR','RS','SC','SE','SP','TO'];
+
+function isAdmin(){ return usuarioAtual?.email === ADMIN_EMAIL; }
+
+async function carregarAdmin(){
+  if(!isAdmin()) return;
+  renderSemaforo();
+  renderDieselGrid();
+  renderRiscoGrid();
+  renderPistaGrid();
+  renderPacotesAdmin();
+  preencherOperacional();
+  await carregarKPIs();
+  await carregarRotasTop();
+}
+
+// ─── SEMÁFORO ────────────────────────────────
+function renderSemaforo(){
+  const hoje = new Date();
+  const itens = [
+    {nome:'Diesel ANP', chave:'diesel', freq:'Semanal', link:'gov.br/anp'},
+    {nome:'Piso ANTT', chave:'antt', freq:'Por portaria', link:'antt.gov.br'},
+    {nome:'Manutenção/km', chave:'manutencao', freq:'Anual (INPC)', link:'-'},
+    {nome:'Alimentação', chave:'alimentacao', freq:'Anual', link:'-'},
+    {nome:'Estadia', chave:'estadia', freq:'Anual (INPC)', link:'-'},
+    {nome:'Roubo PRF/NTC', chave:'roubo', freq:'Anual (dez)', link:'ntclogistica.org.br'},
+    {nome:'Pistas CNT', chave:'pistas', freq:'Anual (nov)', link:'pesquisarodovias.cnt.org.br'},
+  ];
+  const grid = document.getElementById('semaforoGrid');
+  grid.innerHTML = itens.map(item => {
+    const v = CONFIG.vencimentos[item.chave];
+    const [d,m,a] = v.data.split('/');
+    const vencimento = new Date(a,m-1,d);
+    const diffDias = Math.floor((vencimento-hoje)/(1000*60*60*24));
+    let cor, status;
+    if(diffDias < 0){ cor='sem-vermelho'; status=`Vencido há ${Math.abs(diffDias)}d`; }
+    else if(diffDias <= 30){ cor='sem-amarelo'; status=`Vence em ${diffDias}d`; }
+    else { cor='sem-verde'; status=`Válido até ${v.data}`; }
+    return `<div class="sem-item">
+      <div class="sem-dot ${cor}"></div>
+      <div>
+        <div class="sem-nome">${item.nome}</div>
+        <div class="sem-data">${status} · ${item.freq}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── DIESEL GRID ADMIN ───────────────────────
+function renderDieselGrid(){
+  const grid = document.getElementById('dieselGrid');
+  grid.innerHTML = ESTADOS.map(uf => `
+    <div class="d-inp-wrap">
+      <div class="d-inp-label">${uf}</div>
+      <input class="d-inp" id="diesel_${uf}" type="number" step="0.01" value="${(DIESEL_ESTADO[uf]||7.20).toFixed(2)}">
+    </div>`).join('');
+  document.getElementById('adminDieselData').value = CONFIG.diesel_ref_data || '';
+}
+
+async function salvarDiesel(){
+  const novos = {};
+  ESTADOS.forEach(uf => { novos[uf] = parseFloat(document.getElementById('diesel_'+uf).value)||7.20; });
+  const dataRef = document.getElementById('adminDieselData').value;
+  DIESEL_ESTADO = novos;
+  CONFIG.diesel_ref_data = dataRef;
+  // Calcular próximo vencimento (10 dias)
+  const [d,m,a] = dataRef.split('/');
+  const prox = new Date(a,m-1,parseInt(d)+10);
+  CONFIG.vencimentos.diesel.data = `${String(prox.getDate()).padStart(2,'0')}/${String(prox.getMonth()+1).padStart(2,'0')}/${prox.getFullYear()}`;
+  await sb.from('config_app').upsert({chave:'diesel_estado', valor: JSON.stringify(novos), data_ref: dataRef, updated_at: new Date().toISOString()});
+  await sb.from('config_app').upsert({chave:'vencimentos', valor: JSON.stringify(CONFIG.vencimentos), updated_at: new Date().toISOString()});
+  renderSemaforo();
+  alert('✅ Diesel atualizado com sucesso!');
+}
+
+// ─── RISCO GRID ADMIN ────────────────────────
+function renderRiscoGrid(){
+  const opts = ['baixo','medio','alto','critico'];
+  const cores = {baixo:'🟢',medio:'🟡',alto:'🔴',critico:'⚫'};
+  const grid = document.getElementById('riscoGrid');
+  grid.innerHTML = ESTADOS.map(uf => `
+    <div class="risco-wrap">
+      <div class="risco-label">${uf}</div>
+      <select class="risco-sel" id="risco_${uf}">
+        ${opts.map(o=>`<option value="${o}" ${CONFIG.risco_por_estado[uf]===o?'selected':''}>${cores[o]} ${o}</option>`).join('')}
+      </select>
+    </div>`).join('');
+}
+
+async function salvarRisco(){
+  ESTADOS.forEach(uf => { CONFIG.risco_por_estado[uf] = document.getElementById('risco_'+uf).value; });
+  CONFIG.vencimentos.roubo.data = `01/12/${new Date().getFullYear()}`;
+  await sb.from('config_app').upsert({chave:'risco_estado', valor: JSON.stringify(CONFIG.risco_por_estado), updated_at: new Date().toISOString()});
+  renderSemaforo();
+  alert('✅ Índice de risco atualizado!');
+}
+
+// ─── PISTAS GRID ADMIN ───────────────────────
+function renderPistaGrid(){
+  const grid = document.getElementById('pistaGrid');
+  grid.innerHTML = ESTADOS.map(uf => `
+    <div class="d-inp-wrap">
+      <div class="d-inp-label">${uf}</div>
+      <input class="d-inp" id="pista_${uf}" type="number" step="0.05" value="${(CONFIG.pista_por_estado[uf]||1.0).toFixed(2)}">
+    </div>`).join('');
+}
+
+async function salvarPistas(){
+  ESTADOS.forEach(uf => { CONFIG.pista_por_estado[uf] = parseFloat(document.getElementById('pista_'+uf).value)||1.0; });
+  CONFIG.vencimentos.pistas.data = `01/11/${new Date().getFullYear()}`;
+  await sb.from('config_app').upsert({chave:'pista_estado', valor: JSON.stringify(CONFIG.pista_por_estado), updated_at: new Date().toISOString()});
+  renderSemaforo();
+  alert('✅ Condição das pistas atualizada!');
+}
+
+// ─── OPERACIONAL ADMIN ───────────────────────
+function preencherOperacional(){
+  document.getElementById('adminManutKm').value = CONFIG.manutencao_km;
+  document.getElementById('adminAlimDiaria').value = CONFIG.alimentacao_diaria;
+  document.getElementById('adminEstadiaTon').value = CONFIG.estadia_ton_hora;
+  document.getElementById('adminBonus').value = CONFIG.bonus_cadastro;
+}
+
+async function salvarOperacional(){
+  CONFIG.manutencao_km = parseFloat(document.getElementById('adminManutKm').value)||0.74;
+  CONFIG.alimentacao_diaria = parseFloat(document.getElementById('adminAlimDiaria').value)||110;
+  CONFIG.estadia_ton_hora = parseFloat(document.getElementById('adminEstadiaTon').value)||2.29;
+  CONFIG.bonus_cadastro = parseInt(document.getElementById('adminBonus').value)||3;
+  await sb.from('config_app').upsert({chave:'operacional', valor: JSON.stringify({
+    manutencao_km: CONFIG.manutencao_km,
+    alimentacao_diaria: CONFIG.alimentacao_diaria,
+    estadia_ton_hora: CONFIG.estadia_ton_hora,
+    bonus_cadastro: CONFIG.bonus_cadastro
+  }), updated_at: new Date().toISOString()});
+  alert('✅ Valores operacionais salvos!');
+}
+
+// ─── PACOTES ADMIN ───────────────────────────
+function renderPacotesAdmin(){
+  const grid = document.getElementById('adminPacotesGrid');
+  grid.innerHTML = CONFIG.pacotes.map((p,i) => `
+    <div style="border:1.5px solid var(--gb);border-radius:10px;padding:1rem">
+      <div style="font-size:11px;font-weight:700;color:var(--g2);text-transform:uppercase;margin-bottom:.5rem">Pacote ${i+1}</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <input placeholder="Nome" value="${p.nome}" id="pac_nome_${i}" style="border:1.5px solid var(--gb);border-radius:6px;padding:7px 10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none">
+        <input placeholder="Créditos" type="number" value="${p.cred}" id="pac_cred_${i}" style="border:1.5px solid var(--gb);border-radius:6px;padding:7px 10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none">
+        <input placeholder="Preço R$" type="number" step="0.5" value="${p.preco}" id="pac_preco_${i}" style="border:1.5px solid var(--gb);border-radius:6px;padding:7px 10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none">
+        <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer">
+          <input type="checkbox" id="pac_pop_${i}" ${p.popular?'checked':''}> Mais popular
+        </label>
+      </div>
+    </div>`).join('');
+}
+
+async function salvarPacotes(){
+  CONFIG.pacotes = CONFIG.pacotes.map((p,i) => ({
+    ...p,
+    nome: document.getElementById('pac_nome_'+i).value,
+    cred: parseInt(document.getElementById('pac_cred_'+i).value),
+    preco: parseFloat(document.getElementById('pac_preco_'+i).value),
+    popular: document.getElementById('pac_pop_'+i).checked
+  }));
+  await sb.from('config_app').upsert({chave:'pacotes', valor: JSON.stringify(CONFIG.pacotes), updated_at: new Date().toISOString()});
+  renderPacotesUsuario();
+  alert('✅ Pacotes atualizados! Já refletem para os usuários.');
+}
+
+// ─── KPIs ADMIN ──────────────────────────────
+async function carregarKPIs(){
+  const agora = new Date();
+  const inicioMes = new Date(agora.getFullYear(), agora.getMonth(), 1).toISOString();
+  const inicioMesAnt = new Date(agora.getFullYear(), agora.getMonth()-1, 1).toISOString();
+  const fimMesAnt = new Date(agora.getFullYear(), agora.getMonth(), 0).toISOString();
+
+  const [{data:consultasMes},{data:consultasAnt},{data:usuarios},{data:comprasMes},{data:comprasAnt}] = await Promise.all([
+    sb.from('historico_consultas').select('id', {count:'exact'}).gte('created_at', inicioMes),
+    sb.from('historico_consultas').select('id', {count:'exact'}).gte('created_at', inicioMesAnt).lte('created_at', fimMesAnt),
+    sb.from('usuarios').select('id', {count:'exact'}).gte('created_at', inicioMes),
+    sb.from('extrato_creditos').select('valor').eq('tipo','compra').gte('created_at', inicioMes),
+    sb.from('extrato_creditos').select('valor').eq('tipo','compra').gte('created_at', inicioMesAnt).lte('created_at', fimMesAnt),
+  ]);
+
+  const cMes = consultasMes?.length||0, cAnt = consultasAnt?.length||0;
+  const rMes = (comprasMes||[]).reduce((s,r)=>s+(r.valor||0),0);
+  const rAnt = (comprasAnt||[]).reduce((s,r)=>s+(r.valor||0),0);
+  const uMes = usuarios?.length||0;
+
+  const diff = (a,b) => b===0?'+0':((a-b)/b*100).toFixed(0);
+  const seta = v => parseFloat(v)>=0?`<span style="color:var(--ve)">↑ ${v}% vs mês ant.</span>`:`<span style="color:var(--r)">↓ ${Math.abs(v)}% vs mês ant.</span>`;
+
+  document.getElementById('kpiConsultasMes').textContent = cMes;
+  document.getElementById('kpiConsultasComp').innerHTML = seta(diff(cMes,cAnt));
+  document.getElementById('kpiUsuarios').textContent = uMes;
+  document.getElementById('kpiUsuariosComp').innerHTML = `<span style="color:var(--g2)">novos este mês</span>`;
+  document.getElementById('kpiReceita').textContent = 'R$ '+rMes.toFixed(2).replace('.',',');
+  document.getElementById('kpiReceitaComp').innerHTML = seta(diff(rMes,rAnt));
+
+  // Fretes abaixo ANTT
+  const {data:hist} = await sb.from('historico_consultas').select('abaixo_antt').gte('created_at', inicioMes);
+  const abaixo = hist?.filter(h=>h.abaixo_antt).length||0;
+  const total = hist?.length||1;
+  document.getElementById('kpiAbaixoAntt').textContent = `${abaixo} (${Math.round(abaixo/total*100)}%)`;
+}
+
+async function carregarRotasTop(){
+  const inicioMes = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+  const {data} = await sb.from('historico_consultas').select('origem,destino').gte('created_at', inicioMes);
+  if(!data?.length){ document.getElementById('rotasTop').innerHTML = '<div style="font-size:13px;color:var(--g3)">Nenhuma consulta este mês</div>'; return; }
+  const contagem = {};
+  data.forEach(h => { const k=`${h.origem} → ${h.destino}`; contagem[k]=(contagem[k]||0)+1; });
+  const sorted = Object.entries(contagem).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  document.getElementById('rotasTop').innerHTML = sorted.map(([rota,qtd],i) =>
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--gf);font-size:13px">
+      <span>${i+1}. ${rota}</span>
+      <span style="font-weight:700;color:var(--ve)">${qtd}x</span>
+    </div>`).join('');
+}
+
+// ─── CALCULADORA ESTADIA ─────────────────────
+function abrirEstadia(){
+  document.getElementById('modalEstadia').classList.add('open');
+  document.getElementById('estadiaResultado').style.display='none';
+  // Pré-preenche tonelagem pelo veículo da última consulta
+  if(ultimoCalculo?.veiculo){
+    const tons = {vuc:3.5,toco2:6,truck3:10,carreta5:27,carreta6:32,bitrem7:38,rodotrem9:45,treminhao:45};
+    const vKey = document.getElementById('c-veiculo')?.value;
+    if(tons[vKey]){
+      const sel = document.getElementById('estTonelagem');
+      for(let o of sel.options){ if(parseFloat(o.value)>=tons[vKey]){sel.value=o.value;break;} }
+    }
+  }
+}
+function fecharEstadia(){ document.getElementById('modalEstadia').classList.remove('open'); }
+
+function calcularEstadia(){
+  const chegada = document.getElementById('estChegada').value;
+  const saida = document.getElementById('estSaida').value;
+  const tonelagem = parseFloat(document.getElementById('estTonelagem').value);
+  const local = document.getElementById('estLocal').value || 'Local informado';
+  if(!chegada||!saida){ alert('Informe o horário de chegada e liberação.'); return; }
+  const [hC,mC]=chegada.split(':').map(Number);
+  const [hS,mS]=saida.split(':').map(Number);
+  let totalMin = (hS*60+mS)-(hC*60+mC);
+  if(totalMin<0) totalMin+=24*60;
+  const totalHoras = totalMin/60;
+  const franquia = 5; // horas gratuitas
+  const horasExc = Math.max(0, totalHoras-franquia);
+  const valorTon = CONFIG.estadia_ton_hora || 2.29;
+  const valorTotal = horasExc * tonelagem * valorTon;
+  const agora = new Date().toLocaleString('pt-BR');
+  const div = document.getElementById('estadiaResultado');
+  if(horasExc<=0){
+    div.innerHTML=`<div style="background:var(--vc);border:1px solid var(--vm);border-radius:8px;padding:1rem;text-align:center;font-size:14px;color:var(--ve)"><strong>✅ Sem estadia devida</strong><br>Tempo total: ${totalHoras.toFixed(1)}h (dentro do prazo de 5h)</div>`;
+    div.style.display='block'; return;
+  }
+  div.innerHTML=`
+    <div style="border:2px solid var(--v);border-radius:10px;padding:1rem;margin-top:.5rem">
+      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--ve);margin-bottom:.75rem">📄 Comprovante de Estadia</div>
+      <div style="font-size:11px;color:var(--g2);line-height:1.8">
+        <div><strong>Local:</strong> ${local}</div>
+        <div><strong>Emitido em:</strong> ${agora}</div>
+        <div><strong>Chegada:</strong> ${chegada} | <strong>Liberação:</strong> ${saida}</div>
+        <div><strong>Tempo total:</strong> ${totalHoras.toFixed(1)}h | <strong>Franquia:</strong> 5h</div>
+        <div><strong>Horas excedentes:</strong> ${horasExc.toFixed(1)}h</div>
+        <div><strong>Capacidade:</strong> ${tonelagem} toneladas</div>
+        <div><strong>Valor/ton/hora:</strong> R$ ${valorTon.toFixed(2)} (Lei 11.442/07)</div>
+      </div>
+      <div style="border-top:2px solid var(--dark);margin-top:.75rem;padding-top:.75rem;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-weight:700">Total a cobrar</span>
+        <span style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--ve)">R$ ${valorTotal.toFixed(2).replace('.',',')}</span>
+      </div>
+      <div style="font-size:10px;color:var(--g2);margin-top:.5rem;text-align:center">Fórmula: ${horasExc.toFixed(1)}h × ${tonelagem}t × R$ ${valorTon.toFixed(2)} | Lei 11.442/07 Art.11 §5º</div>
+    </div>
+    <div style="font-size:11px;color:var(--a);background:var(--ac);border-radius:6px;padding:.5rem .75rem;margin-top:.5rem">
+      💡 Guarde print desta tela como prova. Você tem 5 anos para cobrar judicialmente.
+    </div>`;
+  div.style.display='block';
+}
+
+// ─── PACOTES DINÂMICOS ───────────────────────
+function renderPacotesUsuario(){
+  const div = document.querySelector('.pacotes');
+  if(!div) return;
+  div.innerHTML = CONFIG.pacotes.map(p => `
+    <div class="pacote ${p.popular?'pop':''}" onclick="selecionarPacote('${p.id}',${p.preco},${p.cred})">
+      ${p.popular?'<div class="pop-badge">MAIS POPULAR</div>':''}
+      <div class="pac-nome">${p.nome}</div>
+      <div class="pac-cred">${p.cred} consultas</div>
+      <div class="pac-preco">R$ ${p.preco.toFixed(2).replace('.',',')}</div>
+      <div class="pac-unit">R$ ${(p.preco/p.cred).toFixed(2).replace('.',',')} por consulta</div>
+      <button class="btn-pac">Comprar</button>
+    </div>`).join('');
+}
+
+// ─── CARREGAR CONFIG DO SUPABASE ─────────────
+async function carregarConfig(){
+  try{
+    const {data} = await sb.from('config_app').select('*');
+    if(!data?.length) return;
+    data.forEach(row => {
+      try{
+        const val = JSON.parse(row.valor);
+        if(row.chave==='diesel_estado'){ DIESEL_ESTADO={...val}; CONFIG.diesel_ref_data=row.data_ref||CONFIG.diesel_ref_data; }
+        if(row.chave==='operacional') Object.assign(CONFIG, val);
+        if(row.chave==='pacotes') CONFIG.pacotes=val;
+        if(row.chave==='risco_estado') CONFIG.risco_por_estado=val;
+        if(row.chave==='pista_estado') CONFIG.pista_por_estado=val;
+        if(row.chave==='vencimentos') CONFIG.vencimentos=val;
+      }catch(e){}
+    });
+    renderPacotesUsuario();
+  }catch(e){ console.log('Config default usada'); }
+}
 
 // ─── VERIFICAR SESSÃO AO CARREGAR ────────────
 window.addEventListener('load',async()=>{
