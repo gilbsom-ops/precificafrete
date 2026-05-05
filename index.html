@@ -61,36 +61,37 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);min
 @media(max-width:700px){#auth{flex-direction:column}.auth-left{padding:2rem;min-height:auto}.auth-items{display:none}}
 
 /* APP SHELL */
-#app{min-height:100vh;display:flex;overflow-x:hidden}
-.sidebar{width:240px;background:var(--dark);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;transition:transform .3s}
-.sidebar-logo{padding:1.5rem 1.25rem;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:10px}
-.sidebar-logo-icon{width:34px;height:34px;background:var(--v);border-radius:8px;display:flex;align-items:center;justify-content:center}
-.sidebar-logo-icon svg{width:19px;height:19px}
-.sidebar-logo-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff}
-.sidebar-nav{flex:1;padding:1rem 0}
-.nav-item{display:flex;align-items:center;gap:10px;padding:.75rem 1.25rem;font-size:14px;font-weight:500;color:rgba(255,255,255,0.5);cursor:pointer;transition:all .2s;border-left:3px solid transparent}
-.nav-item:hover{color:#fff;background:rgba(255,255,255,0.05)}
-.nav-item.ativo{color:#fff;background:rgba(29,158,117,0.12);border-left-color:var(--v)}
-.nav-item-icon{font-size:16px;width:20px;text-align:center}
-.sidebar-footer{padding:1rem 1.25rem;border-top:1px solid rgba(255,255,255,0.08)}
-.sidebar-user{display:flex;align-items:center;gap:10px}
-.sidebar-avatar{width:34px;height:34px;background:var(--v);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
-.sidebar-user-name{font-size:13px;font-weight:600;color:#fff}
-.sidebar-user-cred{font-size:11px;color:var(--g3)}
-.sidebar-sair{font-size:12px;color:var(--g3);cursor:pointer;margin-top:4px;display:inline-block}
+#app{min-height:100vh;display:flex;flex-direction:column}
+.sidebar{width:100%;background:var(--dark);display:flex;flex-direction:row;align-items:center;position:sticky;top:0;z-index:50;height:56px;padding:0 1.5rem;gap:.5rem;flex-shrink:0}
+.sidebar-logo{display:flex;align-items:center;gap:8px;margin-right:.75rem;flex-shrink:0}
+.sidebar-logo-icon{width:30px;height:30px;background:var(--v);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sidebar-logo-icon svg{width:17px;height:17px}
+.sidebar-logo-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#fff}
+.sidebar-nav{flex:1;padding:0;display:flex;flex-direction:row;align-items:center;gap:2px}
+.nav-item{display:flex;align-items:center;gap:6px;padding:.4rem .85rem;font-size:13px;font-weight:500;color:rgba(255,255,255,0.55);cursor:pointer;transition:all .2s;border-left:none;border-radius:6px;white-space:nowrap}
+.nav-item:hover{color:#fff;background:rgba(255,255,255,0.08)}
+.nav-item.ativo{color:#fff;background:rgba(29,158,117,0.25);border-left:none}
+.nav-item-icon{font-size:14px;width:auto}
+.sidebar-footer{padding:0;border-top:none;display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:auto}
+.sidebar-user{display:flex;align-items:center;gap:8px}
+.sidebar-avatar{width:28px;height:28px;background:var(--v);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+.sidebar-user-name{font-size:12px;font-weight:600;color:#fff}
+.sidebar-user-cred{font-size:10px;color:var(--g3)}
+.sidebar-sair{font-size:11px;color:var(--g3);cursor:pointer;white-space:nowrap}
 .sidebar-sair:hover{color:#fff}
-.app-content{margin-left:240px;flex:1;min-height:100vh;overflow-x:hidden}
-.topbar{background:#fff;border-bottom:1px solid var(--gb);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;width:100%}
-.topbar-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700}
-.topbar-cred{display:flex;align-items:center;gap:8px;background:var(--vc);border:1px solid var(--vm);border-radius:99px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--ve);cursor:pointer}
+.app-content{margin-left:0;flex:1;min-height:calc(100vh - 56px);width:100%;overflow-x:hidden}
+.topbar{display:none}
 .page{display:none;padding:2rem}
 .page.ativa{display:block;animation:fadeIn .25s ease}
-.mob-topbar{display:none;background:var(--dark);padding:.875rem 1.25rem;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:60}
-.mob-logo{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff}
-.mob-menu-btn{background:none;border:none;color:#fff;font-size:20px;cursor:pointer}
-.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:45}
-@media(max-width:768px){
-  .sidebar{transform:translateX(-100%)}.sidebar.open{transform:none}
+.mob-topbar{display:none}
+.sidebar-overlay{display:none}
+@media(max-width:700px){
+  .sidebar{height:auto;flex-wrap:wrap;padding:.6rem 1rem}
+  .sidebar-nav{flex-wrap:wrap}
+  .nav-item{font-size:11px;padding:.35rem .6rem}
+  .sidebar-footer{margin-left:0;padding-top:.4rem;border-top:1px solid rgba(255,255,255,.1);width:100%}
+  .page{padding:1rem}
+}.sidebar.open{transform:none}
   .sidebar-overlay.open{display:block}.app-content{margin-left:0}
   .mob-topbar{display:flex}.topbar{display:none}.page{padding:1.25rem}
 }
@@ -459,7 +460,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);min
 </div>
 
     <!-- ADMIN -->
-    <div class="page" id="page-admin" style="padding-left:2rem;padding-right:2rem;width:100%;box-sizing:border-box">
+    <div class="page" id="page-admin">
       <div style="margin-bottom:2rem;padding-top:.5rem">
         <h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:.25rem">⚙️ Painel Administrativo</h2>
         <p style="font-size:14px;color:var(--g2)">Gerencie dados, monitore indicadores e mantenha o app atualizado.</p>
@@ -789,10 +790,8 @@ function irPage(page){
   const titles={dashboard:'Painel',calculadora:'Calcular frete',creditos:'Meus créditos',admin:'Painel Admin'};
   document.getElementById('topbarTitle').textContent=titles[page]||'';
   if(page==='admin'){
-    // Tentar imediatamente, e depois com retry se necessário
-    carregarAdmin();
-    setTimeout(()=>carregarAdmin(), 800);
-    setTimeout(()=>carregarAdmin(), 2000);
+    if(usuarioAtual) carregarAdmin();
+    else setTimeout(()=>carregarAdmin(), 1500);
   }
   if(window.innerWidth<=768)toggleSidebar(false);
 }
@@ -1209,28 +1208,18 @@ function fecharModal(e){if(e.target===document.getElementById('modalOv'))documen
 const ADMIN_EMAIL = 'gilbsom@gmail.com';
 const ESTADOS = ['AC','AL','AM','AP','BA','CE','DF','ES','GO','MA','MG','MS','MT','PA','PB','PE','PI','PR','RJ','RN','RO','RR','RS','SC','SE','SP','TO'];
 
-function isAdmin(){ return usuarioAtual?.email === ADMIN_EMAIL || usuarioAtual?.user_metadata?.email === ADMIN_EMAIL; }
+function isAdmin(){ return usuarioAtual?.email === ADMIN_EMAIL; }
 
 async function carregarAdmin(){
-  // Verificar admin pelo email diretamente
-  const adminEmail = ADMIN_EMAIL;
-  const emailAtual = usuarioAtual?.email || usuarioAtual?.user_metadata?.email || '';
-  if(emailAtual !== adminEmail) return;
-  
-  // Mostrar loading
-  const page = document.getElementById('page-admin');
-  if(!page.querySelector('.admin-loaded')){
-    page.innerHTML += '<div class="admin-loaded" style="display:none"></div>';
-  }
-  
+  if(!isAdmin()) return;
   try{ renderSemaforo(); }catch(e){}
   try{ renderDieselGrid(); }catch(e){}
   try{ renderRiscoGrid(); }catch(e){}
   try{ renderPistaGrid(); }catch(e){}
   try{ renderPacotesAdmin(); }catch(e){}
   try{ preencherOperacional(); }catch(e){}
-  try{ await carregarKPIs(); }catch(e){ console.log('KPIs err:', e); }
-  try{ await carregarRotasTop(); }catch(e){ console.log('Rotas err:', e); }
+  try{ await carregarKPIs(); }catch(e){ console.log('KPIs:', e); }
+  try{ await carregarRotasTop(); }catch(e){ console.log('Rotas:', e); }
 }
 
 // ─── SEMÁFORO ────────────────────────────────
