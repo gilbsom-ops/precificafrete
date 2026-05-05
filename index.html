@@ -79,11 +79,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);min
 .sidebar-user-cred{font-size:11px;color:var(--g3)}
 .sidebar-sair{font-size:12px;color:var(--g3);cursor:pointer;margin-top:4px;display:inline-block}
 .sidebar-sair:hover{color:#fff}
-.app-content{margin-left:240px;flex:1;min-height:100vh}
+.app-content{margin-left:240px;flex:1;min-height:100vh;min-width:0;overflow-x:hidden}
 .topbar{background:#fff;border-bottom:1px solid var(--gb);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40}
 .topbar-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700}
 .topbar-cred{display:flex;align-items:center;gap:8px;background:var(--vc);border:1px solid var(--vm);border-radius:99px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--ve);cursor:pointer}
-.page{display:none;padding:2rem}
+.page{display:none;padding:2rem;max-width:1200px;width:100%}
 .page.ativa{display:block;animation:fadeIn .25s ease}
 .mob-topbar{display:none;background:var(--dark);padding:.875rem 1.25rem;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:60}
 .mob-logo{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff}
@@ -469,12 +469,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);min
       <!-- SEMÁFORO DE SAÚDE DOS DADOS -->
       <div style="background:#fff;border:1px solid var(--gb);border-radius:14px;padding:1.5rem;margin-bottom:1.5rem">
         <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:1rem">🚦 Saúde dos Dados</div>
-        <div id="semaforoGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px"></div>
+        <div id="semaforoGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px"></div>
       </div>
 
       <!-- DASHBOARD KPIs -->
       <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:1rem">📈 Indicadores — Mês atual vs anterior</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:1.5rem">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;margin-bottom:1.5rem">
         <div style="background:#fff;border:1px solid var(--gb);border-radius:12px;padding:1.25rem">
           <div style="font-size:11px;font-weight:600;color:var(--g2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.5rem">Consultas este mês</div>
           <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800" id="kpiConsultasMes">--</div>
@@ -509,7 +509,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);min
           <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700">⛽ Diesel S10 por Estado (ANP)</div>
           <div style="font-size:11px;color:var(--g3)">Fonte: <a href="https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/precos-revenda-e-de-distribuicao-combustiveis/levantamento-de-precos" target="_blank" style="color:var(--v)">gov.br/anp</a></div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px;margin-bottom:1rem" id="dieselGrid"></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:6px;margin-bottom:1rem" id="dieselGrid"></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
           <div style="flex:1;min-width:160px">
             <div style="font-size:11px;font-weight:600;color:var(--g2);margin-bottom:4px">Data de referência ANP</div>
@@ -560,7 +560,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);min
           <div style="font-size:11px;color:var(--g3)">Fonte: <a href="https://www.ntclogistica.org.br" target="_blank" style="color:var(--v)">NTC&Logística</a> — anual</div>
         </div>
         <div style="font-size:12px;color:var(--a);background:var(--ac);border:1px solid var(--ab);border-radius:6px;padding:6px 10px;margin-bottom:1rem">⚠️ Atualizar anualmente em dezembro, quando NTC&Logística publicar o relatório.</div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px" id="riscoGrid"></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:6px" id="riscoGrid"></div>
         <button onclick="salvarRisco()" style="margin-top:1rem;padding:10px 20px;background:var(--v);color:#fff;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer">💾 Salvar risco</button>
       </div>
 
@@ -572,7 +572,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);min
         </div>
         <div style="font-size:12px;color:var(--a);background:var(--ac);border:1px solid var(--ab);border-radius:6px;padding:6px 10px;margin-bottom:1rem">⚠️ Atualizar anualmente em novembro, após publicação da Pesquisa CNT de Rodovias.</div>
         <div style="font-size:11px;color:var(--g2);margin-bottom:.75rem">Multiplicador do custo de manutenção: 1.0 = normal · 1.2 = ruim · 1.5 = péssimo</div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px" id="pistaGrid"></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:6px" id="pistaGrid"></div>
         <button onclick="salvarPistas()" style="margin-top:1rem;padding:10px 20px;background:var(--v);color:#fff;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer">💾 Salvar pistas</button>
       </div>
 
