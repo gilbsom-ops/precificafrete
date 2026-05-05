@@ -1208,14 +1208,14 @@ function isAdmin(){ return usuarioAtual?.email === ADMIN_EMAIL; }
 
 async function carregarAdmin(){
   if(!isAdmin()) return;
-  renderSemaforo();
-  renderDieselGrid();
-  renderRiscoGrid();
-  renderPistaGrid();
-  renderPacotesAdmin();
-  preencherOperacional();
-  await carregarKPIs();
-  await carregarRotasTop();
+  try{ renderSemaforo(); }catch(e){}
+  try{ renderDieselGrid(); }catch(e){}
+  try{ renderRiscoGrid(); }catch(e){}
+  try{ renderPistaGrid(); }catch(e){}
+  try{ renderPacotesAdmin(); }catch(e){}
+  try{ preencherOperacional(); }catch(e){}
+  try{ await carregarKPIs(); }catch(e){ console.log('KPIs:', e); }
+  try{ await carregarRotasTop(); }catch(e){ console.log('Rotas:', e); }
 }
 
 // ─── SEMÁFORO ────────────────────────────────
@@ -1374,36 +1374,40 @@ async function carregarKPIs(){
   const agora = new Date();
   const inicioMes = new Date(agora.getFullYear(), agora.getMonth(), 1).toISOString();
   const inicioMesAnt = new Date(agora.getFullYear(), agora.getMonth()-1, 1).toISOString();
-  const fimMesAnt = new Date(agora.getFullYear(), agora.getMonth(), 0).toISOString();
+  const fimMesAnt = new Date(agora.getFullYear(), agora.getMonth(), 0, 23, 59, 59).toISOString();
 
-  const [{data:consultasMes},{data:consultasAnt},{data:usuarios},{data:comprasMes},{data:comprasAnt}] = await Promise.all([
-    sb.from('historico_consultas').select('id', {count:'exact'}).gte('created_at', inicioMes),
-    sb.from('historico_consultas').select('id', {count:'exact'}).gte('created_at', inicioMesAnt).lte('created_at', fimMesAnt),
-    sb.from('usuarios').select('id', {count:'exact'}).gte('created_at', inicioMes),
+  const [r1,r2,r3,r4,r5] = await Promise.all([
+    sb.from('historico_consultas').select('*', {count:'exact',head:true}).gte('created_at', inicioMes),
+    sb.from('historico_consultas').select('*', {count:'exact',head:true}).gte('created_at', inicioMesAnt).lte('created_at', fimMesAnt),
+    sb.from('usuarios').select('*', {count:'exact',head:true}).gte('created_at', inicioMes),
     sb.from('extrato_creditos').select('valor').eq('tipo','compra').gte('created_at', inicioMes),
     sb.from('extrato_creditos').select('valor').eq('tipo','compra').gte('created_at', inicioMesAnt).lte('created_at', fimMesAnt),
   ]);
 
-  const cMes = consultasMes?.length||0, cAnt = consultasAnt?.length||0;
-  const rMes = (comprasMes||[]).reduce((s,r)=>s+(r.valor||0),0);
-  const rAnt = (comprasAnt||[]).reduce((s,r)=>s+(r.valor||0),0);
-  const uMes = usuarios?.length||0;
+  const cMes = r1.count||0, cAnt = r2.count||0;
+  const uMes = r3.count||0;
+  const rMes = (r4.data||[]).reduce((s,r)=>s+(r.valor||0),0);
+  const rAnt = (r5.data||[]).reduce((s,r)=>s+(r.valor||0),0);
 
-  const diff = (a,b) => b===0?'+0':((a-b)/b*100).toFixed(0);
-  const seta = v => parseFloat(v)>=0?`<span style="color:var(--ve)">↑ ${v}% vs mês ant.</span>`:`<span style="color:var(--r)">↓ ${Math.abs(v)}% vs mês ant.</span>`;
+  const seta = (a,b) => {
+    if(b===0) return `<span style="color:var(--g3)">primeiro mês</span>`;
+    const p = ((a-b)/b*100).toFixed(0);
+    return parseFloat(p)>=0
+      ? `<span style="color:var(--ve)">↑ ${p}% vs mês ant.</span>`
+      : `<span style="color:var(--r)">↓ ${Math.abs(p)}% vs mês ant.</span>`;
+  };
 
   document.getElementById('kpiConsultasMes').textContent = cMes;
-  document.getElementById('kpiConsultasComp').innerHTML = seta(diff(cMes,cAnt));
+  document.getElementById('kpiConsultasComp').innerHTML = seta(cMes,cAnt);
   document.getElementById('kpiUsuarios').textContent = uMes;
   document.getElementById('kpiUsuariosComp').innerHTML = `<span style="color:var(--g2)">novos este mês</span>`;
   document.getElementById('kpiReceita').textContent = 'R$ '+rMes.toFixed(2).replace('.',',');
-  document.getElementById('kpiReceitaComp').innerHTML = seta(diff(rMes,rAnt));
+  document.getElementById('kpiReceitaComp').innerHTML = seta(rMes,rAnt);
 
-  // Fretes abaixo ANTT
   const {data:hist} = await sb.from('historico_consultas').select('abaixo_antt').gte('created_at', inicioMes);
-  const abaixo = hist?.filter(h=>h.abaixo_antt).length||0;
-  const total = hist?.length||1;
-  document.getElementById('kpiAbaixoAntt').textContent = `${abaixo} (${Math.round(abaixo/total*100)}%)`;
+  const abaixo = (hist||[]).filter(h=>h.abaixo_antt).length;
+  const total = hist?.length||0;
+  document.getElementById('kpiAbaixoAntt').textContent = total>0 ? `${abaixo} (${Math.round(abaixo/total*100)}%)` : '0';
 }
 
 async function carregarRotasTop(){
