@@ -79,11 +79,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);min
 .sidebar-user-cred{font-size:11px;color:var(--g3)}
 .sidebar-sair{font-size:12px;color:var(--g3);cursor:pointer;margin-top:4px;display:inline-block}
 .sidebar-sair:hover{color:#fff}
-.app-content{margin-left:240px;flex:1;min-height:100vh;min-width:0;overflow-x:hidden;width:calc(100% - 240px)}
-.topbar{background:#fff;border-bottom:1px solid var(--gb);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40}
+.app-content{margin-left:240px;flex:1;min-height:100vh;overflow-x:hidden}
+.topbar{background:#fff;border-bottom:1px solid var(--gb);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;width:100%}
 .topbar-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700}
 .topbar-cred{display:flex;align-items:center;gap:8px;background:var(--vc);border:1px solid var(--vm);border-radius:99px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--ve);cursor:pointer}
-.page{display:none;padding:2rem;max-width:100%;box-sizing:border-box}
+.page{display:none;padding:2rem}
 .page.ativa{display:block;animation:fadeIn .25s ease}
 .mob-topbar{display:none;background:var(--dark);padding:.875rem 1.25rem;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:60}
 .mob-logo{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff}
@@ -459,9 +459,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);min
 </div>
 
     <!-- ADMIN -->
-    <div class="page" id="page-admin" style="width:100%;box-sizing:border-box">
-      <!-- DASHBOARD ADMIN -->
-      <div style="margin-bottom:2rem">
+    <div class="page" id="page-admin">
+      <div style="margin-bottom:2rem;padding-top:.5rem">
         <h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:.25rem">⚙️ Painel Administrativo</h2>
         <p style="font-size:14px;color:var(--g2)">Gerencie dados, monitore indicadores e mantenha o app atualizado.</p>
       </div>
@@ -785,10 +784,14 @@ function irPage(page){
   document.getElementById('page-'+page).classList.add('ativa');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('ativo'));
   const idx={dashboard:0,calculadora:1,creditos:2,admin:3};
-  document.querySelectorAll('.nav-item')[idx[page]]?.classList.add('ativo');
+  const navItems=document.querySelectorAll('.nav-item');
+  if(navItems[idx[page]]) navItems[idx[page]].classList.add('ativo');
   const titles={dashboard:'Painel',calculadora:'Calcular frete',creditos:'Meus créditos',admin:'Painel Admin'};
   document.getElementById('topbarTitle').textContent=titles[page]||'';
-  if(page==='admin') carregarAdmin();
+  if(page==='admin'){
+    if(usuarioAtual) carregarAdmin();
+    else setTimeout(()=>carregarAdmin(), 1500);
+  }
   if(window.innerWidth<=768)toggleSidebar(false);
 }
 function toggleSidebar(force){
