@@ -738,9 +738,13 @@ async function fazerLogin(){
 // ─── ENTRAR NO APP ────────────────────────────
 async function entrarNoApp(user){
   usuarioAtual=user;
+  // Guardar email original do auth (não pode ser sobrescrito)
+  const _emailOriginal = user.email;
   // Buscar dados do usuário
   const{data:userData}=await sb.from('usuarios').select('*').eq('id',user.id).single();
   if(userData) usuarioAtual={...user,...userData};
+  // Garantir que email do auth nunca se perca no merge
+  usuarioAtual.email = _emailOriginal;
   
   // Trocar tela
   document.getElementById('auth').classList.remove('ativa');
@@ -760,7 +764,11 @@ async function entrarNoApp(user){
   carregarHistorico();
   carregarExtrato();
   await carregarConfig();
-  if(isAdmin()) document.getElementById('navAdmin').style.display='flex';
+  if(isAdmin()){
+    document.getElementById('navAdmin').style.display='flex';
+    // Pré-carrega admin em background após 800ms
+    setTimeout(()=>carregarAdmin(), 800);
+  }
 }
 
 function atualizarCredUI(){
@@ -790,8 +798,9 @@ function irPage(page){
   const titles={dashboard:'Painel',calculadora:'Calcular frete',creditos:'Meus créditos',admin:'Painel Admin'};
   document.getElementById('topbarTitle').textContent=titles[page]||'';
   if(page==='admin'){
-    if(usuarioAtual) carregarAdmin();
-    else setTimeout(()=>carregarAdmin(), 1500);
+    // Tenta imediatamente e com retry para garantir carregamento
+    carregarAdmin();
+    setTimeout(()=>{ if(document.getElementById('semaforoGrid')?.innerHTML==='') carregarAdmin(); }, 1500);
   }
   if(window.innerWidth<=768)toggleSidebar(false);
 }
@@ -1208,13 +1217,9 @@ function fecharModal(e){if(e.target===document.getElementById('modalOv'))documen
 const ADMIN_EMAIL = 'gilbsom@gmail.com';
 const ESTADOS = ['AC','AL','AM','AP','BA','CE','DF','ES','GO','MA','MG','MS','MT','PA','PB','PE','PI','PR','RJ','RN','RO','RR','RS','SC','SE','SP','TO'];
 
-function isAdmin(){ return usuarioAtual?.email === ADMIN_EMAIL; }
+function isAdmin(){ return (usuarioAtual?.email||'') === ADMIN_EMAIL; }
 
 async function carregarAdmin(){
-  if(!usuarioAtual?.email){
-    setTimeout(()=>carregarAdmin(), 600);
-    return;
-  }
   if(!isAdmin()) return;
   try{ renderSemaforo(); }catch(e){}
   try{ renderDieselGrid(); }catch(e){}
