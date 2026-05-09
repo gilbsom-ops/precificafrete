@@ -6,6 +6,7 @@
 <title>Precifica Frete</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCTYB8UdE9SE7Sl5KTWsvfWMvooiK_UESo&libraries=places"></script>
 <style>
 :root {
@@ -80,7 +81,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);min
 .sidebar-sair{font-size:11px;color:var(--g3);cursor:pointer;white-space:nowrap}
 .sidebar-sair:hover{color:#fff}
 .app-content{margin-left:0;flex:1;min-height:calc(100vh - 56px);width:100%;overflow-x:hidden}
-.topbar{display:none}
+.topbar{display:none;height:0;padding:0;margin:0;overflow:hidden}
 .page{display:none;padding:2rem}
 .page.ativa{display:block;animation:fadeIn .25s ease}
 .mob-topbar{display:none}
@@ -93,7 +94,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);min
   .page{padding:1rem}
 }.sidebar.open{transform:none}
   .sidebar-overlay.open{display:block}.app-content{margin-left:0}
-  .mob-topbar{display:flex}.topbar{display:none}.page{padding:1.25rem}
+  .mob-topbar{display:flex}.topbar{display:none;height:0;padding:0;margin:0;overflow:hidden}.page{padding:1.25rem}
 }
 
 /* DASHBOARD */
@@ -451,7 +452,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);min
         <div class="pix-qr">QR Code PIX será gerado aqui após integração com gateway de pagamento</div>
         <div class="pix-key-box"><span class="pix-key">precificafrete@pix.com.br</span><button class="btn-copy" onclick="copiarChave()">Copiar</button></div>
         <div class="pix-instruc">Abra o app do seu banco, escaneie o QR Code ou copie a chave PIX. Os créditos serão adicionados automaticamente em até 1 minuto.</div>
-        <button class="btn-confirmar" onclick="confirmarPagamento()">✓ Já fiz o pagamento</button>
+        <button class="btn-confirmar" id="mpCheckoutBtn" onclick="confirmarPagamento()">✓ Já fiz o pagamento</button>
       </div>
       <div class="sec-title">Extrato de uso</div>
       <div class="extrato-lista" id="extratoLista"><div style="font-size:14px;color:var(--g3);text-align:center;padding:1rem">Carregando extrato...</div></div>
@@ -461,7 +462,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);min
 
     <!-- ADMIN -->
     <div class="page" id="page-admin">
-      <div style="margin-bottom:2rem;padding-top:.5rem">
+      <div style="margin-bottom:1.5rem">
         <h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:.25rem">⚙️ Painel Administrativo</h2>
         <p style="font-size:14px;color:var(--g2)">Gerencie dados, monitore indicadores e mantenha o app atualizado.</p>
       </div>
@@ -736,15 +737,13 @@ async function fazerLogin(){
 }
 
 // ─── ENTRAR NO APP ────────────────────────────
+let mp = null;
 async function entrarNoApp(user){
+  if(!mp) mp = new MercadoPago(MP_PUBLIC_KEY, {locale: "pt-BR"});
   usuarioAtual=user;
-  // Guardar email original do auth (não pode ser sobrescrito)
-  const _emailOriginal = user.email;
   // Buscar dados do usuário
   const{data:userData}=await sb.from('usuarios').select('*').eq('id',user.id).single();
   if(userData) usuarioAtual={...user,...userData};
-  // Garantir que email do auth nunca se perca no merge
-  usuarioAtual.email = _emailOriginal;
   
   // Trocar tela
   document.getElementById('auth').classList.remove('ativa');
@@ -764,11 +763,8 @@ async function entrarNoApp(user){
   carregarHistorico();
   carregarExtrato();
   await carregarConfig();
-  if(isAdmin()){
-    document.getElementById('navAdmin').style.display='flex';
-    // Pré-carrega admin em background após 800ms
-    setTimeout(()=>carregarAdmin(), 800);
-  }
+  await verificarRetornoPagamento();
+  if(isAdmin()) document.getElementById('navAdmin').style.display='flex';
 }
 
 function atualizarCredUI(){
@@ -798,9 +794,8 @@ function irPage(page){
   const titles={dashboard:'Painel',calculadora:'Calcular frete',creditos:'Meus créditos',admin:'Painel Admin'};
   document.getElementById('topbarTitle').textContent=titles[page]||'';
   if(page==='admin'){
-    // Tenta imediatamente e com retry para garantir carregamento
-    carregarAdmin();
-    setTimeout(()=>{ if(document.getElementById('semaforoGrid')?.innerHTML==='') carregarAdmin(); }, 1500);
+    if(usuarioAtual) carregarAdmin();
+    else setTimeout(()=>carregarAdmin(), 1500);
   }
   if(window.innerWidth<=768)toggleSidebar(false);
 }
@@ -1158,24 +1153,115 @@ async function carregarExtrato(){
 // ─── CRÉDITOS ────────────────────────────────
 function selecionarPacote(id,preco,cred){
   pacoteAtual={id,preco,cred};
-  const nomes={experimenta:'Experimenta (5 consultas)',motorista:'Motorista (20 consultas)',empresa:'Empresa (100 consultas)'};
-  document.getElementById('pixDesc').textContent=nomes[id];
-  document.getElementById('pixVal').textContent='R$ '+preco.toFixed(2).replace('.',',');
-  document.getElementById('pixBox').classList.add('show');
-  document.getElementById('pixBox').scrollIntoView({behavior:'smooth',block:'nearest'});
+  iniciarCheckoutMP(id,preco,cred);
 }
+
+async function iniciarCheckoutMP(id,preco,cred){
+  if(!usuarioAtual){ alert('Faça login para comprar créditos.'); return; }
+  const nomes={experimenta:'Experimenta — 5 consultas',motorista:'Motorista — 20 consultas',empresa:'Empresa — 100 consultas'};
+  
+  // Mostrar loading
+  document.getElementById('pixBox').classList.add('show');
+  document.getElementById('pixDesc').textContent = nomes[id]||id;
+  document.getElementById('pixVal').textContent = 'R$ '+preco.toFixed(2).replace('.',',');
+  document.getElementById('mpCheckoutBtn').innerHTML = '⏳ Gerando pagamento...';
+  document.getElementById('mpCheckoutBtn').disabled = true;
+
+  try {
+    // Criar preferência via API do Mercado Pago
+    const resp = await fetch('https://api.mercadopago.com/checkout/preferences', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${MP_ACCESS_TOKEN}`
+      },
+      body: JSON.stringify({
+        items: [{
+          id: id,
+          title: `PrecificaFrete — ${nomes[id]||id}`,
+          quantity: 1,
+          currency_id: 'BRL',
+          unit_price: preco
+        }],
+        payer: {
+          email: usuarioAtual.email
+        },
+        payment_methods: {
+          excluded_payment_types: [],
+          installments: 1
+        },
+        back_urls: {
+          success: `${window.location.href}?payment=success&pacote=${id}&cred=${cred}&preco=${preco}`,
+          failure: `${window.location.href}?payment=failure`,
+          pending: `${window.location.href}?payment=pending`
+        },
+        auto_return: 'approved',
+        statement_descriptor: 'PRECIFICAFRETE',
+        external_reference: `${usuarioAtual.id}|${id}|${cred}|${preco}`
+      })
+    });
+
+    const data = await resp.json();
+    if(data.init_point){
+      document.getElementById('mpCheckoutBtn').innerHTML = '💳 Pagar agora';
+      document.getElementById('mpCheckoutBtn').disabled = false;
+      document.getElementById('mpCheckoutBtn').onclick = () => window.open(data.init_point, '_blank');
+      document.getElementById('pixBox').scrollIntoView({behavior:'smooth',block:'nearest'});
+    } else {
+      throw new Error('Erro ao gerar checkout');
+    }
+  } catch(e) {
+    console.error('MP Error:', e);
+    document.getElementById('mpCheckoutBtn').innerHTML = '❌ Erro — tente novamente';
+    document.getElementById('mpCheckoutBtn').disabled = false;
+    alert('Erro ao conectar com Mercado Pago. Tente novamente.');
+  }
+}
+
+// Verificar retorno do pagamento ao carregar a página
+async function verificarRetornoPagamento(){
+  const params = new URLSearchParams(window.location.search);
+  const payment = params.get('payment');
+  const pacote = params.get('pacote');
+  const cred = parseInt(params.get('cred'));
+  const preco = parseFloat(params.get('preco'));
+  const paymentId = params.get('payment_id');
+  
+  if(payment === 'success' && pacote && cred && usuarioAtual){
+    // Verificar se já não foi processado (evitar duplicação)
+    const {data:existing} = await sb.from('extrato_creditos')
+      .select('id').eq('usuario_id', usuarioAtual.id)
+      .eq('descricao', `Pacote ${pacote} #${paymentId}`).single();
+    
+    if(!existing){
+      const novoSaldo = (usuarioAtual.creditos||0) + cred;
+      await sb.from('usuarios').update({creditos:novoSaldo}).eq('id',usuarioAtual.id);
+      await sb.from('extrato_creditos').insert({
+        usuario_id: usuarioAtual.id,
+        tipo: 'compra',
+        descricao: `Pacote ${pacote} #${paymentId||'mp'}`,
+        quantidade: cred,
+        valor: preco
+      });
+      usuarioAtual.creditos = novoSaldo;
+      atualizarCredUI();
+      carregarExtrato();
+      // Limpar URL
+      window.history.replaceState({}, '', window.location.pathname);
+      setTimeout(()=>alert(`✅ Pagamento confirmado! ${cred} créditos adicionados à sua conta!`), 500);
+    }
+  } else if(payment === 'failure'){
+    window.history.replaceState({}, '', window.location.pathname);
+    setTimeout(()=>alert('❌ Pagamento não aprovado. Tente novamente.'), 500);
+  } else if(payment === 'pending'){
+    window.history.replaceState({}, '', window.location.pathname);
+    setTimeout(()=>alert('⏳ Pagamento pendente. Assim que aprovado seus créditos serão adicionados.'), 500);
+  }
+}
+
 function copiarChave(){navigator.clipboard?.writeText('precificafrete@pix.com.br');alert('Chave PIX copiada!');}
 async function confirmarPagamento(){
-  if(!pacoteAtual||!usuarioAtual)return;
-  const novoSaldo=(usuarioAtual.creditos||0)+pacoteAtual.cred;
-  await sb.from('usuarios').update({creditos:novoSaldo}).eq('id',usuarioAtual.id);
-  await sb.from('extrato_creditos').insert({usuario_id:usuarioAtual.id,tipo:'compra',descricao:`Pacote ${pacoteAtual.id}`,quantidade:pacoteAtual.cred,valor:pacoteAtual.preco});
-  usuarioAtual.creditos=novoSaldo;
-  atualizarCredUI();
-  carregarExtrato();
   document.getElementById('pixBox').classList.remove('show');
-  alert(`✅ ${pacoteAtual.cred} créditos adicionados!`);
-  pacoteAtual=null;
 }
 
 // ─── COMPROVANTE ─────────────────────────────
@@ -1217,9 +1303,13 @@ function fecharModal(e){if(e.target===document.getElementById('modalOv'))documen
 const ADMIN_EMAIL = 'gilbsom@gmail.com';
 const ESTADOS = ['AC','AL','AM','AP','BA','CE','DF','ES','GO','MA','MG','MS','MT','PA','PB','PE','PI','PR','RJ','RN','RO','RR','RS','SC','SE','SP','TO'];
 
-function isAdmin(){ return (usuarioAtual?.email||'') === ADMIN_EMAIL; }
+function isAdmin(){ return usuarioAtual?.email === ADMIN_EMAIL; }
 
 async function carregarAdmin(){
+  if(!usuarioAtual?.email){
+    setTimeout(()=>carregarAdmin(), 600);
+    return;
+  }
   if(!isAdmin()) return;
   try{ renderSemaforo(); }catch(e){}
   try{ renderDieselGrid(); }catch(e){}
