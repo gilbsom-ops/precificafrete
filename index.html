@@ -446,13 +446,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);min
         <div class="pacote" onclick="selecionarPacote('empresa',75,100)"><div class="pac-nome">Empresa</div><div class="pac-cred">100 consultas</div><div class="pac-preco">R$ 75,00</div><div class="pac-unit">R$ 0,75 por consulta</div><button class="btn-pac">Comprar</button></div>
       </div>
       <div id="pixBox" class="pix-box">
-        <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:.25rem">💳 Pagamento via PIX</div>
-        <div style="font-size:13px;color:var(--g2);margin-bottom:1.25rem" id="pixDesc">Pacote selecionado</div>
+        <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:.25rem">💳 Finalizar compra</div>
+        <div style="font-size:13px;color:var(--g2);margin-bottom:.5rem" id="pixDesc">Pacote selecionado</div>
         <div class="pix-val" id="pixVal">R$ 0,00</div>
-        <div class="pix-qr">QR Code PIX será gerado aqui após integração com gateway de pagamento</div>
-        <div class="pix-key-box"><span class="pix-key">precificafrete@pix.com.br</span><button class="btn-copy" onclick="copiarChave()">Copiar</button></div>
-        <div class="pix-instruc">Abra o app do seu banco, escaneie o QR Code ou copie a chave PIX. Os créditos serão adicionados automaticamente em até 1 minuto.</div>
-        <button class="btn-confirmar" id="mpCheckoutBtn" onclick="confirmarPagamento()">✓ Já fiz o pagamento</button>
+        <div style="font-size:12px;color:var(--g2);margin-bottom:1.25rem;text-align:center">Pix · Cartão de crédito · Boleto</div>
+        <button class="btn-confirmar" id="mpCheckoutBtn" onclick="">
+          ⏳ Gerando pagamento...
+        </button>
+        <div style="font-size:11px;color:var(--g3);text-align:center;margin-top:.75rem">
+          Você será redirecionado para o ambiente seguro do Mercado Pago
+        </div>
       </div>
       <div class="sec-title">Extrato de uso</div>
       <div class="extrato-lista" id="extratoLista"><div style="font-size:14px;color:var(--g3);text-align:center;padding:1rem">Carregando extrato...</div></div>
