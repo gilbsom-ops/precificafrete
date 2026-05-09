@@ -1628,6 +1628,30 @@ async function carregarConfig(){
 
 // ─── VERIFICAR SESSÃO AO CARREGAR ────────────
 window.addEventListener('load',async()=>{
+  // Capturar token do magic link na URL (#access_token=...)
+  const hash = window.location.hash;
+  if(hash && hash.includes('access_token')){
+    // Deixar o Supabase processar o hash automaticamente
+    const{data,error} = await sb.auth.getSession();
+    if(data?.session?.user){
+      window.history.replaceState({}, '', window.location.pathname);
+      entrarNoApp(data.session.user);
+      return;
+    }
+    // Tentar setSession a partir do hash
+    const params = new URLSearchParams(hash.substring(1));
+    const access_token = params.get('access_token');
+    const refresh_token = params.get('refresh_token');
+    if(access_token){
+      const{data:sd,error:se} = await sb.auth.setSession({access_token, refresh_token});
+      if(sd?.user){
+        window.history.replaceState({}, '', window.location.pathname);
+        entrarNoApp(sd.user);
+        return;
+      }
+    }
+  }
+  // Sessão normal
   const{data:{session}}=await sb.auth.getSession();
   if(session?.user){
     entrarNoApp(session.user);
