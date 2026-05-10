@@ -633,6 +633,8 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // ─── MERCADO PAGO ─────────────────────────────
 const MP_PUBLIC_KEY = 'APP_USR-bdf1d330-c761-4677-a6ba-8e334caecf85';
 // Access Token seguro na Edge Function do Supabase — não exposto aqui
+let mp = null;
+try { mp = new MercadoPago(MP_PUBLIC_KEY, {locale: 'pt-BR'}); } catch(e) { console.log('MP init:', e); }
 
 // ─── DADOS ───────────────────────────────────
 const VEICULOS = {
@@ -744,9 +746,7 @@ async function fazerLogin(){
 }
 
 // ─── ENTRAR NO APP ────────────────────────────
-let mp = null;
 async function entrarNoApp(user){
-  if(!mp) mp = new MercadoPago(MP_PUBLIC_KEY, {locale: "pt-BR"});
   usuarioAtual=user;
   // Buscar dados do usuário
   const{data:userData}=await sb.from('usuarios').select('*').eq('id',user.id).single();
