@@ -632,7 +632,7 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─── MERCADO PAGO ─────────────────────────────
 const MP_PUBLIC_KEY = 'APP_USR-bdf1d330-c761-4677-a6ba-8e334caecf85';
-const MP_ACCESS_TOKEN = 'APP_USR-5285231099027785-050807-0875e3048a8c222f84d99e1e6edd7e1e-392494762';
+// Access Token seguro na Edge Function do Supabase — não exposto aqui
 
 // ─── DADOS ───────────────────────────────────
 const VEICULOS = {
@@ -1175,12 +1175,13 @@ async function iniciarCheckoutMP(id,preco,cred){
   document.getElementById('mpCheckoutBtn').disabled = true;
 
   try {
-    // Criar preferência via API do Mercado Pago
-    const resp = await fetch('https://api.mercadopago.com/checkout/preferences', {
+    // Criar preferência via Edge Function segura (token não exposto)
+    const baseUrl = window.location.origin + window.location.pathname;
+    const resp = await fetch('https://tkjekntjfcoysteveikc.supabase.co/functions/v1/quick-task', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${MP_ACCESS_TOKEN}`
+        'apikey': 'sb_publishable_sp2zeS2DBZjf5WM9SRKXow_2w6Ewtx8'
       },
       body: JSON.stringify({
         items: [{
@@ -1193,17 +1194,11 @@ async function iniciarCheckoutMP(id,preco,cred){
         payer: {
           email: usuarioAtual.email
         },
-        payment_methods: {
-          excluded_payment_types: [],
-          installments: 1
-        },
         back_urls: {
-          success: `${window.location.href}?payment=success&pacote=${id}&cred=${cred}&preco=${preco}`,
-          failure: `${window.location.href}?payment=failure`,
-          pending: `${window.location.href}?payment=pending`
+          success: `${baseUrl}?payment=success&pacote=${id}&cred=${cred}&preco=${preco}`,
+          failure: `${baseUrl}?payment=failure`,
+          pending: `${baseUrl}?payment=pending`
         },
-        auto_return: 'approved',
-        statement_descriptor: 'PRECIFICAFRETE',
         external_reference: `${usuarioAtual.id}|${id}|${cred}|${preco}`
       })
     });
