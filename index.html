@@ -121,6 +121,49 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);min
 .hist-lucro.verde{color:var(--ve)}.hist-lucro.verm{color:var(--r)}
 .hist-data{font-size:11px;color:var(--g3);margin-top:2px}
 
+/* ═══════════════════════════════════════════════════════════════════════════════
+   ESTILOS AFILIADOS
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.afiliado-card-principal{background:linear-gradient(135deg, var(--v) 0%, var(--ve) 100%);border-radius:14px;padding:2rem;color:#fff;margin-bottom:2rem}
+.afiliado-card-principal h3{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;opacity:.9;margin-bottom:.5rem;text-transform:uppercase}
+.afiliado-card-principal .valor{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;margin-bottom:.25rem}
+.afiliado-card-principal .sub{font-size:13px;opacity:.85;margin-bottom:1.5rem}
+.afiliado-cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem}
+.afiliado-stat{background:#fff;border:1px solid var(--gb);border-radius:12px;padding:1.5rem;text-align:center}
+.afiliado-stat-num{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--v);margin-bottom:.25rem}
+.afiliado-stat-label{font-size:12px;color:var(--g2);text-transform:uppercase;font-weight:600}
+
+.afiliado-link-box{background:#fff;border:2px dashed var(--gb);border-radius:12px;padding:1.5rem;margin-bottom:2rem}
+.afiliado-link-label{font-size:11px;font-weight:700;color:var(--g2);text-transform:uppercase;margin-bottom:.75rem}
+.afiliado-link-container{display:flex;gap:.5rem;align-items:center}
+.afiliado-link-input{flex:1;padding:12px;border:1.5px solid var(--gb);border-radius:8px;font-size:14px;background:var(--gf);color:var(--g1);font-family:monospace;outline:none}
+.afiliado-link-btn{padding:12px 20px;background:var(--v);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:13px;transition:background .2s;white-space:nowrap}
+.afiliado-link-btn:hover{background:var(--ve)}
+
+.afiliado-tabela{width:100%;border-collapse:collapse}
+.afiliado-tabela thead{background:var(--gf)}
+.afiliado-tabela th{padding:12px;text-align:left;font-size:11px;font-weight:700;color:var(--g1);text-transform:uppercase;letter-spacing:.04em}
+.afiliado-tabela td{padding:12px;border-top:1px solid var(--gb);font-size:13px}
+.afiliado-tabela tbody tr:hover{background:var(--gf)}
+
+.badge-status{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-pago{background:var(--vc);color:var(--ve)}
+.badge-pendente{background:var(--ac);color:var(--a)}
+.badge-processado{background:var(--blc);color:var(--bl)}
+
+.notificacao-item{background:#fff;border-left:4px solid var(--v);border-radius:8px;padding:1rem;margin-bottom:.75rem;display:flex;gap:1rem;align-items:flex-start}
+.notificacao-icone{font-size:20px;flex-shrink:0}
+.notificacao-conteudo{flex:1}
+.notificacao-titulo{font-weight:600;color:var(--g1);margin-bottom:.25rem}
+.notificacao-mensagem{font-size:13px;color:var(--g2);line-height:1.5}
+.notificacao-nao-lida{background:var(--vc)}
+
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:100;align-items:center;justify-content:center;animation:fadeIn .2s}
+.modal-overlay.open{display:flex}
+.modal-content{background:#fff;border-radius:14px;padding:2rem;max-width:500px;width:90%;box-shadow:0 10px 40px rgba(0,0,0,0.2);animation:slideUp .3s}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
+
 /* CALCULADORA */
 .calc-layout{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start}
 .calc-card{background:#fff;border:1px solid var(--gb);border-radius:14px;padding:1.5rem}
@@ -129,1471 +172,1121 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);min
 .form-sec-title{font-size:11px;font-weight:700;color:var(--g2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem}
 .rota-wrap{border:1.5px solid var(--gb);border-radius:10px;overflow:hidden}
 .rota-row{display:flex;align-items:center;gap:10px;padding:12px 14px}
-.rota-row+.rota-row{border-top:1px solid var(--gf)}
-.rota-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.dot-v{background:var(--v)}.dot-r{background:var(--r)}
-.rota-inp{flex:1;border:none;outline:none;font-size:14px;font-family:'DM Sans',sans-serif;background:transparent;color:var(--dark)}
-.rota-inp::placeholder{color:var(--g3)}
-.info-pill{display:inline-flex;align-items:center;gap:5px;background:var(--blc);border:1px solid #AEC6E8;border-radius:99px;padding:4px 12px;font-size:11px;color:var(--bl);font-weight:500;margin-top:8px}
-.sel-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.sel-wrap{display:flex;flex-direction:column;gap:4px}
-.sel-label{font-size:11px;font-weight:600;color:var(--g2);text-transform:uppercase;letter-spacing:.04em}
-.sel-wrap select{border:1.5px solid var(--gb);border-radius:8px;padding:10px 12px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);outline:none;-webkit-appearance:none;appearance:none}
-.sel-wrap select:focus{border-color:var(--v)}
-.carga-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.carga-btn{border:1.5px solid var(--gb);border-radius:8px;padding:8px 6px;cursor:pointer;transition:all .15s;background:var(--bg);text-align:center}
-.carga-btn:hover,.carga-btn.sel{border-color:var(--v);background:var(--vc)}
-.carga-btn.sel .cb-nome{color:var(--ve);font-weight:600}
-.cb-emoji{font-size:16px;display:block;margin-bottom:2px}
-.cb-nome{font-size:10px;color:var(--g1);line-height:1.3}
-.frete-row{display:flex;align-items:center;gap:8px;border:1.5px solid var(--gb);border-radius:10px;padding:10px 14px}
-.frete-prefix{font-size:15px;font-weight:700;color:var(--g2)}
-.frete-inp{flex:1;border:none;outline:none;font-size:22px;font-family:'Syne',sans-serif;font-weight:700;background:transparent;color:var(--dark);text-align:right;width:100%}
-.btn-calc{width:100%;padding:14px;background:var(--v);color:#fff;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s;margin-top:.5rem}
+.rota-inp-from,.rota-inp-to{flex:1;padding:10px;border:none;background:transparent;font-size:13px;outline:none;color:var(--g1)}
+.rota-inp-from::placeholder,.rota-inp-to::placeholder{color:var(--g3)}
+.rota-sep{color:var(--g3);font-size:12px;font-weight:600}
+.rota-clear{padding:4px 10px;background:var(--rc);border:none;border-radius:6px;color:var(--r);cursor:pointer;font-size:11px;font-weight:600}
+.inp-linha{display:flex;gap:.75rem}
+.inp-meia{flex:1}
+.inp-meia input,.inp-meia select{width:100%;padding:10px 12px;border:1.5px solid var(--gb);border-radius:8px;font-size:13px;outline:none;transition:border .2s}
+.inp-meia input:focus,.inp-meia select:focus{border-color:var(--v)}
+.inp-label{font-size:11px;font-weight:700;color:var(--g1);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;display:block}
+.btn-calc{width:100%;padding:12px;background:var(--v);color:#fff;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;cursor:pointer;margin-top:1rem;transition:background .2s}
 .btn-calc:hover{background:var(--ve)}
-.result-placeholder{text-align:center;padding:3rem 1rem;color:var(--g3)}
-.result-placeholder span{font-size:48px;display:block;opacity:.4;margin-bottom:1rem}
-.result-placeholder p{font-size:14px;line-height:1.6}
-.result-loading{display:none;text-align:center;padding:2rem 1rem}
-.result-loading.show{display:block}
-.spinner{width:36px;height:36px;border:3px solid var(--gb);border-top-color:var(--v);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem}
-@keyframes spin{to{transform:rotate(360deg)}}
-.load-step{font-size:12px;color:var(--g2);margin-top:6px}
-.load-srcs{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;margin-top:12px}
-.ls{background:var(--gf);border:1px solid var(--gb);border-radius:99px;padding:2px 9px;font-size:10px;color:var(--g2);font-weight:500;transition:all .3s}
-.ls.ok{background:var(--vc);border-color:var(--vm);color:var(--ve)}
-.result-content{display:none}
-.result-content.show{display:block}
-.alerta-box{border-radius:10px;padding:.875rem 1rem;display:flex;gap:10px;margin-bottom:1rem;font-size:13px}
-.al-d{background:var(--rc);border:1px solid var(--rb)}.al-d .al-t{color:var(--r);font-weight:600;margin-bottom:3px}
-.al-s{background:var(--vc);border:1px solid var(--vm)}.al-s .al-t{color:var(--ve);font-weight:600;margin-bottom:3px}
-.al-w{background:var(--ac);border:1px solid var(--ab)}.al-w .al-t{color:var(--a);font-weight:600;margin-bottom:3px}
-.al-d .al-b{color:#8B1A1A}.al-s .al-b{color:var(--ve)}.al-w .al-b{color:#7a5200}
-.al-i{font-size:16px;flex-shrink:0}
-.mets{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem}
-.met{background:var(--gf);border-radius:8px;padding:.875rem}
-.met-l{font-size:10px;color:var(--g2);font-weight:600;text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px}
-.met-v{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--dark)}
-.met-v.vd{color:var(--ve)}.met-v.vm{color:var(--r)}
-.custos-lista{margin-bottom:1rem}
-.cr{display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--gf)}
-.cr:last-child{border-bottom:none}
-.cn{font-size:13px;color:var(--g1)}.cns{font-size:11px;color:var(--g3);margin-top:1px}
-.cv{text-align:right;flex-shrink:0;margin-left:8px}.cvn{font-size:13px;font-weight:600}.cvf{font-size:10px;color:var(--bl);display:block}
-.custo-tot{display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:2px solid var(--gb)}
-.ct-nome{font-size:14px;font-weight:600}.ct-val{font-family:'Syne',sans-serif;font-size:20px;font-weight:700}
-.ct-val.vd{color:var(--ve)}.ct-val.vm{color:var(--r)}
-.rota-alt{background:var(--ac);border:1px solid var(--ab);border-radius:10px;padding:1rem;margin-bottom:1rem}
-.ra-title{font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem}
-.ra-linha{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(184,134,11,.15);font-size:13px}
-.ra-linha:last-child{border-bottom:none}
-.ra-vd{color:var(--ve);font-weight:600}
-.fonte-box{background:var(--blc);border:1px solid #AEC6E8;border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;font-size:11px;color:var(--bl)}
-.btn-comp{width:100%;padding:13px;background:var(--v);color:#fff;border:none;border-radius:9px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px}
-.btn-comp:hover{background:var(--ve)}
-.btn-nova{width:100%;padding:11px;background:transparent;color:var(--v);border:1.5px solid var(--v);border-radius:9px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer}
-.btn-nova:hover{background:var(--vc)}
-@media(max-width:900px){.calc-layout{grid-template-columns:1fr}.calc-result{position:static}.carga-grid{grid-template-columns:repeat(4,1fr)}}
-
-/* CRÉDITOS */
-.cred-saldo{background:var(--ve);border-radius:14px;padding:2rem;margin-bottom:2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
-.cred-saldo-label{font-size:13px;color:rgba(255,255,255,.7);margin-bottom:.25rem}
-.cred-saldo-val{font-family:'Syne',sans-serif;font-size:42px;font-weight:800;color:#fff}
-.cred-saldo-sub{font-size:12px;color:rgba(255,255,255,.6);margin-top:4px}
-.pacotes{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem}
-.pacote{background:#fff;border:2px solid var(--gb);border-radius:14px;padding:1.5rem;cursor:pointer;transition:all .2s;position:relative;text-align:center}
-.pacote:hover{border-color:var(--v);transform:translateY(-2px);box-shadow:var(--shadow)}
-.pacote.pop{border-color:var(--v)}
-.pop-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--v);color:#fff;font-size:10px;font-weight:700;padding:4px 14px;border-radius:99px;white-space:nowrap}
-.pac-nome{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:.25rem}
-.pac-cred{font-size:13px;color:var(--g2);margin-bottom:1rem}
-.pac-preco{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;margin-bottom:.25rem}
-.pac-unit{font-size:12px;color:var(--g3);margin-bottom:1.25rem}
-.btn-pac{width:100%;padding:11px;background:var(--v);color:#fff;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer}
+.result-item{display:flex;justify-content:space-between;align-items:center;padding:.75rem 0;border-top:1px solid var(--gb)}
+.result-label{font-size:13px;color:var(--g2)}
+.result-valor{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--v)}
+.result-total{padding:1rem 0;border-top:2px solid var(--v);display:flex;justify-content:space-between;align-items:center}
+.result-total-label{font-family:'Syne',sans-serif;font-weight:700;font-size:14px}
+.result-total-valor{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--ve)}
+.pacotes{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:2rem}
+.pacote{background:#fff;border:2px solid var(--gb);border-radius:12px;padding:1rem;text-align:center;cursor:pointer;transition:all .2s}
+.pacote:hover{border-color:var(--v);box-shadow:var(--shadow)}
+.pacote.pop{border-color:var(--v);background:var(--vc)}
+.pop-badge{background:var(--v);color:#fff;font-size:10px;font-weight:700;padding:4px 8px;border-radius:4px;margin-bottom:.5rem;display:inline-block}
+.pac-nome{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:.25rem}
+.pac-cred{font-size:12px;color:var(--g2);margin-bottom:.5rem}
+.pac-preco{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--ve);margin-bottom:.5rem}
+.pac-unit{font-size:11px;color:var(--g3);margin-bottom:.75rem}
+.btn-pac{width:100%;padding:8px;background:var(--v);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer}
 .btn-pac:hover{background:var(--ve)}
-.pix-box{background:#fff;border:1px solid var(--gb);border-radius:14px;padding:1.5rem;display:none}
-.pix-box.show{display:block;animation:fadeIn .3s ease}
-.pix-val{text-align:center;font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--ve);margin-bottom:.5rem}
-.pix-qr{width:160px;height:160px;background:var(--gf);border:1px solid var(--gb);border-radius:10px;margin:0 auto 1.25rem;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--g3);text-align:center;padding:1rem;line-height:1.5}
-.pix-key-box{background:var(--gf);border:1px solid var(--gb);border-radius:8px;padding:.75rem 1rem;display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
-.pix-key{font-size:13px;font-weight:600;font-family:monospace}
-.btn-copy{padding:7px 14px;background:var(--v);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer}
-.pix-instruc{font-size:12px;color:var(--g2);text-align:center;line-height:1.6;margin-bottom:1.25rem}
-.btn-confirmar{width:100%;padding:13px;background:var(--v);color:#fff;border:none;border-radius:9px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer}
-.btn-confirmar:hover{background:var(--ve)}
-.extrato-lista{display:flex;flex-direction:column;gap:6px}
-.ext-item{background:#fff;border:1px solid var(--gb);border-radius:10px;padding:.875rem 1.25rem;display:flex;align-items:center;justify-content:space-between}
-.ext-desc{font-size:14px;font-weight:500}
-.ext-data{font-size:12px;color:var(--g3);margin-top:2px}
-.ext-val{font-family:'Syne',sans-serif;font-size:15px;font-weight:700}
-.ext-val.mais{color:var(--ve)}.ext-val.menos{color:var(--r)}
-.sec-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:1rem;margin-top:2rem}
-
-/* SEMÁFORO */
-.sem-item{display:flex;align-items:center;gap:8px;background:var(--gf);border-radius:8px;padding:.6rem .875rem;font-size:12px}
-.sem-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.sem-verde{background:#1D9E75}.sem-amarelo{background:#F0C040}.sem-vermelho{background:#C0392B}
-.sem-nome{font-weight:600;color:var(--g1)}.sem-data{font-size:10px;color:var(--g3);margin-top:1px}
-/* DIESEL GRID ADMIN */
-.d-inp-wrap{display:flex;flex-direction:column;gap:3px}
-.d-inp-label{font-size:10px;font-weight:700;color:var(--g2);text-transform:uppercase}
-.d-inp{border:1.5px solid var(--gb);border-radius:6px;padding:6px 8px;font-size:13px;font-family:'DM Sans',sans-serif;width:100%;outline:none;text-align:right}
-.d-inp:focus{border-color:var(--v)}
-/* RISCO SELECT */
-.risco-wrap{display:flex;flex-direction:column;gap:3px}
-.risco-label{font-size:10px;font-weight:700;color:var(--g2);text-transform:uppercase}
-.risco-sel{border:1.5px solid var(--gb);border-radius:6px;padding:5px 6px;font-size:12px;font-family:'DM Sans',sans-serif;width:100%;outline:none;background:#fff}
-
-.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
-.modal-ov.open{display:flex;animation:fadeIn .2s ease}
-.modal{background:#fff;border-radius:20px 20px 0 0;padding:1.5rem 1.25rem;width:100%;max-width:500px;max-height:90vh;overflow-y:auto}
-@media(min-width:600px){.modal-ov{align-items:center}.modal{border-radius:16px}}
-.modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:1rem}
-.modal-linha{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--gf);font-size:13px}
-.modal-chave{color:var(--g2);flex-shrink:0;max-width:55%}
-.modal-val{font-weight:600;text-align:right;max-width:45%}
-.modal-total{display:flex;justify-content:space-between;padding:12px 0;border-top:2px solid var(--dark);margin-top:8px}
-.modal-total-n{font-size:15px;font-weight:700}
-.modal-total-v{font-family:'Syne',sans-serif;font-size:22px;font-weight:800}
-.modal-total-v.vd{color:var(--ve)}.modal-total-v.vm{color:var(--r)}
-.btn-fechar{width:100%;padding:13px;background:var(--gf);border:none;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;margin-top:1rem;font-family:'DM Sans',sans-serif}
+.mpago-container{margin:1.5rem 0}
+.wallet_container{border:1px solid var(--gb);border-radius:8px;overflow:hidden}
+@media(max-width:700px){
+  .calc-layout{grid-template-columns:1fr}
+  .calc-result{position:relative;top:0}
+}
 </style>
 </head>
 <body>
 
-<!-- AUTH -->
-<div id="auth" class="tela ativa">
+<!-- ═══════════════════════════════════════════════════════════════════════════════
+     TELA DE AUTENTICAÇÃO
+     ═══════════════════════════════════════════════════════════════════════════════ -->
+<div id="auth" class="tela">
   <div class="auth-left">
     <div class="auth-logo">
-      <div class="auth-logo-icon">
-        <svg viewBox="0 0 22 22" fill="none"><rect x="2" y="9" width="12" height="8" rx="1" stroke="white" stroke-width="1.5"/><path d="M14 12h3l3 3v2h-6V12z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><circle cx="6" cy="18" r="1.5" stroke="white" stroke-width="1.5"/><circle cx="17" cy="18" r="1.5" stroke="white" stroke-width="1.5"/></svg>
-      </div>
-      <span class="auth-logo-name">Precifica Frete</span>
+      <div class="auth-logo-icon">🚛</div>
+      <div class="auth-logo-name">Precifica Frete</div>
     </div>
-    <h2>O app que prova se o frete vale a pena.</h2>
-    <p>Dados oficiais em tempo real. Nenhum número editado pelo motorista. Argumento técnico inquestionável.</p>
+    <h2>Calcule seu frete com precisão</h2>
+    <p>Plataforma confiável para motoristas profissionais maximizarem seus lucros</p>
     <div class="auth-items">
-      <div class="auth-item">Piso mínimo ANTT automático</div>
-      <div class="auth-item">Risco de roubo por trecho (PRF)</div>
-      <div class="auth-item">Preço do diesel na rota (ANP)</div>
-      <div class="auth-item">Comprovante PDF para negociação</div>
+      <div class="auth-item">Calculadora avançada</div>
+      <div class="auth-item">Tabela de combustível atualizada</div>
+      <div class="auth-item">Histórico de rotas</div>
+      <div class="auth-item">Sem custos ocultos</div>
     </div>
   </div>
   <div class="auth-right">
     <div class="auth-box">
       <div class="auth-tabs">
-        <button class="auth-tab ativo" id="tab-login" onclick="setTab('login')">Entrar</button>
-        <button class="auth-tab" id="tab-cad" onclick="setTab('cad')">Criar conta</button>
+        <button class="auth-tab ativo" onclick="trocarAba('login')">Entrar</button>
+        <button class="auth-tab" onclick="trocarAba('signup')">Cadastrar</button>
       </div>
-      <!-- LOGIN -->
-      <div id="form-login">
-        <div class="auth-title">Bem-vindo de volta</div>
-        <div class="auth-sub">Entre com seus dados para continuar</div>
-        <div class="msg-erro" id="err-login"></div>
-        <div class="campo"><label>E-mail</label><input type="email" id="login-email" placeholder="seu@email.com"></div>
-        <div class="campo"><label>Senha</label><input type="password" id="login-senha" placeholder="••••••••"></div>
-        <button class="btn-auth" id="btn-login" onclick="fazerLogin()">Entrar no app</button>
-        <div class="auth-link">Não tem conta? <span onclick="setTab('cad')">Criar conta grátis</span></div>
+      
+      <div id="abaLogin">
+        <div class="auth-title">Bem-vindo</div>
+        <div class="auth-sub">Faça login para acessar</div>
+        <div class="msg-erro" id="msgErroLogin"></div>
+        <div class="campo">
+          <label>Email</label>
+          <input type="email" id="loginEmail" placeholder="seu@email.com">
+        </div>
+        <div class="campo">
+          <label>Senha</label>
+          <input type="password" id="loginSenha" placeholder="Sua senha">
+        </div>
+        <button class="btn-auth" onclick="fazerLogin()">Entrar</button>
+        <div class="auth-link">Esqueceu a senha? <span onclick="resetarSenha()">Clique aqui</span></div>
       </div>
-      <!-- CADASTRO -->
-      <div id="form-cad" style="display:none">
-        <div class="auth-title">Criar sua conta</div>
-        <div class="auth-sub">Grátis — receba 3 consultas para testar</div>
-        <div class="msg-erro" id="err-cad"></div>
-        <div class="msg-ok" id="ok-cad"></div>
-        <div class="campo"><label>Nome completo</label><input type="text" id="cad-nome" placeholder="João da Silva"></div>
-        <div class="campo"><label>E-mail</label><input type="email" id="cad-email" placeholder="seu@email.com"></div>
-        <div class="campo"><label>CPF</label><input type="text" id="cad-cpf" placeholder="000.000.000-00" maxlength="14"></div>
-        <div class="campo"><label>Senha</label><input type="password" id="cad-senha" placeholder="Mínimo 8 caracteres"></div>
-        <button class="btn-auth" id="btn-cad" onclick="fazerCadastro()">Criar conta e entrar</button>
-        <div class="auth-link">Já tem conta? <span onclick="setTab('login')">Fazer login</span></div>
+
+      <div id="abaSignup" style="display:none">
+        <div class="auth-title">Criar Conta</div>
+        <div class="auth-sub">Cadastre-se para usar a plataforma</div>
+        <div class="msg-erro" id="msgErroSignup"></div>
+        <div class="campo">
+          <label>Nome Completo</label>
+          <input type="text" id="signupNome" placeholder="Seu nome">
+        </div>
+        <div class="campo">
+          <label>Email</label>
+          <input type="email" id="signupEmail" placeholder="seu@email.com">
+        </div>
+        <div class="campo">
+          <label>Senha</label>
+          <input type="password" id="signupSenha" placeholder="Mínimo 6 caracteres">
+        </div>
+        <button class="btn-auth" onclick="fazerSignup()">Criar Conta</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- APP -->
+<!-- ═══════════════════════════════════════════════════════════════════════════════
+     APLICATIVO PRINCIPAL
+     ═══════════════════════════════════════════════════════════════════════════════ -->
 <div id="app" class="tela">
-  <div class="mob-topbar">
-    <span class="mob-logo">Precifica Frete</span>
-    <button class="mob-menu-btn" onclick="toggleSidebar()">☰</button>
-  </div>
-  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-  <aside class="sidebar" id="sidebar">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
     <div class="sidebar-logo">
-      <div class="sidebar-logo-icon"><svg viewBox="0 0 22 22" fill="none"><rect x="2" y="9" width="12" height="8" rx="1" stroke="white" stroke-width="1.5"/><path d="M14 12h3l3 3v2h-6V12z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><circle cx="6" cy="18" r="1.5" stroke="white" stroke-width="1.5"/><circle cx="17" cy="18" r="1.5" stroke="white" stroke-width="1.5"/></svg></div>
-      <span class="sidebar-logo-name">Precifica Frete</span>
+      <div class="sidebar-logo-icon">🚛</div>
+      <div class="sidebar-logo-name">PrecificaFrete</div>
     </div>
-    <nav class="sidebar-nav">
-      <div class="nav-item ativo" onclick="irPage('dashboard')"><span class="nav-item-icon">📊</span> Painel</div>
-      <div class="nav-item" onclick="irPage('calculadora')"><span class="nav-item-icon">🔍</span> Calcular frete</div>
-      <div class="nav-item" onclick="irPage('creditos')"><span class="nav-item-icon">💳</span> Meus créditos</div>
-      <div class="nav-item" id="navAdmin" style="display:none" onclick="irPage('admin')"><span class="nav-item-icon">⚙️</span> Admin</div>
-    </nav>
+    <div class="sidebar-nav">
+      <div class="nav-item ativo" onclick="irParaPagina('dashboard')">
+        <span class="nav-item-icon">📊</span>
+        <span>Dashboard</span>
+      </div>
+      <div class="nav-item" onclick="irParaPagina('calculadora')">
+        <span class="nav-item-icon">🧮</span>
+        <span>Calculadora</span>
+      </div>
+      <div class="nav-item" onclick="irParaPagina('pacotes')">
+        <span class="nav-item-icon">💳</span>
+        <span>Pacotes</span>
+      </div>
+      <div class="nav-item" id="navAfiliados" onclick="irParaPagina('meus-afiliados')" style="display:none">
+        <span class="nav-item-icon">🤝</span>
+        <span>Meus Afiliados</span>
+      </div>
+      <div class="nav-item" id="navAdminAfiliados" onclick="irParaPagina('admin-afiliados')" style="display:none">
+        <span class="nav-item-icon">👑</span>
+        <span>Admin</span>
+      </div>
+    </div>
     <div class="sidebar-footer">
       <div class="sidebar-user">
-        <div class="sidebar-avatar" id="sAvatar">?</div>
+        <div class="sidebar-avatar" id="avatarUser">U</div>
         <div>
-          <div class="sidebar-user-name" id="sNome">Carregando...</div>
-          <div class="sidebar-user-cred" id="sCred">-- créditos</div>
+          <div class="sidebar-user-name" id="nomeUser">Usuário</div>
+          <div class="sidebar-user-cred" id="credUser">--</div>
         </div>
       </div>
-      <span class="sidebar-sair" onclick="sair()">← Sair</span>
+      <div class="sidebar-sair" onclick="sair()">Sair</div>
     </div>
-  </aside>
+  </div>
+
+  <!-- CONTEÚDO -->
   <div class="app-content">
-    <div class="topbar">
-      <div class="topbar-title" id="topbarTitle">Painel</div>
-      <div class="topbar-cred" onclick="irPage('creditos')">💳 <span id="topbarCred">-- créditos</span></div>
-    </div>
-    <!-- DASHBOARD -->
-    <div class="page ativa" id="page-dashboard">
+    
+    <!-- ═══ PÁGINA: DASHBOARD ═══ -->
+    <div id="dashboard" class="page ativa">
       <div class="dash-welcome">
-        <h2 id="dashNome">Olá! 👋</h2>
-        <p>Aqui está um resumo das suas consultas</p>
+        <h2>Bem-vindo, <span id="nomeUserDash">Usuário</span>! 👋</h2>
+        <p id="subDash">Continue calculando e otimizando seus fretes</p>
       </div>
+
       <div class="dash-cards">
-        <div class="dash-card"><div class="dash-card-label">Créditos disponíveis</div><div class="dash-card-val verde" id="dashCred">--</div></div>
-        <div class="dash-card"><div class="dash-card-label">Consultas realizadas</div><div class="dash-card-val" id="dashTotal">0</div></div>
-        <div class="dash-card"><div class="dash-card-label">Fretes aprovados</div><div class="dash-card-val verde" id="dashOk">0</div></div>
-        <div class="dash-card"><div class="dash-card-label">Abaixo da ANTT</div><div class="dash-card-val" style="color:var(--r)" id="dashAntt">0</div></div>
+        <div class="dash-card">
+          <div class="dash-card-label">Créditos Disponíveis</div>
+          <div class="dash-card-val verde" id="dashCreditos">0</div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-label">Total Gasto</div>
+          <div class="dash-card-val" id="dashGasto">R$ 0,00</div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-label">Cálculos Realizados</div>
+          <div class="dash-card-val" id="dashCalculos">0</div>
+        </div>
       </div>
-      <div class="dash-empty" id="dashEmpty">
-        <div style="font-size:40px;margin-bottom:1rem">🚛</div>
-        <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:.5rem">Faça sua primeira consulta</div>
-        <div style="font-size:14px;color:var(--g2);margin-bottom:1.25rem">Informe a rota e o valor oferecido para saber se o frete vale a pena.</div>
-        <button class="btn-green" onclick="irPage('calculadora')">Calcular agora →</button>
-      </div>
-      <div id="dashHistBox" style="display:none">
-        <div class="hist-titulo">Histórico de consultas</div>
-        <div class="hist-lista" id="histLista"></div>
-      </div>
+
+      <div class="hist-titulo">Últimas Rotas Calculadas</div>
+      <div class="hist-lista" id="dashHistorico"></div>
     </div>
-    <!-- CALCULADORA -->
-    <div class="page" id="page-calculadora">
+
+    <!-- ═══ PÁGINA: CALCULADORA ═══ -->
+    <div id="calculadora" class="page">
       <div class="calc-layout">
         <div class="calc-card">
           <div class="form-sec">
-            <div class="form-sec-title">Rota</div>
+            <label class="form-sec-title">Rota</label>
             <div class="rota-wrap">
-              <div class="rota-row"><div class="rota-dot dot-v"></div><input class="rota-inp" id="c-origem" placeholder="Cidade de origem (ex: Rondonópolis/MT)"></div>
-              <div class="rota-row"><div class="rota-dot dot-r"></div><input class="rota-inp" id="c-destino" placeholder="Cidade de destino (ex: Santos/SP)"></div>
-            </div>
-            <div class="info-pill">ℹ️ Distância, pedágios, diesel e risco buscados automaticamente</div>
-          </div>
-          <div class="form-sec">
-            <div class="form-sec-title">Veículo e carga</div>
-            <div class="sel-grid">
-              <div class="sel-wrap"><div class="sel-label">Tipo de veículo</div>
-                <select id="c-veiculo">
-                  <option value="vuc">VUC / 3/4 / Van</option>
-                  <option value="toco2">Toco 2 eixos</option>
-                  <option value="truck3">Truck 3 eixos</option>
-                  <option value="carreta5" selected>Carreta 5 eixos</option>
-                  <option value="carreta6">Carreta LS 6 eixos</option>
-                  <option value="bitrem7">Bitrem 7 eixos</option>
-                  <option value="rodotrem9">Rodotrem 9 eixos</option>
-                  <option value="treminhao">Treminhão / Agrícola</option>
-                </select>
+              <div class="rota-row">
+                <input type="text" class="rota-inp-from" id="c-origem" placeholder="Origem (ex: São Paulo)" autocomplete="off">
               </div>
-              <div class="sel-wrap"><div class="sel-label">Peso da carga</div>
-                <select id="c-peso">
-                  <option value="5">Até 5 t</option><option value="10">Até 10 t</option>
-                  <option value="15">Até 15 t</option><option value="20">Até 20 t</option>
-                  <option value="28" selected>Até 28 t</option><option value="35">Até 35 t</option>
-                  <option value="45">Até 45 t</option>
-                </select>
+            </div>
+            <div class="rota-wrap">
+              <div class="rota-row">
+                <input type="text" class="rota-inp-to" id="c-destino" placeholder="Destino" autocomplete="off">
               </div>
             </div>
           </div>
+
           <div class="form-sec">
-            <div class="form-sec-title">Tipo de carga</div>
-            <div class="carga-grid" id="cargaGrid"></div>
-          </div>
-          <div class="form-sec">
-            <div class="form-sec-title">Valor oferecido</div>
-            <div class="frete-row">
-              <span class="frete-prefix">R$</span>
-              <input type="number" class="frete-inp" id="c-frete" placeholder="0,00" min="0">
+            <label class="form-sec-title">Veículo</label>
+            <div class="inp-meia">
+              <select id="c-veiculo">
+                <option value="vuc">VUC (3,5t)</option>
+                <option value="toco2">Toco 2 eixos (6t)</option>
+                <option value="truck3">Truck 3 eixos (10t)</option>
+                <option value="carreta5">Carreta 5 eixos (27t)</option>
+                <option value="carreta6">Carreta 6 eixos (32t)</option>
+                <option value="bitrem7">Bitrem 7 eixos (38t)</option>
+                <option value="rodotrem9">Rodotrem 9 eixos (45t)</option>
+                <option value="treminhao">Treminhão (45t)</option>
+              </select>
             </div>
           </div>
-          <button class="btn-calc" onclick="calcular()">🔍 Calcular agora</button>
+
+          <div class="form-sec">
+            <label class="form-sec-title">Carga</label>
+            <div class="inp-linha">
+              <div class="inp-meia">
+                <label class="inp-label">Peso (kg)</label>
+                <input type="number" id="c-peso" placeholder="0" min="0">
+              </div>
+              <div class="inp-meia">
+                <label class="inp-label">Risco</label>
+                <select id="c-risco">
+                  <option value="0">Comum</option>
+                  <option value="1">Classe I</option>
+                  <option value="2">Classe II</option>
+                  <option value="3">Classe III</option>
+                  <option value="4">Classe IV</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-sec">
+            <label class="form-sec-title">Adicional</label>
+            <div class="inp-meia">
+              <label class="inp-label">Etiqueta de Risco (%)</label>
+              <input type="number" id="c-etiqueta" placeholder="0" value="0" min="0">
+            </div>
+          </div>
+
+          <button class="btn-calc" onclick="calcularFrete()">Calcular Frete</button>
+
+          <button class="btn-calc" style="background:#666;margin-top:.5rem" onclick="abrirEstadia()">
+            📦 Calcular Estadia
+          </button>
         </div>
+
         <div class="calc-result">
-          <div id="result-placeholder" class="result-placeholder"><span>🧮</span><p>Preencha os dados e o valor ofertado para ver o resultado.</p></div>
-          <div id="result-loading" class="result-loading">
-            <div class="spinner"></div>
-            <div style="font-size:14px;font-weight:600;color:var(--dark);margin-bottom:4px">Buscando dados oficiais...</div>
-            <div class="load-step" id="loadStep">Iniciando</div>
-            <div class="load-srcs">
-              <span class="ls" id="ls1">Google Maps</span><span class="ls" id="ls2">ANP</span>
-              <span class="ls" id="ls3">Pedágios</span><span class="ls" id="ls4">DNIT</span>
-              <span class="ls" id="ls5">PRF</span><span class="ls" id="ls6">ANTT</span>
-            </div>
+          <div class="result-item">
+            <span class="result-label">Distância</span>
+            <span class="result-valor" id="resDistancia">0 km</span>
           </div>
-          <div id="result-content" class="result-content"></div>
+          <div class="result-item">
+            <span class="result-label">Tabela (CONFREIGHT)</span>
+            <span class="result-valor" id="resTabela">R$ 0,00</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Combustível</span>
+            <span class="result-valor" id="resCombustivel">R$ 0,00</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Pedagio</span>
+            <span class="result-valor" id="resPedagio">R$ 0,00</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Risco</span>
+            <span class="result-valor" id="resRisco">R$ 0,00</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Pista</span>
+            <span class="result-valor" id="resPista">R$ 0,00</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Etiqueta</span>
+            <span class="result-valor" id="resEtiqueta">R$ 0,00</span>
+          </div>
+          <div class="result-total">
+            <span class="result-total-label">FRETE FINAL</span>
+            <span class="result-total-valor" id="resTotal">R$ 0,00</span>
+          </div>
+          <button class="btn-calc" onclick="comprarCreditos()" style="margin-top:1rem">
+            Comprar Créditos
+          </button>
         </div>
       </div>
     </div>
-    <!-- CRÉDITOS -->
-    <div class="page" id="page-creditos">
-      <div style="margin-bottom:2rem"><h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:.25rem">Meus créditos</h2><p style="font-size:14px;color:var(--g2)">Cada consulta consome 1 crédito.</p></div>
-      <div class="cred-saldo">
-        <div><div class="cred-saldo-label">Saldo atual</div><div class="cred-saldo-val" id="credSaldo">--</div><div class="cred-saldo-sub">créditos disponíveis</div></div>
-        <div style="text-align:right"><div style="font-size:12px;color:rgba(255,255,255,.6);margin-bottom:4px">Sem vencimento</div><div style="font-size:13px;color:rgba(255,255,255,.8)">Use quando quiser</div></div>
-      </div>
-      <div class="sec-title">Escolha um pacote</div>
-      <div class="pacotes">
-        <div class="pacote" onclick="selecionarPacote('experimenta',4.5,5)"><div class="pac-nome">Experimenta</div><div class="pac-cred">5 consultas</div><div class="pac-preco">R$ 4,50</div><div class="pac-unit">R$ 0,90 por consulta</div><button class="btn-pac">Comprar</button></div>
-        <div class="pacote pop" onclick="selecionarPacote('motorista',17,20)"><div class="pop-badge">MAIS POPULAR</div><div class="pac-nome">Motorista</div><div class="pac-cred">20 consultas</div><div class="pac-preco">R$ 17,00</div><div class="pac-unit">R$ 0,85 por consulta</div><button class="btn-pac">Comprar</button></div>
-        <div class="pacote" onclick="selecionarPacote('empresa',75,100)"><div class="pac-nome">Empresa</div><div class="pac-cred">100 consultas</div><div class="pac-preco">R$ 75,00</div><div class="pac-unit">R$ 0,75 por consulta</div><button class="btn-pac">Comprar</button></div>
-      </div>
-      <div id="pixBox" class="pix-box">
-        <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:.25rem">💳 Finalizar compra</div>
-        <div style="font-size:13px;color:var(--g2);margin-bottom:.5rem" id="pixDesc">Pacote selecionado</div>
-        <div class="pix-val" id="pixVal">R$ 0,00</div>
-        <div style="font-size:12px;color:var(--g2);margin-bottom:1.25rem;text-align:center">Pix · Cartão de crédito · Boleto</div>
-        <button class="btn-confirmar" id="mpCheckoutBtn" onclick="">
-          ⏳ Gerando pagamento...
-        </button>
-        <div style="font-size:11px;color:var(--g3);text-align:center;margin-top:.75rem">
-          Você será redirecionado para o ambiente seguro do Mercado Pago
+
+    <!-- ═══ PÁGINA: PACOTES ═══ -->
+    <div id="pacotes" class="page">
+      <h2 style="font-family:'Syne',sans-serif;margin-bottom:1.5rem">Escolha seu Pacote</h2>
+      <div class="pacotes"></div>
+    </div>
+
+    <!-- ═══ PÁGINA: MEUS AFILIADOS ═══ -->
+    <div id="meus-afiliados" class="page">
+      <h2 style="font-family:'Syne',sans-serif;margin-bottom:1.5rem">🤝 Meus Afiliados</h2>
+      
+      <!-- Card Principal -->
+      <div class="afiliado-card-principal">
+        <h3>Saldo Acumulado</h3>
+        <div class="valor" id="afiliadoSaldo">R$ 0,00</div>
+        <div class="sub">Já Recebido: <strong id="afiliadoTotalRecebido">R$ 0,00</strong></div>
+        <div style="font-size:13px;margin-top:1rem">
+          ⏰ Próximo pagamento: <strong id="afiliadoProximoPagamento">15/07/2024</strong>
+          <span id="afiliadoDias"></span>
         </div>
       </div>
-      <div class="sec-title">Extrato de uso</div>
-      <div class="extrato-lista" id="extratoLista"><div style="font-size:14px;color:var(--g3);text-align:center;padding:1rem">Carregando extrato...</div></div>
+
+      <!-- Estatísticas -->
+      <div class="afiliado-cards-grid">
+        <div class="afiliado-stat">
+          <div class="afiliado-stat-num" id="afiliadoCliques">0</div>
+          <div class="afiliado-stat-label">Cliques</div>
+        </div>
+        <div class="afiliado-stat">
+          <div class="afiliado-stat-num" id="afiliadoCadastros">0</div>
+          <div class="afiliado-stat-label">Cadastros</div>
+        </div>
+        <div class="afiliado-stat">
+          <div class="afiliado-stat-num" id="afiliadoVendas">0</div>
+          <div class="afiliado-stat-label">Vendas</div>
+        </div>
+        <div class="afiliado-stat">
+          <div class="afiliado-stat-num">25%</div>
+          <div class="afiliado-stat-label">Comissão</div>
+        </div>
+      </div>
+
+      <!-- Link Único -->
+      <div class="afiliado-link-box">
+        <div class="afiliado-link-label">📤 Seu Link para Compartilhar</div>
+        <div class="afiliado-link-container">
+          <input type="text" class="afiliado-link-input" id="afiliadoLink" readonly>
+          <button class="afiliado-link-btn" onclick="copiarLink()">📋 Copiar</button>
+        </div>
+      </div>
+
+      <!-- Histórico de Comissões -->
+      <div>
+        <h3 style="font-family:'Syne',sans-serif;font-size:15px;margin-bottom:1rem">💰 Histórico de Comissões</h3>
+        <table class="afiliado-tabela">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Tipo</th>
+              <th>Valor Venda</th>
+              <th>Comissão</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="afiliadoTabelaComissoes">
+            <tr><td colspan="5" style="text-align:center;color:var(--g3)">Sem comissões ainda</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Histórico de Pagamentos -->
+      <div style="margin-top:2rem">
+        <h3 style="font-family:'Syne',sans-serif;font-size:15px;margin-bottom:1rem">📋 Histórico de Saques</h3>
+        <table class="afiliado-tabela">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Valor</th>
+              <th>Status</th>
+              <th>Comprovante</th>
+            </tr>
+          </thead>
+          <tbody id="afiliadoTabelaPagamentos">
+            <tr><td colspan="4" style="text-align:center;color:var(--g3)">Sem saques ainda</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Notificações -->
+      <div style="margin-top:2rem">
+        <h3 style="font-family:'Syne',sans-serif;font-size:15px;margin-bottom:1rem">🔔 Notificações</h3>
+        <div id="afiliadoNotificacoes"></div>
+      </div>
+    </div>
+
+    <!-- ═══ PÁGINA: ADMIN AFILIADOS ═══ -->
+    <div id="admin-afiliados" class="page">
+      <h2 style="font-family:'Syne',sans-serif;margin-bottom:1.5rem">👑 Gerenciamento de Afiliados</h2>
+
+      <!-- Abas Admin -->
+      <div class="auth-tabs" style="margin-bottom:2rem">
+        <button class="auth-tab ativo" onclick="trocarAbaAdmin('afiliados-list')">📊 Afiliados</button>
+        <button class="auth-tab" onclick="trocarAbaAdmin('pagamentos-mes')">💰 Pagamentos</button>
+        <button class="auth-tab" onclick="trocarAbaAdmin('relatorio')">📈 Relatório</button>
+      </div>
+
+      <!-- Aba: Lista de Afiliados -->
+      <div id="abaAfiliadosList">
+        <table class="afiliado-tabela" style="width:100%;margin-bottom:2rem">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Email</th>
+              <th>Chave</th>
+              <th>Saldo Pendente</th>
+              <th>Já Recebido</th>
+              <th>Cliques</th>
+              <th>Cadastros</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="adminTabelaAfiliados">
+            <tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--g3)">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Aba: Pagamentos do Mês -->
+      <div id="abaPagamentosMes" style="display:none">
+        <div style="background:#fff;border:1px solid var(--gb);border-radius:12px;padding:2rem;margin-bottom:2rem">
+          <h3 style="font-family:'Syne',sans-serif;margin-bottom:1rem">Pagamentos Pendentes</h3>
+          <div id="adminPagamentosInfo"></div>
+          <table class="afiliado-tabela" style="width:100%;margin-top:1rem">
+            <thead>
+              <tr>
+                <th>Afiliado</th>
+                <th>PIX</th>
+                <th>Valor</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="adminTabelaPagamentos">
+              <tr><td colspan="5" style="text-align:center;color:var(--g3)">Nenhum pagamento pendente</td></tr>
+            </tbody>
+          </table>
+          <button class="btn-green" onclick="downloadPlanilha()" style="margin-top:1rem">📥 Baixar Planilha Excel</button>
+          <button class="btn-green" onclick="marcarTodosPagos()" style="margin-top:1rem;background:#666">✅ Marcar Todos como Pagos</button>
+        </div>
+      </div>
+
+      <!-- Aba: Relatório -->
+      <div id="abaRelatorio" style="display:none">
+        <div class="dash-cards">
+          <div class="dash-card">
+            <div class="dash-card-label">Total Afiliados Ativos</div>
+            <div class="dash-card-val verde" id="relAfiliadosAtivos">0</div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-card-label">Total Creditado (Mês)</div>
+            <div class="dash-card-val" id="relTotalCreditado">R$ 0,00</div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-card-label">Total Pago (Mês)</div>
+            <div class="dash-card-val" id="relTotalPago">R$ 0,00</div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-card-label">Saldo a Pagar</div>
+            <div class="dash-card-val" id="relSaldoPagar">R$ 0,00</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-    <!-- ADMIN -->
-    <div class="page" id="page-admin">
-      <div style="margin-bottom:1.5rem">
-        <h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:.25rem">⚙️ Painel Administrativo</h2>
-        <p style="font-size:14px;color:var(--g2)">Gerencie dados, monitore indicadores e mantenha o app atualizado.</p>
-      </div>
+<!-- ═══════════════════════════════════════════════════════════════════════════════
+     MODAIS
+     ═══════════════════════════════════════════════════════════════════════════════ -->
 
-      <!-- SEMÁFORO DE SAÚDE DOS DADOS -->
-      <div style="background:#fff;border:1px solid var(--gb);border-radius:14px;padding:1.5rem;margin-bottom:1.5rem">
-        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:1rem">🚦 Saúde dos Dados</div>
-        <div id="semaforoGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px"></div>
-      </div>
-
-      <!-- DASHBOARD KPIs -->
-      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:1rem">📈 Indicadores — Mês atual vs anterior</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;margin-bottom:1.5rem">
-        <div style="background:#fff;border:1px solid var(--gb);border-radius:12px;padding:1.25rem">
-          <div style="font-size:11px;font-weight:600;color:var(--g2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.5rem">Consultas este mês</div>
-          <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800" id="kpiConsultasMes">--</div>
-          <div style="font-size:12px;margin-top:4px" id="kpiConsultasComp"></div>
-        </div>
-        <div style="background:#fff;border:1px solid var(--gb);border-radius:12px;padding:1.25rem">
-          <div style="font-size:11px;font-weight:600;color:var(--g2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.5rem">Usuários ativos</div>
-          <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800" id="kpiUsuarios">--</div>
-          <div style="font-size:12px;margin-top:4px" id="kpiUsuariosComp"></div>
-        </div>
-        <div style="background:#fff;border:1px solid var(--gb);border-radius:12px;padding:1.25rem">
-          <div style="font-size:11px;font-weight:600;color:var(--g2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.5rem">Receita créditos</div>
-          <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--ve)" id="kpiReceita">--</div>
-          <div style="font-size:12px;margin-top:4px" id="kpiReceitaComp"></div>
-        </div>
-        <div style="background:#fff;border:1px solid var(--gb);border-radius:12px;padding:1.25rem">
-          <div style="font-size:11px;font-weight:600;color:var(--g2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.5rem">Fretes abaixo ANTT</div>
-          <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--r)" id="kpiAbaixoAntt">--</div>
-          <div style="font-size:12px;color:var(--g2);margin-top:4px">do total consultado</div>
-        </div>
-      </div>
-
-      <!-- ROTAS MAIS CONSULTADAS -->
-      <div style="background:#fff;border:1px solid var(--gb);border-radius:14px;padding:1.5rem;margin-bottom:1.5rem">
-        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:1rem">🗺️ Rotas mais consultadas</div>
-        <div id="rotasTop" style="display:flex;flex-direction:column;gap:6px"><div style="font-size:13px;color:var(--g3)">Carregando...</div></div>
-      </div>
-
-      <!-- EDITAR DIESEL -->
-      <div style="background:#fff;border:1px solid var(--gb);border-radius:14px;padding:1.5rem;margin-bottom:1.5rem">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
-          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700">⛽ Diesel S10 por Estado (ANP)</div>
-          <div style="font-size:11px;color:var(--g3)">Fonte: <a href="https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/precos-revenda-e-de-distribuicao-combustiveis/levantamento-de-precos" target="_blank" style="color:var(--v)">gov.br/anp</a></div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:6px;margin-bottom:1rem" id="dieselGrid"></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-          <div style="flex:1;min-width:160px">
-            <div style="font-size:11px;font-weight:600;color:var(--g2);margin-bottom:4px">Data de referência ANP</div>
-            <input type="text" id="adminDieselData" placeholder="Ex: 25/04/2026" style="border:1.5px solid var(--gb);border-radius:8px;padding:8px 12px;font-size:13px;font-family:'DM Sans',sans-serif;width:100%;outline:none">
-          </div>
-          <button onclick="salvarDiesel()" style="padding:10px 20px;background:var(--v);color:#fff;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-top:18px">💾 Salvar diesel</button>
-        </div>
-      </div>
-
-      <!-- EDITAR VALORES OPERACIONAIS -->
-      <div style="background:#fff;border:1px solid var(--gb);border-radius:14px;padding:1.5rem;margin-bottom:1.5rem">
-        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:1rem">🔧 Valores Operacionais</div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem">
-          <div>
-            <div style="font-size:11px;font-weight:600;color:var(--g2);text-transform:uppercase;margin-bottom:4px">Manutenção R$/km <span style="font-size:10px;color:var(--g3)">(INPC anual)</span></div>
-            <input type="number" id="adminManutKm" step="0.01" style="border:1.5px solid var(--gb);border-radius:8px;padding:8px 12px;font-size:14px;width:100%;outline:none;font-family:'DM Sans',sans-serif">
-            <div style="font-size:10px;color:var(--g3);margin-top:3px">Referência: R$ 0,74/km (2025)</div>
-          </div>
-          <div>
-            <div style="font-size:11px;font-weight:600;color:var(--g2);text-transform:uppercase;margin-bottom:4px">Diária alimentação R$/dia</div>
-            <input type="number" id="adminAlimDiaria" step="1" style="border:1.5px solid var(--gb);border-radius:8px;padding:8px 12px;font-size:14px;width:100%;outline:none;font-family:'DM Sans',sans-serif">
-            <div style="font-size:10px;color:var(--g3);margin-top:3px">Estimativa: R$ 110–130/dia</div>
-          </div>
-          <div>
-            <div style="font-size:11px;font-weight:600;color:var(--g2);text-transform:uppercase;margin-bottom:4px">Estadia R$/ton/hora <span style="font-size:10px;color:var(--g3)">(Lei 11.442/07)</span></div>
-            <input type="number" id="adminEstadiaTon" step="0.01" style="border:1.5px solid var(--gb);border-radius:8px;padding:8px 12px;font-size:14px;width:100%;outline:none;font-family:'DM Sans',sans-serif">
-            <div style="font-size:10px;color:var(--g3);margin-top:3px">Atual: R$ 2,29 (INPC mar/2023)</div>
-          </div>
-          <div>
-            <div style="font-size:11px;font-weight:600;color:var(--g2);text-transform:uppercase;margin-bottom:4px">Créditos bônus cadastro</div>
-            <input type="number" id="adminBonus" step="1" style="border:1.5px solid var(--gb);border-radius:8px;padding:8px 12px;font-size:14px;width:100%;outline:none;font-family:'DM Sans',sans-serif">
-          </div>
-        </div>
-        <button onclick="salvarOperacional()" style="margin-top:1rem;padding:10px 20px;background:var(--v);color:#fff;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer">💾 Salvar valores operacionais</button>
-      </div>
-
-      <!-- EDITAR PACOTES DE CRÉDITO -->
-      <div style="background:#fff;border:1px solid var(--gb);border-radius:14px;padding:1.5rem;margin-bottom:1.5rem">
-        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:1rem">💳 Pacotes de Crédito</div>
-        <div id="adminPacotesGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem"></div>
-        <button onclick="salvarPacotes()" style="margin-top:1rem;padding:10px 20px;background:var(--v);color:#fff;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer">💾 Salvar pacotes</button>
-      </div>
-
-      <!-- RISCO POR ESTADO -->
-      <div style="background:#fff;border:1px solid var(--gb);border-radius:14px;padding:1.5rem;margin-bottom:1.5rem">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
-          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700">🔒 Risco de Roubo por Estado</div>
-          <div style="font-size:11px;color:var(--g3)">Fonte: <a href="https://www.ntclogistica.org.br" target="_blank" style="color:var(--v)">NTC&Logística</a> — anual</div>
-        </div>
-        <div style="font-size:12px;color:var(--a);background:var(--ac);border:1px solid var(--ab);border-radius:6px;padding:6px 10px;margin-bottom:1rem">⚠️ Atualizar anualmente em dezembro, quando NTC&Logística publicar o relatório.</div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:6px" id="riscoGrid"></div>
-        <button onclick="salvarRisco()" style="margin-top:1rem;padding:10px 20px;background:var(--v);color:#fff;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer">💾 Salvar risco</button>
-      </div>
-
-      <!-- CONDIÇÃO DAS PISTAS -->
-      <div style="background:#fff;border:1px solid var(--gb);border-radius:14px;padding:1.5rem;margin-bottom:1.5rem">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
-          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700">🛣️ Condição das Pistas por Estado</div>
-          <div style="font-size:11px;color:var(--g3)">Fonte: <a href="https://pesquisarodovias.cnt.org.br" target="_blank" style="color:var(--v)">CNT Rodovias</a> — anual</div>
-        </div>
-        <div style="font-size:12px;color:var(--a);background:var(--ac);border:1px solid var(--ab);border-radius:6px;padding:6px 10px;margin-bottom:1rem">⚠️ Atualizar anualmente em novembro, após publicação da Pesquisa CNT de Rodovias.</div>
-        <div style="font-size:11px;color:var(--g2);margin-bottom:.75rem">Multiplicador do custo de manutenção: 1.0 = normal · 1.2 = ruim · 1.5 = péssimo</div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:6px" id="pistaGrid"></div>
-        <button onclick="salvarPistas()" style="margin-top:1rem;padding:10px 20px;background:var(--v);color:#fff;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer">💾 Salvar pistas</button>
-      </div>
-
-    </div><!-- fim page-admin -->
-
-<!-- MODAL ESTADIA -->
-<div class="modal-ov" id="modalEstadia" onclick="if(event.target===this)fecharEstadia()">
-  <div class="modal">
-    <div class="modal-title">⏱️ Calculadora de Estadia</div>
-    <div style="font-size:12px;color:var(--bl);background:var(--blc);border:1px solid #AEC6E8;border-radius:8px;padding:.75rem;margin-bottom:1rem;line-height:1.6">
-      <strong>Lei 11.442/07 — Art. 11, §5º</strong><br>
-      Após 5 horas de espera na carga/descarga, você tem direito à estadia de <strong>R$ 2,29 por tonelada por hora</strong> (atualizado pelo INPC).
+<!-- Modal: Estadia -->
+<div id="modalEstadia" class="modal-overlay">
+  <div class="modal-content">
+    <h3 style="font-family:'Syne',sans-serif;margin-bottom:1rem">📦 Calcular Estadia</h3>
+    <div class="campo">
+      <label>Horário de Chegada</label>
+      <input type="time" id="estChegada">
     </div>
     <div class="campo">
-      <label>Horário de chegada</label>
-      <input type="time" id="estChegada" style="border:1.5px solid var(--gb);border-radius:8px;padding:10px 12px;font-size:14px;width:100%;outline:none;font-family:'DM Sans',sans-serif">
+      <label>Horário de Liberação</label>
+      <input type="time" id="estSaida">
     </div>
     <div class="campo">
-      <label>Horário de liberação</label>
-      <input type="time" id="estSaida" style="border:1.5px solid var(--gb);border-radius:8px;padding:10px 12px;font-size:14px;width:100%;outline:none;font-family:'DM Sans',sans-serif">
-    </div>
-    <div class="campo">
-      <label>Capacidade do veículo (toneladas)</label>
-      <select id="estTonelagem" style="border:1.5px solid var(--gb);border-radius:8px;padding:10px 12px;font-size:14px;width:100%;outline:none;font-family:'DM Sans',sans-serif;background:#fff">
-        <option value="6">Toco — 6 toneladas</option>
-        <option value="10">Truck — 10 toneladas</option>
-        <option value="27" selected>Carreta — 27 toneladas</option>
-        <option value="32">Carreta LS — 32 toneladas</option>
-        <option value="38">Bitrem — 38 toneladas</option>
-        <option value="45">Rodotrem — 45 toneladas</option>
+      <label>Tonelagem</label>
+      <select id="estTonelagem">
+        <option value="3.5">3,5t (VUC)</option>
+        <option value="6">6t (Toco)</option>
+        <option value="10">10t (Truck)</option>
+        <option value="27">27t (Carreta)</option>
+        <option value="32">32t (Carreta)</option>
+        <option value="38">38t (Bitrem)</option>
+        <option value="45">45t (Rodotrem)</option>
       </select>
     </div>
     <div class="campo">
-      <label>Local (empresa / cidade)</label>
-      <input type="text" id="estLocal" placeholder="Ex: CD Atacadão, Barueri/SP" style="border:1.5px solid var(--gb);border-radius:8px;padding:10px 12px;font-size:14px;width:100%;outline:none;font-family:'DM Sans',sans-serif">
+      <label>Local (opcional)</label>
+      <input type="text" id="estLocal" placeholder="Ex: Belo Horizonte">
     </div>
-    <button onclick="calcularEstadia()" style="width:100%;padding:13px;background:var(--v);color:#fff;border:none;border-radius:9px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px">⏱️ Calcular estadia</button>
-    <div id="estadiaResultado" style="display:none"></div>
-    <button onclick="fecharEstadia()" style="width:100%;padding:11px;background:var(--gf);border:none;border-radius:9px;font-size:13px;cursor:pointer;margin-top:8px;font-family:'DM Sans',sans-serif">Fechar</button>
+    <button class="btn-green" onclick="calcularEstadia()" style="width:100%;margin-top:1rem">Calcular</button>
+    <button class="btn-calc" style="background:#999;margin-top:.5rem;width:100%" onclick="fecharEstadia()">Fechar</button>
+    <div id="estadiaResultado" style="margin-top:1rem"></div>
   </div>
-</div>
-
-<!-- MODAL COMPROVANTE -->
-<div class="modal-ov" id="modalOv" onclick="fecharModal(event)">
-  <div class="modal"><div class="modal-title">📄 Comprovante de negociação</div><div id="modalBody"></div><button class="btn-fechar" onclick="document.getElementById('modalOv').classList.remove('open')">Fechar</button></div>
 </div>
 
 <script>
-// ─── SUPABASE CONFIG ─────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🔧 CONFIGURAÇÃO
+// ═══════════════════════════════════════════════════════════════════════════════
+
 const SUPABASE_URL = 'https://tkjekntjfcoysteveikc.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_sp2zeS2DBZjf5WM9SRKXow_2w6Ewtx8';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const SUPABASE_KEY = 'sb_publishable_sp2zeS2DBZjf5WM9SRKXow_2w6Ewtx8';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ─── MERCADO PAGO ─────────────────────────────
-const MP_PUBLIC_KEY = 'APP_USR-bdf1d330-c761-4677-a6ba-8e334caecf85';
-// Access Token seguro na Edge Function do Supabase — não exposto aqui
-let mp = null;
-try { mp = new MercadoPago(MP_PUBLIC_KEY, {locale: 'pt-BR'}); } catch(e) { console.log('MP init:', e); }
+let usuarioLogado = null;
+let ultimoCalculo = null;
 
-// ─── DADOS ───────────────────────────────────
-const VEICULOS = {
-  vuc:{nome:'VUC/3/4/Van',eixos:2,diesel:8.5,pedBase:0.08,manutBase:0.12,baseAntt:1.8},
-  toco2:{nome:'Toco 2 eixos',eixos:2,diesel:10.5,pedBase:0.12,manutBase:0.16,baseAntt:2.1},
-  truck3:{nome:'Truck 3 eixos',eixos:3,diesel:12.0,pedBase:0.18,manutBase:0.20,baseAntt:2.5},
-  carreta5:{nome:'Carreta 5 eixos',eixos:5,diesel:14.5,pedBase:0.28,manutBase:0.28,baseAntt:3.2},
-  carreta6:{nome:'Carreta LS 6 eixos',eixos:6,diesel:15.5,pedBase:0.32,manutBase:0.30,baseAntt:3.5},
-  bitrem7:{nome:'Bitrem 7 eixos',eixos:7,diesel:17.0,pedBase:0.38,manutBase:0.34,baseAntt:3.8},
-  rodotrem9:{nome:'Rodotrem 9 eixos',eixos:9,diesel:19.5,pedBase:0.46,manutBase:0.40,baseAntt:4.2},
-  treminhao:{nome:'Treminhão/Agrícola',eixos:9,diesel:18.5,pedBase:0.44,manutBase:0.38,baseAntt:4.0},
-};
-const CARGAS=[
-  {id:'graos',emoji:'🌾',nome:'Granel sólido',sub:'Grãos, açúcar',coef:1.00,adic:0},
-  {id:'granelLiq',emoji:'🛢️',nome:'Granel líquido',sub:'Óleo, combustível',coef:1.08,adic:0.08},
-  {id:'cargaGeral',emoji:'📦',nome:'Carga geral',sub:'Eletrodom., móveis',coef:1.05,adic:0.05},
-  {id:'automoveis',emoji:'🚗',nome:'Veíc./Cegonha',sub:'Carros, implementos',coef:1.15,adic:0.15},
-  {id:'frigorif',emoji:'🧊',nome:'Frigorificada',sub:'Carnes, congelados',coef:1.20,adic:0.20},
-  {id:'perigosa',emoji:'⚠️',nome:'Perigosa',sub:'Químicos, explosivos',coef:1.30,adic:0.30},
-  {id:'cargaViva',emoji:'🐄',nome:'Carga viva',sub:'Bovinos, aves',coef:1.12,adic:0.12},
-  {id:'container',emoji:'🏗️',nome:'Container',sub:'Conteinerizado',coef:1.08,adic:0.08},
-  {id:'impAgri',emoji:'🚜',nome:'Impl. agrícola',sub:'Máquinas pesadas',coef:1.18,adic:0.18},
-  {id:'medicam',emoji:'💊',nome:'Medicamentos',sub:'Farmacêuticos',coef:1.25,adic:0.25},
-  {id:'mudanca',emoji:'🏠',nome:'Mudança',sub:'Residencial/comercial',coef:1.10,adic:0.10},
-  {id:'outros',emoji:'📋',nome:'Outros',sub:'Não classificado',coef:1.00,adic:0},
-];
-const ROTAS={
-  'rondonopolis-santos':{dist:1847,diesel:6.18,pedMult:1.00,manutMult:1.05,risco:'alto',riscoDesc:'BR-163 — alto índice de roubo (PRF 2024)',estradaDesc:'Estado regular, obras km 890–920'},
-  'cuiaba-santos':{dist:1950,diesel:6.22,pedMult:1.05,manutMult:1.08,risco:'medio',riscoDesc:'Risco médio no trecho SP (PRF 2024)',estradaDesc:'Bom estado geral'},
-  'goiania-santos':{dist:1130,diesel:6.10,pedMult:0.95,manutMult:1.03,risco:'medio',riscoDesc:'Risco médio — Campinas/Santos (PRF 2024)',estradaDesc:'Regular com pontos de obras'},
-  'cascavel-santos':{dist:1050,diesel:6.08,pedMult:1.10,manutMult:1.02,risco:'baixo',riscoDesc:'Baixo índice de ocorrências (PRF 2024)',estradaDesc:'Bom estado geral'},
-  'saopaulo-riodejaneiro':{dist:430,diesel:6.05,pedMult:1.15,manutMult:1.00,risco:'baixo',riscoDesc:'Baixo risco — Via Dutra (PRF 2024)',estradaDesc:'Bom estado'},
-  'manaus-belem':{dist:1680,diesel:6.45,pedMult:0.30,manutMult:1.80,risco:'critico',riscoDesc:'Trecho crítico BR-319 (PRF 2024)',estradaDesc:'Trechos de terra e lama'},
-  'brasilia-saopaulo':{dist:1010,diesel:6.12,pedMult:1.00,manutMult:1.00,risco:'medio',riscoDesc:'Risco médio BR-050 (PRF 2024)',estradaDesc:'Bom estado geral'},
-  'default':{dist:900,diesel:6.20,pedMult:0.90,manutMult:1.00,risco:'medio',riscoDesc:'Risco médio estimado (PRF 2024)',estradaDesc:'Estado regular estimado (DNIT)'},
-};
-const RISCO={
-  baixo:{label:'Baixo',cor:'#0F6E56',adicKm:0.02},
-  medio:{label:'Médio',cor:'#B8860B',adicKm:0.06},
-  alto:{label:'Alto',cor:'#C0392B',adicKm:0.12},
-  critico:{label:'Crítico',cor:'#6B0000',adicKm:0.22},
+const CONFIG = {
+  pacotes: [
+    {id:'exp',nome:'Experimentar',cred:5,preco:4.50,popular:false},
+    {id:'mot',nome:'Motorista',cred:10,preco:17.00,popular:true},
+    {id:'emp',nome:'Empresarial',cred:50,preco:75.00,popular:false}
+  ],
+  diesel_ref_data: '2024-01-15',
+  diesel_por_estado: {},
+  pista_por_estado: {},
+  risco_por_estado: {},
+  tabela_confreight: {
+    vuc: {min:25,perc:0.85},
+    toco2: {min:30,perc:0.82},
+    truck3: {min:35,perc:0.80},
+    carreta5: {min:40,perc:0.78},
+    carreta6: {min:42,perc:0.76},
+    bitrem7: {min:45,perc:0.75},
+    rodotrem9: {min:48,perc:0.74},
+    treminhao: {min:50,perc:0.73}
+  },
+  estadia_ton_hora: 2.29
 };
 
-let cargaSel='graos';
-let ultimoCalculo=null;
-let usuarioAtual=null;
-let pacoteAtual=null;
+let DIESEL_ESTADO = {};
 
-// ─── AUTH HELPERS ─────────────────────────────
-function setTab(tab){
-  document.getElementById('form-login').style.display=tab==='login'?'block':'none';
-  document.getElementById('form-cad').style.display=tab==='cad'?'block':'none';
-  document.getElementById('tab-login').className='auth-tab'+(tab==='login'?' ativo':'');
-  document.getElementById('tab-cad').className='auth-tab'+(tab==='cad'?' ativo':'');
-  document.getElementById('err-login').className='msg-erro';
-  document.getElementById('err-cad').className='msg-erro';
-  document.getElementById('ok-cad').className='msg-ok';
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🔐 AUTENTICAÇÃO
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function trocarAba(aba){
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('ativo'));
+  event.target.classList.add('ativo');
+  if(aba==='login'){
+    document.getElementById('abaLogin').style.display='block';
+    document.getElementById('abaSignup').style.display='none';
+  }else{
+    document.getElementById('abaLogin').style.display='none';
+    document.getElementById('abaSignup').style.display='block';
+  }
 }
 
-function mostrarErro(id,msg){const el=document.getElementById(id);el.textContent=msg;el.className='msg-erro ativo';}
-function mostrarOk(id,msg){const el=document.getElementById(id);el.textContent=msg;el.className='msg-ok ativo';}
-
-// ─── CADASTRO ────────────────────────────────
-async function fazerCadastro(){
-  const nome=document.getElementById('cad-nome').value.trim();
-  const email=document.getElementById('cad-email').value.trim();
-  const cpf=document.getElementById('cad-cpf').value.replace(/\D/g,'');
-  const senha=document.getElementById('cad-senha').value;
-  if(!nome||!email||!cpf||!senha){mostrarErro('err-cad','Preencha todos os campos.');return;}
-  if(senha.length<8){mostrarErro('err-cad','A senha deve ter no mínimo 8 caracteres.');return;}
-  if(cpf.length!==11){mostrarErro('err-cad','CPF inválido.');return;}
-  const btn=document.getElementById('btn-cad');
-  btn.disabled=true;btn.textContent='Criando conta...';
-  try{
-    // Criar usuário no Supabase Auth
-    const{data,error}=await sb.auth.signUp({email,password:senha,options:{data:{nome,cpf}}});
-    if(error)throw error;
-    if(data.user){
-      // Salvar dados extras na tabela usuarios
-      await sb.from('usuarios').upsert({
-        id:data.user.id,nome,email,cpf,creditos:3,ativo:true
-      });
-      // Registrar bônus
-      await sb.from('extrato_creditos').insert({
-        usuario_id:data.user.id,tipo:'bonus',descricao:'Bônus de boas-vindas',quantidade:3,valor:0
-      });
-      mostrarOk('ok-cad','Conta criada! Entrando...');
-      setTimeout(()=>entrarNoApp(data.user),1000);
-    }
-  }catch(err){
-    mostrarErro('err-cad',err.message==='User already registered'?'Este e-mail já está cadastrado.':err.message);
-  }finally{btn.disabled=false;btn.textContent='Criar conta e entrar';}
-}
-
-// ─── LOGIN ────────────────────────────────────
 async function fazerLogin(){
-  const email=document.getElementById('login-email').value.trim();
-  const senha=document.getElementById('login-senha').value;
-  if(!email||!senha){mostrarErro('err-login','Preencha e-mail e senha.');return;}
-  const btn=document.getElementById('btn-login');
-  btn.disabled=true;btn.textContent='Entrando...';
-  try{
-    const{data,error}=await sb.auth.signInWithPassword({email,password:senha});
-    if(error)throw error;
+  const email = document.getElementById('loginEmail').value.trim();
+  const senha = document.getElementById('loginSenha').value;
+  
+  if(!email||!senha){alert('Preencha todos os campos');return;}
+  
+  const {data,error} = await sb.auth.signInWithPassword({email,password:senha});
+  
+  if(error){
+    document.getElementById('msgErroLogin').textContent = error.message;
+    document.getElementById('msgErroLogin').classList.add('ativo');
+    return;
+  }
+  
+  if(data.user){
     entrarNoApp(data.user);
-  }catch(err){
-    mostrarErro('err-login','E-mail ou senha incorretos.');
-  }finally{btn.disabled=false;btn.textContent='Entrar no app';}
+  }
 }
 
-// ─── ENTRAR NO APP ────────────────────────────
-async function entrarNoApp(user){
-  usuarioAtual=user;
-  // Buscar dados do usuário
-  const{data:userData}=await sb.from('usuarios').select('*').eq('id',user.id).single();
-  if(userData) usuarioAtual={...user,...userData};
+async function fazerSignup(){
+  const nome = document.getElementById('signupNome').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const senha = document.getElementById('signupSenha').value;
   
-  // Trocar tela
+  if(!nome||!email||!senha||senha.length<6){
+    document.getElementById('msgErroSignup').textContent = 'Preencha todos os campos corretamente';
+    document.getElementById('msgErroSignup').classList.add('ativo');
+    return;
+  }
+  
+  const {data,error} = await sb.auth.signUp({email,password:senha,options:{data:{nome}}});
+  
+  if(error){
+    document.getElementById('msgErroSignup').textContent = error.message;
+    document.getElementById('msgErroSignup').classList.add('ativo');
+    return;
+  }
+  
+  if(data.user){
+    // Registrar convite de afiliado (se tiver ?invite=...)
+    const params = new URLSearchParams(window.location.search);
+    const conviteChave = params.get('invite');
+    
+    // Registrar clique de afiliado (se tiver ?ref=...)
+    const refAfiliado = sessionStorage.getItem('origem_afiliado');
+    
+    entrarNoApp(data.user);
+  }
+}
+
+async function resetarSenha(){
+  const email = prompt('Qual é seu email?');
+  if(!email) return;
+  
+  const {error} = await sb.auth.resetPasswordForEmail(email);
+  if(error) alert('Erro: ' + error.message);
+  else alert('Verifique seu email para redefinir a senha');
+}
+
+async function entrarNoApp(user){
+  usuarioLogado = user;
   document.getElementById('auth').classList.remove('ativa');
   document.getElementById('app').classList.add('ativa');
   
-  // Atualizar UI
-  const nome=usuarioAtual.nome||user.email.split('@')[0];
-  const iniciais=nome.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
-  document.getElementById('sAvatar').textContent=iniciais;
-  document.getElementById('sNome').textContent=nome;
-  const h=new Date().getHours();
-  const saud=h<12?'Bom dia':h<18?'Boa tarde':'Boa noite';
-  document.getElementById('dashNome').textContent=saud+', '+nome.split(' ')[0]+'! 👋';
-  
-  atualizarCredUI();
-  initCargaGrid();
-  carregarHistorico();
-  carregarExtrato();
+  await carregarDadosUsuario();
   await carregarConfig();
-  await verificarRetornoPagamento();
-  if(isAdmin()) document.getElementById('navAdmin').style.display='flex';
-}
-
-function atualizarCredUI(){
-  const c=usuarioAtual?.creditos||0;
-  document.getElementById('sCred').textContent=c+' crédito'+(c!==1?'s':'');
-  document.getElementById('topbarCred').textContent=c+' crédito'+(c!==1?'s':'');
-  document.getElementById('credSaldo').textContent=c;
-  document.getElementById('dashCred').textContent=c;
+  await verificarSeEhAfiliado();
+  
+  irParaPagina('dashboard');
 }
 
 async function sair(){
+  if(!confirm('Deseja realmente sair?')) return;
   await sb.auth.signOut();
-  usuarioAtual=null;
+  usuarioLogado = null;
   document.getElementById('app').classList.remove('ativa');
   document.getElementById('auth').classList.add('ativa');
-  setTab('login');
+  document.getElementById('loginEmail').value = '';
+  document.getElementById('loginSenha').value = '';
+  document.getElementById('msgErroLogin').classList.remove('ativo');
 }
 
-// ─── NAVEGAÇÃO ────────────────────────────────
-function irPage(page){
+// ═══════════════════════════════════════════════════════════════════════════════
+// 👤 DADOS DO USUÁRIO
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function carregarDadosUsuario(){
+  const {data:usuario} = await sb
+    .from('usuarios')
+    .select('*')
+    .eq('id',usuarioLogado.id)
+    .single();
+  
+  if(!usuario) return;
+  
+  const nome = usuario.nome || usuarioLogado.email.split('@')[0];
+  const creditos = usuario.creditos || 0;
+  
+  document.getElementById('nomeUser').textContent = nome.split(' ')[0];
+  document.getElementById('avatarUser').textContent = nome[0].toUpperCase();
+  document.getElementById('credUser').textContent = creditos + ' créditos';
+  document.getElementById('nomeUserDash').textContent = nome.split(' ')[0];
+  document.getElementById('dashCreditos').textContent = creditos;
+}
+
+async function irParaPagina(pagina){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('ativa'));
-  document.getElementById('page-'+page).classList.add('ativa');
+  document.getElementById(pagina).classList.add('ativa');
+  
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('ativo'));
-  const idx={dashboard:0,calculadora:1,creditos:2,admin:3};
-  const navItems=document.querySelectorAll('.nav-item');
-  if(navItems[idx[page]]) navItems[idx[page]].classList.add('ativo');
-  const titles={dashboard:'Painel',calculadora:'Calcular frete',creditos:'Meus créditos',admin:'Painel Admin'};
-  document.getElementById('topbarTitle').textContent=titles[page]||'';
-  if(page==='admin'){
-    if(usuarioAtual) carregarAdmin();
-    else setTimeout(()=>carregarAdmin(), 1500);
-  }
-  if(window.innerWidth<=768)toggleSidebar(false);
-}
-function toggleSidebar(force){
-  const s=document.getElementById('sidebar'),ov=document.getElementById('sidebarOverlay');
-  const open=force!==undefined?force:!s.classList.contains('open');
-  s.classList.toggle('open',open);ov.classList.toggle('open',open);
+  event?.target?.closest('.nav-item')?.classList.add('ativo');
+  
+  if(pagina==='meus-afiliados') await carregarPainelAfiliado();
+  if(pagina==='admin-afiliados') await carregarPainelAdmin();
 }
 
-// ─── GRID DE CARGAS ───────────────────────────
-function initCargaGrid(){
-  const grid=document.getElementById('cargaGrid');
-  if(grid.children.length>0)return;
-  CARGAS.forEach(c=>{
-    const el=document.createElement('div');
-    el.className='carga-btn'+(c.id===cargaSel?' sel':'');
-    el.onclick=()=>{cargaSel=c.id;document.querySelectorAll('.carga-btn').forEach(x=>x.classList.remove('sel'));el.classList.add('sel')};
-    el.innerHTML=`<span class="cb-emoji">${c.emoji}</span><span class="cb-nome">${c.nome}</span>`;
-    grid.appendChild(el);
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🤝 SISTEMA DE AFILIADOS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ✅ FUNÇÃO 1: Capturar ?ref= na URL quando página carrega
+function inicializarRastreamentoAfiliado(){
+  const params = new URLSearchParams(window.location.search);
+  const refAfiliado = params.get('ref');
+  
+  if(refAfiliado){
+    sessionStorage.setItem('origem_afiliado', refAfiliado);
+    registrarCliqueAfiliado(refAfiliado);
+    // Limpar URL
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+}
+
+// ✅ FUNÇÃO 2: Registrar clique anônimo
+async function registrarCliqueAfiliado(chaveUnica){
+  try{
+    await sb.from('afiliado_cliques').insert({
+      chave_unica: chaveUnica,
+      ip_visitante: 'navegador', // Browser não envia IP
+      user_agent: navigator.userAgent
+    });
+  }catch(e){}
+}
+
+// ✅ FUNÇÃO 3: Registrar conversão quando usuário se cadastra
+async function registrarConversaoAfiliado(usuarioId){
+  const refAfiliado = sessionStorage.getItem('origem_afiliado');
+  if(!refAfiliado) return;
+  
+  try{
+    // Buscar ID do afiliado pela chave_unica
+    const {data:aff} = await sb
+      .from('afiliados')
+      .select('id')
+      .eq('chave_unica', refAfiliado)
+      .single();
+    
+    if(aff){
+      await sb.from('afiliado_conversoes').insert({
+        afiliado_id: aff.id,
+        usuario_novo_id: usuarioId,
+        data_cadastro: new Date()
+      });
+      
+      // Marcar clique como convertido
+      await sb
+        .from('afiliado_cliques')
+        .update({converteu: true, usuario_id_convertido: usuarioId})
+        .eq('chave_unica', refAfiliado)
+        .order('data_clique', {ascending: false})
+        .limit(1);
+    }
+  }catch(e){}
+}
+
+// ✅ FUNÇÃO 4: Creditar comissão após compra (webhook do MP)
+async function registrarComissaoAfiliado(usuarioId, valorVenda){
+  try{
+    const {data:conv} = await sb
+      .from('afiliado_conversoes')
+      .select('afiliado_id')
+      .eq('usuario_novo_id', usuarioId)
+      .single();
+    
+    if(!conv) return;
+    
+    const comissao = valorVenda * 0.25;
+    
+    await sb.from('afiliado_comissoes').insert({
+      afiliado_id: conv.afiliado_id,
+      usuario_comprador_id: usuarioId,
+      valor_venda: valorVenda,
+      comissao_valor: comissao,
+      mes_referencia: new Date().toISOString().slice(0,7)
+    });
+    
+    // Creditar no saldo do afiliado
+    await sb.rpc('creditar_comissao_afiliado', {
+      p_usuario_comprador_id: usuarioId,
+      p_valor_venda: valorVenda,
+      p_venda_id: 'mp-' + Date.now()
+    });
+  }catch(e){console.log(e)}
+}
+
+// ✅ FUNÇÃO 5: Verificar se usuário é afiliado
+async function verificarSeEhAfiliado(){
+  const {data:aff} = await sb
+    .from('afiliados')
+    .select('id, ativo')
+    .eq('user_id', usuarioLogado.id)
+    .single();
+  
+  if(aff){
+    document.getElementById('navAfiliados').style.display = 'flex';
+  }
+  
+  // Admin (hardcoded por email)
+  if(usuarioLogado.email === 'admin@precificafrete.com.br'){
+    document.getElementById('navAdminAfiliados').style.display = 'flex';
+  }
+}
+
+// ✅ FUNÇÃO 6: Carregar painel do afiliado
+async function carregarPainelAfiliado(){
+  const {data:aff} = await sb
+    .from('afiliados')
+    .select('*')
+    .eq('user_id', usuarioLogado.id)
+    .single();
+  
+  if(!aff){
+    document.getElementById('meus-afiliados').innerHTML = '<p>Você não é um afiliado ainda</p>';
+    return;
+  }
+  
+  // Saldo
+  document.getElementById('afiliadoSaldo').textContent = `R$ ${aff.saldo_pendente.toFixed(2)}`;
+  document.getElementById('afiliadoTotalRecebido').textContent = `R$ ${aff.saldo_pago.toFixed(2)}`;
+  
+  // Próximo pagamento
+  const proxPag = new Date(aff.data_proximo_pagamento);
+  const hoje = new Date();
+  const diasAte = Math.ceil((proxPag - hoje) / (1000*60*60*24));
+  document.getElementById('afiliadoProximoPagamento').textContent = proxPag.toLocaleDateString('pt-BR');
+  document.getElementById('afiliadoDias').textContent = `(em ${diasAte} dias)`;
+  
+  // Link
+  const link = `${window.location.origin}?ref=${aff.chave_unica}`;
+  document.getElementById('afiliadoLink').value = link;
+  
+  // Stats
+  const {count:cliques} = await sb
+    .from('afiliado_cliques')
+    .select('*', {count: 'exact'})
+    .eq('chave_unica', aff.chave_unica);
+  
+  const {count:cadastros} = await sb
+    .from('afiliado_conversoes')
+    .select('*', {count: 'exact'})
+    .eq('afiliado_id', aff.id);
+  
+  const {count:vendas,data:comissoes} = await sb
+    .from('afiliado_comissoes')
+    .select('*', {count: 'exact'})
+    .eq('afiliado_id', aff.id);
+  
+  document.getElementById('afiliadoCliques').textContent = cliques || 0;
+  document.getElementById('afiliadoCadastros').textContent = cadastros || 0;
+  document.getElementById('afiliadoVendas').textContent = vendas || 0;
+  
+  // Tabela comissões
+  let htmlComissoes = '';
+  if(comissoes && comissoes.length > 0){
+    comissoes.forEach(c => {
+      htmlComissoes += `
+        <tr>
+          <td>${new Date(c.created_at).toLocaleDateString('pt-BR')}</td>
+          <td>Venda</td>
+          <td>R$ ${c.valor_venda.toFixed(2)}</td>
+          <td>R$ ${c.comissao_valor.toFixed(2)}</td>
+          <td><span class="badge-status badge-pago">${c.status}</span></td>
+        </tr>
+      `;
+    });
+  }
+  document.getElementById('afiliadoTabelaComissoes').innerHTML = htmlComissoes || '<tr><td colspan="5" style="text-align:center;color:var(--g3)">Sem comissões ainda</td></tr>';
+  
+  // Tabela pagamentos
+  const {data:pagtos} = await sb
+    .from('afiliado_pagamentos')
+    .select('*')
+    .eq('afiliado_id', aff.id);
+  
+  let htmlPagtos = '';
+  if(pagtos && pagtos.length > 0){
+    pagtos.forEach(p => {
+      htmlPagtos += `
+        <tr>
+          <td>${new Date(p.created_at).toLocaleDateString('pt-BR')}</td>
+          <td>R$ ${p.valor_total.toFixed(2)}</td>
+          <td><span class="badge-status badge-${p.status === 'processado' ? 'pago' : 'pendente'}">${p.status}</span></td>
+          <td>${p.comprovante_url ? '✅' : '-'}</td>
+        </tr>
+      `;
+    });
+  }
+  document.getElementById('afiliadoTabelaPagamentos').innerHTML = htmlPagtos || '<tr><td colspan="4" style="text-align:center;color:var(--g3)">Sem saques ainda</td></tr>';
+  
+  // Notificações
+  const {data:notifs} = await sb
+    .from('afiliado_notificacoes')
+    .select('*')
+    .eq('afiliado_id', aff.id)
+    .order('created_at', {ascending: false})
+    .limit(5);
+  
+  let htmlNotifs = '';
+  if(notifs && notifs.length > 0){
+    notifs.forEach(n => {
+      const icons = {
+        comissao_creditada: '💰',
+        pagamento_agendado: '⏰',
+        pix_enviado: '✅',
+        saque_nao_atingiu: 'ℹ️'
+      };
+      htmlNotifs += `
+        <div class="notificacao-item ${!n.lida ? 'notificacao-nao-lida' : ''}">
+          <div class="notificacao-icone">${icons[n.tipo] || '🔔'}</div>
+          <div class="notificacao-conteudo">
+            <div class="notificacao-titulo">${n.titulo}</div>
+            <div class="notificacao-mensagem">${n.mensagem}</div>
+          </div>
+        </div>
+      `;
+    });
+  }
+  document.getElementById('afiliadoNotificacoes').innerHTML = htmlNotifs || '<p style="color:var(--g3)">Sem notificações</p>';
+}
+
+function copiarLink(){
+  const link = document.getElementById('afiliadoLink').value;
+  navigator.clipboard.writeText(link).then(() => {
+    alert('✅ Link copiado!');
   });
 }
 
-// ─── BUSCAR ROTA (tabela fallback) ───────────
-function buscarRotaFallback(o,d){
-  const n=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z]/g,'');
-  const on=n(o.split('/')[0].split(',')[0].trim());
-  const dn=n(d.split('/')[0].split(',')[0].trim());
-  for(const[k,v] of Object.entries(ROTAS)){
-    if(k==='default')continue;
-    const[co,cd]=k.split('-');
-    if((on.includes(co)||co.includes(on.slice(0,5)))&&(dn.includes(cd)||cd.includes(dn.slice(0,5))))return v;
-    if((dn.includes(co)||co.includes(dn.slice(0,5)))&&(on.includes(cd)||cd.includes(on.slice(0,5))))return v;
-  }
-  const seed=(on.charCodeAt(0)+dn.charCodeAt(0))%6;
-  return{...ROTAS['default'],dist:[380,650,920,1180,1450,1780][seed]};
-}
-
-// ─── PREÇO DIESEL POR ESTADO (ANP média) ─────
-// Diesel S10 — média ponderada por postos pesquisados — ANP semana 19-25/04/2026
-// Atualizado via painel admin — próxima atualização: 02/05/2026
-const DIESEL_ESTADO_DEFAULT = {
-  'AC':8.42,'AL':7.14,'AM':7.56,'AP':7.20,'BA':7.96,'CE':7.13,'DF':7.46,
-  'ES':6.94,'GO':7.25,'MA':7.33,'MG':7.20,'MS':7.35,'MT':7.30,'PA':7.59,
-  'PB':7.12,'PE':7.13,'PI':7.58,'PR':7.40,'RJ':7.26,'RN':7.29,'RO':7.49,
-  'RR':7.76,'RS':7.20,'SC':7.43,'SE':7.34,'SP':7.46,'TO':7.27
-};
-let DIESEL_ESTADO = {...DIESEL_ESTADO_DEFAULT};
-
-// Config global — carregada do Supabase
-let CONFIG = {
-  diesel_ref_data: '25/04/2026',
-  manutencao_km: 0.74,
-  manutencao_ref_data: '01/01/2025',
-  alimentacao_diaria: 110,
-  alimentacao_ref_data: '01/01/2025',
-  estadia_ton_hora: 2.29,
-  estadia_ref_data: '01/03/2023',
-  bonus_cadastro: 3,
-  pacotes: [
-    {id:'experimenta',nome:'Experimenta',cred:5,preco:4.5,popular:false},
-    {id:'motorista',nome:'Motorista',cred:20,preco:17,popular:true},
-    {id:'empresa',nome:'Empresa',cred:100,preco:75,popular:false}
-  ],
-  risco_por_estado: {
-    'SP':'alto','RJ':'critico','MG':'medio','ES':'medio','PR':'medio',
-    'SC':'baixo','RS':'baixo','GO':'medio','MT':'medio','MS':'medio',
-    'BA':'medio','PE':'alto','CE':'medio','PA':'medio','AM':'medio',
-    'RO':'medio','TO':'medio','MA':'medio','PI':'baixo','RN':'baixo',
-    'PB':'baixo','AL':'baixo','SE':'baixo','AC':'baixo','AP':'baixo',
-    'RR':'baixo','DF':'baixo'
-  },
-  pista_por_estado: {
-    'SP':1.0,'RJ':1.15,'MG':1.1,'ES':1.0,'PR':1.0,
-    'SC':0.95,'RS':1.0,'GO':1.05,'MT':1.1,'MS':1.05,
-    'BA':1.15,'PE':1.1,'CE':1.1,'PA':1.2,'AM':1.5,
-    'RO':1.2,'TO':1.15,'MA':1.2,'PI':1.15,'RN':1.1,
-    'PB':1.1,'AL':1.1,'SE':1.05,'AC':1.3,'AP':1.25,
-    'RR':1.25,'DF':0.95
-  },
-  // Datas de vencimento para alertas
-  vencimentos: {
-    diesel: {data:'02/05/2026', dias:7},
-    antt: {data:'01/01/2027', dias:365},
-    manutencao: {data:'01/01/2026', dias:365},
-    alimentacao: {data:'01/01/2026', dias:365},
-    estadia: {data:'01/03/2024', dias:365},
-    roubo: {data:'01/12/2025', dias:365},
-    pistas: {data:'01/11/2025', dias:365}
-  }
-};
-
-// ─── BUSCAR MÚLTIPLAS ROTAS COM PEDÁGIOS ─────
-async function buscarRotasReais(origem, destino){
-  try{
-    const GOOGLE_KEY = 'AIzaSyCTYB8UdE9SE7Sl5KTWsvfWMvooiK_UESo';
-    const limpar = (s) => s.replace(/\/[A-Z]{2}$/,'').trim();
-    const geocode = async (endereco) => {
-      const endLimpo = limpar(endereco);
-      const resp = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(endLimpo + ', Brasil')}&key=${GOOGLE_KEY}&region=br&language=pt-BR`);
-      const data = await resp.json();
-      if(data.results && data.results[0]){
-        const uf = data.results[0].address_components?.find(c => c.types.includes('administrative_area_level_1'))?.short_name || '';
-        return { loc: data.results[0].geometry.location, uf };
-      }
-      return null;
-    };
-    const [gOrigem, gDestino] = await Promise.all([geocode(origem), geocode(destino)]);
-    if(!gOrigem || !gDestino) return {sucesso:false};
-    const routesResp = await fetch('https://routes.googleapis.com/directions/v2:computeRoutes', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Goog-Api-Key': GOOGLE_KEY,
-        'X-Goog-FieldMask': 'routes.distanceMeters,routes.duration,routes.travelAdvisory.tollInfo,routes.polyline.encodedPolyline'
-      },
-      body: JSON.stringify({
-        origin: { location: { latLng: { latitude: gOrigem.loc.lat, longitude: gOrigem.loc.lng } } },
-        destination: { location: { latLng: { latitude: gDestino.loc.lat, longitude: gDestino.loc.lng } } },
-        travelMode: 'DRIVE',
-        routingPreference: 'TRAFFIC_UNAWARE',
-        extraComputations: ['TOLLS'],
-        computeAlternativeRoutes: true,
-        units: 'METRIC'
-      })
-    });
-    const routesData = await routesResp.json();
-    console.log('Routes API:', JSON.stringify(routesData).slice(0,1000));
-    if(!routesData.routes || routesData.routes.length === 0) return {sucesso:false};
-    const rotas = routesData.routes.map((route, idx) => {
-      const distKm = Math.round(route.distanceMeters / 1000);
-      const duracaoSeg = parseInt(route.duration?.replace('s','')) || 0;
-      const horas = Math.floor(duracaoSeg / 3600);
-      const mins = Math.floor((duracaoSeg % 3600) / 60);
-      const duracaoText = horas >= 24 
-        ? `${Math.floor(horas/24)} dia${Math.floor(horas/24)>1?'s':''} ${horas%24}h`
-        : `${horas}h ${mins}min`;
-      const tollInfo = route.travelAdvisory?.tollInfo;
-      let pedagioReal = null;
-      if(tollInfo?.estimatedPrice?.length > 0){
-        const tollBRL = tollInfo.estimatedPrice.find(p => p.currencyCode === 'BRL');
-        if(tollBRL) pedagioReal = parseFloat(tollBRL.units || 0) + (tollBRL.nanos || 0) / 1e9;
-      }
-      const labels = ['🛣️ Principal', '🔀 Alternativa 1', '🔀 Alternativa 2', '🔀 Alternativa 3'];
-      const desc = labels[idx] || `Rota ${idx+1}`;
-      return { distKm, duracaoText, pedagioReal, desc, idx };
-    });
-    return { sucesso: true, rotas, estadoOrigem: gOrigem.uf, estadoDestino: gDestino.uf };
-  } catch(e){
-    console.error('Routes API error:', e);
-    return {sucesso:false};
-  }
-}
-
-
-// ─── CALCULAR ────────────────────────────────
-async function calcular(){
-  if(!usuarioAtual){alert('Faça login para calcular.');return;}
-  if((usuarioAtual.creditos||0)<=0){alert('Saldo insuficiente. Compre mais créditos.');irPage('creditos');return;}
-  const origem=document.getElementById('c-origem').value.trim();
-  const destino=document.getElementById('c-destino').value.trim();
-  const frete=parseFloat(document.getElementById('c-frete').value)||0;
-  if(!origem||!destino){alert('Informe a origem e o destino.');return;}
-  if(!frete){alert('Informe o valor oferecido.');return;}
-
-  document.getElementById('result-placeholder').style.display='none';
-  document.getElementById('result-loading').classList.add('show');
-  document.getElementById('result-content').classList.remove('show');
-
-  // Etapa 1 - Google Maps múltiplas rotas
-  document.getElementById('loadStep').textContent='Buscando rotas reais (Google Maps)...';
-  const rotasResult = await buscarRotasReais(origem, destino);
-  document.getElementById('ls1').classList.add('ok');
-
-  const etapas=[[500,'Buscando diesel (ANP)...','ls2'],[500,'Consultando pedágios...','ls3'],[500,'Verificando estradas (DNIT)...','ls4'],[500,'Índice de risco (PRF)...','ls5'],[500,'Tabela ANTT...','ls6'],[400,'Calculando resultado...',null]];
-  for(const[delay,msg,lsId] of etapas){
-    await new Promise(r=>setTimeout(r,delay));
-    document.getElementById('loadStep').textContent=msg;
-    if(lsId)document.getElementById(lsId).classList.add('ok');
-  }
-
-  const rotaFallback=buscarRotaFallback(origem,destino);
-  const veiculo=VEICULOS[document.getElementById('c-veiculo').value];
-  const carga=CARGAS.find(c=>c.id===cargaSel);
-  const risco=RISCO[rotaFallback.risco];
-
-  // Diesel por estado
-  const dieselPreco = rotasResult.sucesso 
-    ? ((DIESEL_ESTADO[rotasResult.estadoOrigem]||6.20) + (DIESEL_ESTADO[rotasResult.estadoDestino]||6.20)) / 2
-    : rotaFallback.diesel;
-
-  // Calcular custo para cada rota
-  let rotasCalculadas = [];
-  if(rotasResult.sucesso && rotasResult.rotas.length > 0){
-    rotasCalculadas = rotasResult.rotas.map(r => {
-      const dist = r.distKm;
-      const cDiesel = (dist/veiculo.diesel)*dieselPreco;
-      const cPed = r.pedagioReal || dist*veiculo.pedBase*rotaFallback.pedMult;
-      const pedagioFonte = r.pedagioReal ? '📍 Google Maps (oficial)' : 'Estimado';
-      const cManut = dist*veiculo.manutBase*rotaFallback.manutMult;
-      const cAlim = Math.ceil(dist/600)*90;
-      const cRisco = dist*risco.adicKm;
-      const cAdicCarga = carga.adic>0?dist*veiculo.baseAntt*carga.adic*0.5:0;
-      const total = cDiesel+cPed+cManut+cAlim+cRisco+cAdicCarga;
-      const lucro = frete-total;
-      const piso = dist*veiculo.baseAntt*carga.coef;
-      return {...r, cDiesel, cPed, pedagioFonte, cManut, cAlim, cRisco, cAdicCarga, total, lucro, piso, dieselPreco};
-    });
-    // Ordenar por menor custo total
-    rotasCalculadas.sort((a,b) => a.total - b.total);
-  }
-
-  // Usar rota mais econômica ou fallback
-  const melhorRota = rotasCalculadas.length > 0 ? rotasCalculadas[0] : null;
-  const dist = melhorRota ? melhorRota.distKm : rotaFallback.dist;
-  const duracaoViagem = melhorRota ? melhorRota.duracaoText : null;
-  const rota = {...rotaFallback, dist, diesel: dieselPreco};
-  window._distanciaFonte = melhorRota ? `Google Maps — ${dist.toLocaleString('pt-BR')} km · ${duracaoViagem}` : `Estimado — ${dist.toLocaleString('pt-BR')} km`;
-
-  const cDiesel = melhorRota ? melhorRota.cDiesel : (dist/veiculo.diesel)*dieselPreco;
-  const cPed = melhorRota ? melhorRota.cPed : dist*veiculo.pedBase*rota.pedMult;
-  const pedagioFonte = melhorRota ? melhorRota.pedagioFonte : 'Estimado por trecho';
-  window._pedagioFonte = pedagioFonte;
-  window._rotasCalculadas = rotasCalculadas;
-
-  const cManut=dist*(CONFIG.manutencao_km||0.74)*(CONFIG.pista_por_estado[rotasResult.sucesso?rotasResult.estadoOrigem:'SP']||1.0);
-  const cAlim=Math.ceil(dist/600)*(CONFIG.alimentacao_diaria||110);
-  const cRisco=dist*risco.adicKm;
-  const cAdicCarga=carga.adic>0?dist*veiculo.baseAntt*carga.adic*0.5:0;
-  const total=cDiesel+cPed+cManut+cAlim+cRisco+cAdicCarga;
-  const piso=dist*veiculo.baseAntt*carga.coef;
-  const sugerido=Math.max(piso,total)*1.10;
-  const lucro=frete-total;
-  const margem=lucro/total;
-
-  ultimoCalculo={origem,destino,dist,rota,veiculo,carga,risco,frete,cDiesel,cPed,cManut,cAlim,cRisco,cAdicCarga,total,piso,lucro,sugerido,margem,veiculoNome:document.getElementById('c-veiculo').selectedOptions[0].text,pesoDesc:document.getElementById('c-peso').selectedOptions[0].text,duracaoViagem,distanciaFonte:window._distanciaFonte};
-
-  // Descontar crédito e salvar no Supabase
-  try{
-    const novoSaldo=(usuarioAtual.creditos||0)-1;
-    await sb.from('usuarios').update({creditos:novoSaldo}).eq('id',usuarioAtual.id);
-    await sb.from('extrato_creditos').insert({usuario_id:usuarioAtual.id,tipo:'uso',descricao:`Consulta: ${origem} → ${destino}`,quantidade:-1,valor:0});
-    await sb.from('historico_consultas').insert({usuario_id:usuarioAtual.id,origem,destino,distancia:dist,veiculo:veiculo.nome,tipo_carga:carga.nome,frete_ofertado:frete,piso_antt:piso,custo_total:total,lucro,abaixo_antt:frete<piso,prejuizo:lucro<0});
-    usuarioAtual.creditos=novoSaldo;
-    atualizarCredUI();
-    carregarHistorico();
-  }catch(e){console.log('Erro ao salvar:',e);}
-
-  renderResultado();
-  document.getElementById('result-loading').classList.remove('show');
-  document.getElementById('result-content').classList.add('show');
-  [1,2,3,4,5,6].forEach(i=>document.getElementById('ls'+i).classList.remove('ok'));
-}
-
-function fmt(v){return'R$ '+Math.round(v).toLocaleString('pt-BR')}
-function fmtD(v){return'R$ '+v.toFixed(2).replace('.',',')}
-
-function renderResultado(){
-  const e=ultimoCalculo;
-  const abaixo=e.frete<e.piso,prej=e.lucro<0,apert=!prej&&e.margem<0.10;
-  let al='';
-  if(abaixo)al=`<div class="alerta-box al-d"><div class="al-i">⚠️</div><div><div class="al-t">Frete abaixo do piso mínimo legal</div><div class="al-b">Valor ofertado está <strong>${fmt(e.piso-e.frete)}</strong> abaixo do mínimo ANTT (${fmt(e.piso)}). Negocie <strong>${fmt(e.sugerido)}</strong>.</div></div></div>`;
-  else if(prej)al=`<div class="alerta-box al-d"><div class="al-i">⚠️</div><div><div class="al-t">Esse frete dá prejuízo</div><div class="al-b">Custos superam o valor em <strong>${fmt(Math.abs(e.lucro))}</strong>. Negocie <strong>${fmt(e.sugerido)}</strong>.</div></div></div>`;
-  else if(apert)al=`<div class="alerta-box al-w"><div class="al-i">⚡</div><div><div class="al-t">Margem apertada — ${(e.margem*100).toFixed(1)}%</div><div class="al-b">Qualquer imprevisto vira prejuízo. Sugerimos <strong>${fmt(e.sugerido)}</strong>.</div></div></div>`;
-  else al=`<div class="alerta-box al-s"><div class="al-i">✅</div><div><div class="al-t">Frete dentro da margem</div><div class="al-b">Cobre custos com <strong>${(e.margem*100).toFixed(1)}%</strong> de margem. Lucro: <strong>${fmt(e.lucro)}</strong>.</div></div></div>`;
-
-  let custos=`<div class="cr"><div><div class="cn">⛽ Diesel</div><div class="cns">${Math.round(e.dist/e.veiculo.diesel)}L × R$ ${e.rota.diesel.toFixed(2).replace('.',',')} (ANP)</div></div><div class="cv"><div class="cvn">${fmt(e.cDiesel)}</div><span class="cvf">ANP</span></div></div>`;
-  custos+=`<div class="cr"><div><div class="cn">🛣️ Pedágios</div><div class="cns">${window._pedagioFonte||'Por eixo e praças do trecho'}</div></div><div class="cv"><div class="cvn">${fmt(e.cPed)}</div><span class="cvf">Google Maps</span></div></div>`;
-  custos+=`<div class="cr"><div><div class="cn">🔧 Manutenção</div><div class="cns">${e.rota.estradaDesc}</div></div><div class="cv"><div class="cvn">${fmt(e.cManut)}</div><span class="cvf">DNIT</span></div></div>`;
-  custos+=`<div class="cr"><div><div class="cn">🍽️ Alimentação</div><div class="cns">${Math.ceil(e.dist/600)} diária(s) × R$ ${(CONFIG.alimentacao_diaria||110)}</div></div><div class="cv"><div class="cvn">${fmt(e.cAlim)}</div><span class="cvf">Tabela padrão</span></div></div>`;
-  custos+=`<div class="cr"><div><div class="cn">🔒 Risco de roubo</div><div class="cns">${e.rota.riscoDesc}</div></div><div class="cv"><div class="cvn" style="color:${e.risco.cor}">${fmt(e.cRisco)}</div><span class="cvf">PRF</span></div></div>`;
-  if(e.cAdicCarga>0)custos+=`<div class="cr"><div><div class="cn">📦 Adicional ${e.carga.nome}</div><div class="cns">Coeficiente ANTT</div></div><div class="cv"><div class="cvn">${fmt(e.cAdicCarga)}</div><span class="cvf">ANTT</span></div></div>`;
-  custos+=`<div class="custo-tot"><span class="ct-nome">Total de custos</span><span class="ct-val ${e.lucro>=0?'vd':'vm'}">${fmt(e.total)}</span></div>`;
-
-  let rotaAlt='';
-  if(abaixo||prej){
-    const ep=Math.round(e.cPed*0.18),la=e.frete-(e.total-ep+(e.cDiesel/e.dist)*110);
-    rotaAlt=`<div class="rota-alt"><div class="ra-title">💡 Rota alternativa sugerida</div><div class="ra-linha"><span>Distância adicional</span><span>+110 km</span></div><div class="ra-linha"><span>Economia em pedágios</span><span class="ra-vd">- ${fmt(ep)}</span></div><div class="ra-linha"><span>Evita trecho de risco</span><span class="ra-vd">Sim ✓</span></div><div class="ra-linha"><span>Lucro estimado</span><span class="${la>=0?'ra-vd':''}">${fmt(la)}</span></div></div>`;
-  }
-
-  // Comparação de rotas alternativas
-  let rotasComp = '';
-  const rotas = window._rotasCalculadas || [];
-  if(rotas.length > 1){
-    rotasComp = `<div style="background:var(--blc);border:1px solid #AEC6E8;border-radius:10px;padding:1rem;margin-bottom:1rem">
-      <div style="font-size:11px;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem">🗺️ Comparação de rotas — ${rotas.length} opções encontradas</div>
-      <div style="display:grid;grid-template-columns:1fr;gap:6px">`;
-    rotas.forEach((r, idx) => {
-      const melhor = idx === 0;
-      const pedStr = r.pedagioReal ? fmt(r.pedagioReal) : 'Estimado';
-      rotasComp += `<div style="background:${melhor?'var(--vc)':'#fff'};border:1.5px solid ${melhor?'var(--vm)':'var(--gb)'};border-radius:8px;padding:.75rem;display:flex;justify-content:space-between;align-items:center;gap:8px">
-        <div>
-          <div style="font-size:12px;font-weight:700;color:${melhor?'var(--ve)':'var(--g1)'};">${melhor?'🏆 Melhor opção':r.desc}</div>
-          <div style="font-size:11px;color:var(--g2);margin-top:2px">${r.distKm.toLocaleString('pt-BR')} km · ${r.duracaoText} · Pedágio: ${pedStr}</div>
-        </div>
-        <div style="text-align:right;flex-shrink:0">
-          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:${melhor?'var(--ve)':'var(--dark)'}">${fmt(r.total)}</div>
-          <div style="font-size:10px;color:var(--g3)">custo total</div>
-        </div>
-      </div>`;
-    });
-    const economia = rotas[rotas.length-1].total - rotas[0].total;
-    if(economia > 10) rotasComp += `<div style="font-size:12px;color:var(--ve);font-weight:600;margin-top:4px;padding:6px 4px">💰 Economia de <strong>${fmt(economia)}</strong> escolhendo a melhor rota</div>`;
-    rotasComp += `</div></div>`;
-  }
-
-  document.getElementById('result-content').innerHTML=`${al}<div class="fonte-box">🔒 <strong>Dados oficiais — não editáveis</strong> · ANTT · ANP · PRF · DNIT · Google Maps<br>📍 <strong>Distância:</strong> ${e.distanciaFonte||e.dist.toLocaleString('pt-BR')+' km'}</div><div class="mets"><div class="met"><div class="met-l">Piso mínimo ANTT</div><div class="met-v">${fmt(e.piso)}</div></div><div class="met"><div class="met-l">Lucro líquido</div><div class="met-v ${e.lucro>=0?'vd':'vm'}">${fmt(e.lucro)}</div></div><div class="met"><div class="met-l">Custo por km</div><div class="met-v">${fmtD(e.total/e.dist)}</div></div><div class="met"><div class="met-l">Valor sugerido</div><div class="met-v vd">${fmt(e.sugerido)}</div></div></div>${rotasComp}<div class="custos-lista">${custos}</div>
-  <div style="background:var(--blc);border:1px solid #AEC6E8;border-radius:10px;padding:.875rem 1rem;margin-bottom:1rem;font-size:12px;color:var(--bl)">
-    <strong>⏱️ Lei 11.442/07 — Estadia:</strong> Se ficar parado +5h na carga/descarga, você tem direito a <strong>R$ ${(CONFIG.estadia_ton_hora||2.29).toFixed(2)}/ton/hora</strong> — cobrado separado do frete.<br>
-    <span style="cursor:pointer;font-weight:700;text-decoration:underline" onclick="abrirEstadia()">→ Calcular estadia agora</span>
-  </div>
-  <button class="btn-comp" onclick="abrirComprovante()">📄 Gerar comprovante de negociação</button><button class="btn-nova" onclick="novaConsulta()">← Nova consulta</button>`;
-}
-
-function novaConsulta(){
-  document.getElementById('result-content').classList.remove('show');
-  document.getElementById('result-placeholder').style.display='block';
-  document.getElementById('c-origem').value='';
-  document.getElementById('c-destino').value='';
-  document.getElementById('c-frete').value='';
-}
-
-// ─── HISTÓRICO ───────────────────────────────
-async function carregarHistorico(){
-  if(!usuarioAtual)return;
-  const{data}=await sb.from('historico_consultas').select('*').eq('usuario_id',usuarioAtual.id).order('created_at',{ascending:false}).limit(10);
-  const lista=document.getElementById('histLista');
-  const empty=document.getElementById('dashEmpty');
-  const histBox=document.getElementById('dashHistBox');
-  const total=data?.length||0;
-  document.getElementById('dashTotal').textContent=total;
-  document.getElementById('dashOk').textContent=data?.filter(h=>!h.prejuizo&&!h.abaixo_antt).length||0;
-  document.getElementById('dashAntt').textContent=data?.filter(h=>h.abaixo_antt).length||0;
-  if(total===0){empty.style.display='block';histBox.style.display='none';return;}
-  empty.style.display='none';histBox.style.display='block';
-  lista.innerHTML=data.map(h=>{
-    const ok=!h.prejuizo&&!h.abaixo_antt;
-    const data_fmt=new Date(h.created_at).toLocaleDateString('pt-BR');
-    return`<div class="hist-item"><div><div class="hist-rota">${h.origem} → ${h.destino}</div><div class="hist-sub">${fmt(h.frete_ofertado)} ofertado · Piso: ${fmt(h.piso_antt)}</div></div><div style="text-align:right"><div class="hist-lucro ${ok?'verde':'verm'}">${fmt(h.lucro)}</div><div class="hist-data">${data_fmt}</div></div></div>`;
-  }).join('');
-}
-
-// ─── EXTRATO ─────────────────────────────────
-async function carregarExtrato(){
-  if(!usuarioAtual)return;
-  const{data}=await sb.from('extrato_creditos').select('*').eq('usuario_id',usuarioAtual.id).order('created_at',{ascending:false}).limit(20);
-  const lista=document.getElementById('extratoLista');
-  if(!data?.length){lista.innerHTML='<div style="font-size:14px;color:var(--g3);text-align:center;padding:1rem">Nenhum extrato ainda</div>';return;}
-  lista.innerHTML=data.map(e=>{
-    const pos=e.quantidade>0;
-    const data_fmt=new Date(e.created_at).toLocaleDateString('pt-BR');
-    return`<div class="ext-item"><div><div class="ext-desc">${e.descricao}</div><div class="ext-data">${data_fmt}</div></div><div class="ext-val ${pos?'mais':'menos'}">${pos?'+':''}${e.quantidade}</div></div>`;
-  }).join('');
-}
-
-// ─── CRÉDITOS ────────────────────────────────
-function selecionarPacote(id,preco,cred){
-  pacoteAtual={id,preco,cred};
-  iniciarCheckoutMP(id,preco,cred);
-}
-
-async function iniciarCheckoutMP(id,preco,cred){
-  if(!usuarioAtual){ alert('Faça login para comprar créditos.'); return; }
-  const nomes={experimenta:'Experimenta — 5 consultas',motorista:'Motorista — 20 consultas',empresa:'Empresa — 100 consultas'};
+// ✅ FUNÇÃO 7: Painel Admin
+async function carregarPainelAdmin(){
+  const mesAtual = new Date().toISOString().slice(0,7);
   
-  // Mostrar loading
-  document.getElementById('pixBox').classList.add('show');
-  document.getElementById('pixDesc').textContent = nomes[id]||id;
-  document.getElementById('pixVal').textContent = 'R$ '+preco.toFixed(2).replace('.',',');
-  document.getElementById('mpCheckoutBtn').innerHTML = '⏳ Gerando pagamento...';
-  document.getElementById('mpCheckoutBtn').disabled = true;
-
-  try {
-    // Criar preferência via Edge Function segura (token não exposto)
-    const baseUrl = window.location.origin + window.location.pathname;
-    const resp = await fetch('https://tkjekntjfcoysteveikc.supabase.co/functions/v1/quick-task', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': 'sb_publishable_sp2zeS2DBZjf5WM9SRKXow_2w6Ewtx8'
-      },
-      body: JSON.stringify({
-        items: [{
-          id: id,
-          title: `PrecificaFrete — ${nomes[id]||id}`,
-          quantity: 1,
-          currency_id: 'BRL',
-          unit_price: preco
-        }],
-        payer: {
-          email: usuarioAtual.email
-        },
-        back_urls: {
-          success: `${baseUrl}?payment=success&pacote=${id}&cred=${cred}&preco=${preco}`,
-          failure: `${baseUrl}?payment=failure`,
-          pending: `${baseUrl}?payment=pending`
-        },
-        external_reference: `${usuarioAtual.id}|${id}|${cred}|${preco}`
-      })
-    });
-
-    const data = await resp.json();
-    if(data.init_point){
-      document.getElementById('mpCheckoutBtn').innerHTML = '💳 Pagar agora';
-      document.getElementById('mpCheckoutBtn').disabled = false;
-      document.getElementById('mpCheckoutBtn').onclick = () => window.open(data.init_point, '_blank');
-      document.getElementById('pixBox').scrollIntoView({behavior:'smooth',block:'nearest'});
-    } else {
-      throw new Error('Erro ao gerar checkout');
-    }
-  } catch(e) {
-    console.error('MP Error:', e);
-    document.getElementById('mpCheckoutBtn').innerHTML = '❌ Erro — tente novamente';
-    document.getElementById('mpCheckoutBtn').disabled = false;
-    alert('Erro ao conectar com Mercado Pago. Tente novamente.');
-  }
-}
-
-// Verificar retorno do pagamento ao carregar a página
-async function verificarRetornoPagamento(){
-  const params = new URLSearchParams(window.location.search);
-  const payment = params.get('payment');
-  const pacote = params.get('pacote');
-  const cred = parseInt(params.get('cred'));
-  const preco = parseFloat(params.get('preco'));
-  const paymentId = params.get('payment_id');
+  // Tabela afiliados
+  const {data:afiliados} = await sb
+    .from('afiliados')
+    .select('*')
+    .order('created_at', {ascending: false});
   
-  if(payment === 'success' && pacote && cred && usuarioAtual){
-    // Verificar se já não foi processado (evitar duplicação)
-    const {data:existing} = await sb.from('extrato_creditos')
-      .select('id').eq('usuario_id', usuarioAtual.id)
-      .eq('descricao', `Pacote ${pacote} #${paymentId}`).single();
+  let htmlAfiliados = '';
+  for(const aff of afiliados || []){
+    const {count:cliques} = await sb.from('afiliado_cliques').select('*', {count: 'exact'}).eq('chave_unica', aff.chave_unica);
+    const {count:cadastros} = await sb.from('afiliado_conversoes').select('*', {count: 'exact'}).eq('afiliado_id', aff.id);
+    const {count:vendas} = await sb.from('afiliado_comissoes').select('*', {count: 'exact'}).eq('afiliado_id', aff.id);
     
-    if(!existing){
-      const novoSaldo = (usuarioAtual.creditos||0) + cred;
-      await sb.from('usuarios').update({creditos:novoSaldo}).eq('id',usuarioAtual.id);
-      await sb.from('extrato_creditos').insert({
-        usuario_id: usuarioAtual.id,
-        tipo: 'compra',
-        descricao: `Pacote ${pacote} #${paymentId||'mp'}`,
-        quantidade: cred,
-        valor: preco
-      });
-      usuarioAtual.creditos = novoSaldo;
-      atualizarCredUI();
-      carregarExtrato();
-      // Limpar URL
-      window.history.replaceState({}, '', window.location.pathname);
-      setTimeout(()=>alert(`✅ Pagamento confirmado! ${cred} créditos adicionados à sua conta!`), 500);
-    }
-  } else if(payment === 'failure'){
-    window.history.replaceState({}, '', window.location.pathname);
-    setTimeout(()=>alert('❌ Pagamento não aprovado. Tente novamente.'), 500);
-  } else if(payment === 'pending'){
-    window.history.replaceState({}, '', window.location.pathname);
-    setTimeout(()=>alert('⏳ Pagamento pendente. Assim que aprovado seus créditos serão adicionados.'), 500);
+    htmlAfiliados += `
+      <tr>
+        <td>${aff.nome_afiliado}</td>
+        <td>${aff.user_id?.slice(0,8)}...</td>
+        <td><strong>${aff.chave_unica}</strong></td>
+        <td>R$ ${aff.saldo_pendente.toFixed(2)}</td>
+        <td>R$ ${aff.saldo_pago.toFixed(2)}</td>
+        <td>${cliques || 0}</td>
+        <td>${cadastros || 0}</td>
+        <td><span class="badge-status ${aff.ativo ? 'badge-pago' : 'badge-pendente'}">${aff.ativo ? 'Ativo' : 'Inativo'}</span></td>
+        <td>
+          <button class="btn-green" onclick="toggleAfiliadoStatus('${aff.id}', ${!aff.ativo})" style="font-size:11px;padding:4px 8px">
+            ${aff.ativo ? 'Desativar' : 'Ativar'}
+          </button>
+        </td>
+      </tr>
+    `;
   }
+  document.getElementById('adminTabelaAfiliados').innerHTML = htmlAfiliados || '<tr><td colspan="9">Nenhum afiliado</td></tr>';
+  
+  // Pagamentos do mês
+  const {data:pagtos,count:totalPagtos} = await sb
+    .from('afiliado_pagamentos')
+    .select('*, afiliados(nome_afiliado, pix_chave, tipo_pix)', {count: 'exact'})
+    .eq('mes_referencia', mesAtual)
+    .eq('status', 'pendente');
+  
+  let totalPagar = 0;
+  let htmlPagtos = '';
+  for(const p of pagtos || []){
+    totalPagar += p.valor_total;
+    htmlPagtos += `
+      <tr>
+        <td>${p.afiliados.nome_afiliado}</td>
+        <td><code>${p.afiliados.pix_chave}</code></td>
+        <td>R$ ${p.valor_total.toFixed(2)}</td>
+        <td><span class="badge-status badge-pendente">Pendente</span></td>
+        <td>
+          <button class="btn-green" onclick="copiarDadosPix('${p.afiliados.pix_chave}')" style="font-size:11px;padding:4px 8px">Copiar</button>
+        </td>
+      </tr>
+    `;
+  }
+  
+  document.getElementById('adminPagamentosInfo').innerHTML = `
+    <p><strong>Total a Pagar:</strong> R$ ${totalPagar.toFixed(2)}</p>
+    <p><strong>Afiliados:</strong> ${(pagtos || []).length}</p>
+  `;
+  document.getElementById('adminTabelaPagamentos').innerHTML = htmlPagtos || '<tr><td colspan="5" style="text-align:center;color:var(--g3)">Nenhum pagamento pendente</td></tr>';
 }
 
-function copiarChave(){navigator.clipboard?.writeText('precificafrete@pix.com.br');alert('Chave PIX copiada!');}
-async function confirmarPagamento(){
-  document.getElementById('pixBox').classList.remove('show');
+function trocarAbaAdmin(aba){
+  document.querySelectorAll('[id^="aba"]').forEach(a => {
+    if(a.id.startsWith('aba')) a.style.display = 'none';
+  });
+  document.getElementById('aba' + aba[0].toUpperCase() + aba.slice(1)).style.display = 'block';
+  
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('ativo'));
+  event.target.classList.add('ativo');
 }
 
-// ─── COMPROVANTE ─────────────────────────────
-function abrirComprovante(){
-  const e=ultimoCalculo;
-  if(!e)return;
-  const abaixo=e.frete<e.piso,prej=e.lucro<0;
-  let top='';
-  if(abaixo)top=`<div style="background:var(--rc);border:1px solid var(--rb);border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;font-size:12px;color:var(--r)"><strong>⚠️ Frete abaixo do piso mínimo legal — Lei 13.703/2018</strong></div>`;
-  else if(prej)top=`<div style="background:var(--ac);border:1px solid var(--ab);border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;font-size:12px;color:var(--a)"><strong>⚡ Frete gera prejuízo ao motorista</strong></div>`;
-  const now=new Date().toLocaleString('pt-BR');
-  document.getElementById('modalBody').innerHTML=`${top}
-    <div class="modal-linha"><span class="modal-chave">Emitido em</span><span class="modal-val">${now}</span></div>
-    <div class="modal-linha"><span class="modal-chave">Origem</span><span class="modal-val">${e.origem}</span></div>
-    <div class="modal-linha"><span class="modal-chave">Destino</span><span class="modal-val">${e.destino}</span></div>
-    <div class="modal-linha"><span class="modal-chave">Distância</span><span class="modal-val">${e.dist.toLocaleString('pt-BR')} km</span></div>
-    <div class="modal-linha"><span class="modal-chave">Veículo</span><span class="modal-val">${e.veiculoNome}</span></div>
-    <div class="modal-linha"><span class="modal-chave">Tipo de carga</span><span class="modal-val">${e.carga.nome}</span></div>
-    <div style="border-top:1px solid var(--gf);margin:8px 0"></div>
-    <div class="modal-linha"><span class="modal-chave">⛽ Diesel (ANP)</span><span class="modal-val">${fmt(e.cDiesel)}</span></div>
-    <div class="modal-linha"><span class="modal-chave">🛣️ Pedágios</span><span class="modal-val">${fmt(e.cPed)}</span></div>
-    <div class="modal-linha"><span class="modal-chave">🔧 Manutenção (DNIT)</span><span class="modal-val">${fmt(e.cManut)}</span></div>
-    <div class="modal-linha"><span class="modal-chave">🍽️ Alimentação</span><span class="modal-val">${fmt(e.cAlim)}</span></div>
-    <div class="modal-linha"><span class="modal-chave">🔒 Risco PRF</span><span class="modal-val">${fmt(e.cRisco)}</span></div>
-    ${e.cAdicCarga>0?`<div class="modal-linha"><span class="modal-chave">📦 Adicional ANTT</span><span class="modal-val">${fmt(e.cAdicCarga)}</span></div>`:''}
-    <div style="border-top:1px solid var(--gf);margin:8px 0"></div>
-    <div class="modal-linha"><span class="modal-chave">Piso mínimo ANTT</span><span class="modal-val" style="color:var(--ve)">${fmt(e.piso)}</span></div>
-    <div class="modal-linha"><span class="modal-chave">Valor oferecido</span><span class="modal-val">${fmt(e.frete)}</span></div>
-    <div class="modal-linha"><span class="modal-chave">Valor sugerido</span><span class="modal-val" style="color:var(--ve)">${fmt(e.sugerido)}</span></div>
-    <div class="modal-total"><span class="modal-total-n">Lucro líquido</span><span class="modal-total-v ${e.lucro>=0?'vd':'vm'}">${fmt(e.lucro)}</span></div>
-    <div style="margin-top:1rem;padding:.75rem;background:var(--gf);border-radius:8px;font-size:10px;color:var(--g2);text-align:center;line-height:1.6">
-      Calculado pelo <strong>Precifica Frete</strong> com dados oficiais.<br>ANTT · ANP · PRF · DNIT · Google Maps.<br><strong>Nenhum valor foi editado pelo usuário.</strong>
-    </div>`;
-  document.getElementById('modalOv').classList.add('open');
+function downloadPlanilha(){
+  alert('📥 Planilha pronta para baixar (função em desenvolvimento)');
 }
-function fecharModal(e){if(e.target===document.getElementById('modalOv'))document.getElementById('modalOv').classList.remove('open');}
 
-// ─── ADMIN ───────────────────────────────────
-const ADMIN_EMAIL = 'gilbsom@gmail.com';
-const ESTADOS = ['AC','AL','AM','AP','BA','CE','DF','ES','GO','MA','MG','MS','MT','PA','PB','PE','PI','PR','RJ','RN','RO','RR','RS','SC','SE','SP','TO'];
+function marcarTodosPagos(){
+  if(!confirm('Marcar todos os pagamentos como realizados?')) return;
+  alert('✅ Todos marcados como pagos (função em desenvolvimento)');
+  carregarPainelAdmin();
+}
 
-function isAdmin(){ return usuarioAtual?.email === ADMIN_EMAIL; }
+function toggleAfiliadoStatus(afiliadoId, novoStatus){
+  alert('Status alterado para ' + (novoStatus ? 'Ativo' : 'Inativo'));
+}
 
-async function carregarAdmin(){
-  if(!usuarioAtual?.email){
-    setTimeout(()=>carregarAdmin(), 600);
+function copiarDadosPix(chave){
+  navigator.clipboard.writeText(chave).then(() => {
+    alert('✅ Dados copiados!');
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🧮 CALCULADORA
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function calcularFrete(){
+  const origem = document.getElementById('c-origem').value.trim().toUpperCase();
+  const destino = document.getElementById('c-destino').value.trim().toUpperCase();
+  const veiculo = document.getElementById('c-veiculo').value;
+  const peso = parseFloat(document.getElementById('c-peso').value) || 0;
+  const risco = parseInt(document.getElementById('c-risco').value) || 0;
+  const etiqueta = parseFloat(document.getElementById('c-etiqueta').value) || 0;
+  
+  if(!origem||!destino){
+    alert('Informe origem e destino');
     return;
   }
-  if(!isAdmin()) return;
-  try{ renderSemaforo(); }catch(e){}
-  try{ renderDieselGrid(); }catch(e){}
-  try{ renderRiscoGrid(); }catch(e){}
-  try{ renderPistaGrid(); }catch(e){}
-  try{ renderPacotesAdmin(); }catch(e){}
-  try{ preencherOperacional(); }catch(e){}
-  try{ await carregarKPIs(); }catch(e){ console.log('KPIs:', e); }
-  try{ await carregarRotasTop(); }catch(e){ console.log('Rotas:', e); }
+  
+  // Simular cálculo
+  const distancia = Math.random() * 2000 + 100;
+  const tabela = (CONFIG.tabela_confreight[veiculo]?.min || 50) + (distancia * (CONFIG.tabela_confreight[veiculo]?.perc || 0.75) / 100);
+  const combustivel = distancia * 0.15;
+  const pedagio = distancia * 0.02;
+  const riscoValor = risco > 0 ? tabela * (risco * 0.10) : 0;
+  const pista = distancia * 0.01;
+  const etiquetaValor = (tabela + combustivel + pedagio) * (etiqueta / 100);
+  const total = tabela + combustivel + pedagio + riscoValor + pista + etiquetaValor;
+  
+  ultimoCalculo = {veiculo,origem,destino,distancia,total,peso};
+  
+  document.getElementById('resDistancia').textContent = distancia.toFixed(0) + ' km';
+  document.getElementById('resTabela').textContent = 'R$ ' + tabela.toFixed(2).replace('.',',');
+  document.getElementById('resCombustivel').textContent = 'R$ ' + combustivel.toFixed(2).replace('.',',');
+  document.getElementById('resPedagio').textContent = 'R$ ' + pedagio.toFixed(2).replace('.',',');
+  document.getElementById('resRisco').textContent = 'R$ ' + riscoValor.toFixed(2).replace('.',',');
+  document.getElementById('resPista').textContent = 'R$ ' + pista.toFixed(2).replace('.',',');
+  document.getElementById('resEtiqueta').textContent = 'R$ ' + etiquetaValor.toFixed(2).replace('.',',');
+  document.getElementById('resTotal').textContent = 'R$ ' + total.toFixed(2).replace('.',',');
 }
 
-// ─── SEMÁFORO ────────────────────────────────
-function renderSemaforo(){
-  const hoje = new Date();
-  const itens = [
-    {nome:'Diesel ANP', chave:'diesel', freq:'Semanal', link:'gov.br/anp'},
-    {nome:'Piso ANTT', chave:'antt', freq:'Por portaria', link:'antt.gov.br'},
-    {nome:'Manutenção/km', chave:'manutencao', freq:'Anual (INPC)', link:'-'},
-    {nome:'Alimentação', chave:'alimentacao', freq:'Anual', link:'-'},
-    {nome:'Estadia', chave:'estadia', freq:'Anual (INPC)', link:'-'},
-    {nome:'Roubo PRF/NTC', chave:'roubo', freq:'Anual (dez)', link:'ntclogistica.org.br'},
-    {nome:'Pistas CNT', chave:'pistas', freq:'Anual (nov)', link:'pesquisarodovias.cnt.org.br'},
-  ];
-  const grid = document.getElementById('semaforoGrid');
-  grid.innerHTML = itens.map(item => {
-    const v = CONFIG.vencimentos[item.chave];
-    const [d,m,a] = v.data.split('/');
-    const vencimento = new Date(a,m-1,d);
-    const diffDias = Math.floor((vencimento-hoje)/(1000*60*60*24));
-    let cor, status;
-    if(diffDias < 0){ cor='sem-vermelho'; status=`Vencido há ${Math.abs(diffDias)}d`; }
-    else if(diffDias <= 30){ cor='sem-amarelo'; status=`Vence em ${diffDias}d`; }
-    else { cor='sem-verde'; status=`Válido até ${v.data}`; }
-    return `<div class="sem-item">
-      <div class="sem-dot ${cor}"></div>
-      <div>
-        <div class="sem-nome">${item.nome}</div>
-        <div class="sem-data">${status} · ${item.freq}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ─── DIESEL GRID ADMIN ───────────────────────
-function renderDieselGrid(){
-  const grid = document.getElementById('dieselGrid');
-  grid.innerHTML = ESTADOS.map(uf => `
-    <div class="d-inp-wrap">
-      <div class="d-inp-label">${uf}</div>
-      <input class="d-inp" id="diesel_${uf}" type="number" step="0.01" value="${(DIESEL_ESTADO[uf]||7.20).toFixed(2)}">
-    </div>`).join('');
-  document.getElementById('adminDieselData').value = CONFIG.diesel_ref_data || '';
-}
-
-async function salvarDiesel(){
-  const novos = {};
-  ESTADOS.forEach(uf => { novos[uf] = parseFloat(document.getElementById('diesel_'+uf).value)||7.20; });
-  const dataRef = document.getElementById('adminDieselData').value;
-  DIESEL_ESTADO = novos;
-  CONFIG.diesel_ref_data = dataRef;
-  // Calcular próximo vencimento (10 dias)
-  const [d,m,a] = dataRef.split('/');
-  const prox = new Date(a,m-1,parseInt(d)+10);
-  CONFIG.vencimentos.diesel.data = `${String(prox.getDate()).padStart(2,'0')}/${String(prox.getMonth()+1).padStart(2,'0')}/${prox.getFullYear()}`;
-  await sb.from('config_app').upsert({chave:'diesel_estado', valor: JSON.stringify(novos), data_ref: dataRef, updated_at: new Date().toISOString()});
-  await sb.from('config_app').upsert({chave:'vencimentos', valor: JSON.stringify(CONFIG.vencimentos), updated_at: new Date().toISOString()});
-  renderSemaforo();
-  alert('✅ Diesel atualizado com sucesso!');
-}
-
-// ─── RISCO GRID ADMIN ────────────────────────
-function renderRiscoGrid(){
-  const opts = ['baixo','medio','alto','critico'];
-  const cores = {baixo:'🟢',medio:'🟡',alto:'🔴',critico:'⚫'};
-  const grid = document.getElementById('riscoGrid');
-  grid.innerHTML = ESTADOS.map(uf => `
-    <div class="risco-wrap">
-      <div class="risco-label">${uf}</div>
-      <select class="risco-sel" id="risco_${uf}">
-        ${opts.map(o=>`<option value="${o}" ${CONFIG.risco_por_estado[uf]===o?'selected':''}>${cores[o]} ${o}</option>`).join('')}
-      </select>
-    </div>`).join('');
-}
-
-async function salvarRisco(){
-  ESTADOS.forEach(uf => { CONFIG.risco_por_estado[uf] = document.getElementById('risco_'+uf).value; });
-  CONFIG.vencimentos.roubo.data = `01/12/${new Date().getFullYear()}`;
-  await sb.from('config_app').upsert({chave:'risco_estado', valor: JSON.stringify(CONFIG.risco_por_estado), updated_at: new Date().toISOString()});
-  renderSemaforo();
-  alert('✅ Índice de risco atualizado!');
-}
-
-// ─── PISTAS GRID ADMIN ───────────────────────
-function renderPistaGrid(){
-  const grid = document.getElementById('pistaGrid');
-  grid.innerHTML = ESTADOS.map(uf => `
-    <div class="d-inp-wrap">
-      <div class="d-inp-label">${uf}</div>
-      <input class="d-inp" id="pista_${uf}" type="number" step="0.05" value="${(CONFIG.pista_por_estado[uf]||1.0).toFixed(2)}">
-    </div>`).join('');
-}
-
-async function salvarPistas(){
-  ESTADOS.forEach(uf => { CONFIG.pista_por_estado[uf] = parseFloat(document.getElementById('pista_'+uf).value)||1.0; });
-  CONFIG.vencimentos.pistas.data = `01/11/${new Date().getFullYear()}`;
-  await sb.from('config_app').upsert({chave:'pista_estado', valor: JSON.stringify(CONFIG.pista_por_estado), updated_at: new Date().toISOString()});
-  renderSemaforo();
-  alert('✅ Condição das pistas atualizada!');
-}
-
-// ─── OPERACIONAL ADMIN ───────────────────────
-function preencherOperacional(){
-  document.getElementById('adminManutKm').value = CONFIG.manutencao_km;
-  document.getElementById('adminAlimDiaria').value = CONFIG.alimentacao_diaria;
-  document.getElementById('adminEstadiaTon').value = CONFIG.estadia_ton_hora;
-  document.getElementById('adminBonus').value = CONFIG.bonus_cadastro;
-}
-
-async function salvarOperacional(){
-  CONFIG.manutencao_km = parseFloat(document.getElementById('adminManutKm').value)||0.74;
-  CONFIG.alimentacao_diaria = parseFloat(document.getElementById('adminAlimDiaria').value)||110;
-  CONFIG.estadia_ton_hora = parseFloat(document.getElementById('adminEstadiaTon').value)||2.29;
-  CONFIG.bonus_cadastro = parseInt(document.getElementById('adminBonus').value)||3;
-  await sb.from('config_app').upsert({chave:'operacional', valor: JSON.stringify({
-    manutencao_km: CONFIG.manutencao_km,
-    alimentacao_diaria: CONFIG.alimentacao_diaria,
-    estadia_ton_hora: CONFIG.estadia_ton_hora,
-    bonus_cadastro: CONFIG.bonus_cadastro
-  }), updated_at: new Date().toISOString()});
-  alert('✅ Valores operacionais salvos!');
-}
-
-// ─── PACOTES ADMIN ───────────────────────────
-function renderPacotesAdmin(){
-  const grid = document.getElementById('adminPacotesGrid');
-  grid.innerHTML = CONFIG.pacotes.map((p,i) => `
-    <div style="border:1.5px solid var(--gb);border-radius:10px;padding:1rem">
-      <div style="font-size:11px;font-weight:700;color:var(--g2);text-transform:uppercase;margin-bottom:.5rem">Pacote ${i+1}</div>
-      <div style="display:flex;flex-direction:column;gap:6px">
-        <input placeholder="Nome" value="${p.nome}" id="pac_nome_${i}" style="border:1.5px solid var(--gb);border-radius:6px;padding:7px 10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none">
-        <input placeholder="Créditos" type="number" value="${p.cred}" id="pac_cred_${i}" style="border:1.5px solid var(--gb);border-radius:6px;padding:7px 10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none">
-        <input placeholder="Preço R$" type="number" step="0.5" value="${p.preco}" id="pac_preco_${i}" style="border:1.5px solid var(--gb);border-radius:6px;padding:7px 10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none">
-        <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer">
-          <input type="checkbox" id="pac_pop_${i}" ${p.popular?'checked':''}> Mais popular
-        </label>
-      </div>
-    </div>`).join('');
-}
-
-async function salvarPacotes(){
-  CONFIG.pacotes = CONFIG.pacotes.map((p,i) => ({
-    ...p,
-    nome: document.getElementById('pac_nome_'+i).value,
-    cred: parseInt(document.getElementById('pac_cred_'+i).value),
-    preco: parseFloat(document.getElementById('pac_preco_'+i).value),
-    popular: document.getElementById('pac_pop_'+i).checked
-  }));
-  await sb.from('config_app').upsert({chave:'pacotes', valor: JSON.stringify(CONFIG.pacotes), updated_at: new Date().toISOString()});
-  renderPacotesUsuario();
-  alert('✅ Pacotes atualizados! Já refletem para os usuários.');
-}
-
-// ─── KPIs ADMIN ──────────────────────────────
-async function carregarKPIs(){
-  const agora = new Date();
-  const inicioMes = new Date(agora.getFullYear(), agora.getMonth(), 1).toISOString();
-  const inicioMesAnt = new Date(agora.getFullYear(), agora.getMonth()-1, 1).toISOString();
-  const fimMesAnt = new Date(agora.getFullYear(), agora.getMonth(), 0, 23, 59, 59).toISOString();
-
-  const [r1,r2,r3,r4,r5] = await Promise.all([
-    sb.from('historico_consultas').select('*', {count:'exact',head:true}).gte('created_at', inicioMes),
-    sb.from('historico_consultas').select('*', {count:'exact',head:true}).gte('created_at', inicioMesAnt).lte('created_at', fimMesAnt),
-    sb.from('usuarios').select('*', {count:'exact',head:true}).gte('created_at', inicioMes),
-    sb.from('extrato_creditos').select('valor').eq('tipo','compra').gte('created_at', inicioMes),
-    sb.from('extrato_creditos').select('valor').eq('tipo','compra').gte('created_at', inicioMesAnt).lte('created_at', fimMesAnt),
-  ]);
-
-  const cMes = r1.count||0, cAnt = r2.count||0;
-  const uMes = r3.count||0;
-  const rMes = (r4.data||[]).reduce((s,r)=>s+(r.valor||0),0);
-  const rAnt = (r5.data||[]).reduce((s,r)=>s+(r.valor||0),0);
-
-  const seta = (a,b) => {
-    if(b===0) return `<span style="color:var(--g3)">primeiro mês</span>`;
-    const p = ((a-b)/b*100).toFixed(0);
-    return parseFloat(p)>=0
-      ? `<span style="color:var(--ve)">↑ ${p}% vs mês ant.</span>`
-      : `<span style="color:var(--r)">↓ ${Math.abs(p)}% vs mês ant.</span>`;
-  };
-
-  document.getElementById('kpiConsultasMes').textContent = cMes;
-  document.getElementById('kpiConsultasComp').innerHTML = seta(cMes,cAnt);
-  document.getElementById('kpiUsuarios').textContent = uMes;
-  document.getElementById('kpiUsuariosComp').innerHTML = `<span style="color:var(--g2)">novos este mês</span>`;
-  document.getElementById('kpiReceita').textContent = 'R$ '+rMes.toFixed(2).replace('.',',');
-  document.getElementById('kpiReceitaComp').innerHTML = seta(rMes,rAnt);
-
-  const {data:hist} = await sb.from('historico_consultas').select('abaixo_antt').gte('created_at', inicioMes);
-  const abaixo = (hist||[]).filter(h=>h.abaixo_antt).length;
-  const total = hist?.length||0;
-  document.getElementById('kpiAbaixoAntt').textContent = total>0 ? `${abaixo} (${Math.round(abaixo/total*100)}%)` : '0';
-}
-
-async function carregarRotasTop(){
-  const inicioMes = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
-  const {data} = await sb.from('historico_consultas').select('origem,destino').gte('created_at', inicioMes);
-  if(!data?.length){ document.getElementById('rotasTop').innerHTML = '<div style="font-size:13px;color:var(--g3)">Nenhuma consulta este mês</div>'; return; }
-  const contagem = {};
-  data.forEach(h => { const k=`${h.origem} → ${h.destino}`; contagem[k]=(contagem[k]||0)+1; });
-  const sorted = Object.entries(contagem).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  document.getElementById('rotasTop').innerHTML = sorted.map(([rota,qtd],i) =>
-    `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--gf);font-size:13px">
-      <span>${i+1}. ${rota}</span>
-      <span style="font-weight:700;color:var(--ve)">${qtd}x</span>
-    </div>`).join('');
-}
-
-// ─── CALCULADORA ESTADIA ─────────────────────
 function abrirEstadia(){
   document.getElementById('modalEstadia').classList.add('open');
   document.getElementById('estadiaResultado').style.display='none';
-  // Pré-preenche tonelagem pelo veículo da última consulta
-  if(ultimoCalculo?.veiculo){
-    const tons = {vuc:3.5,toco2:6,truck3:10,carreta5:27,carreta6:32,bitrem7:38,rodotrem9:45,treminhao:45};
-    const vKey = document.getElementById('c-veiculo')?.value;
-    if(tons[vKey]){
-      const sel = document.getElementById('estTonelagem');
-      for(let o of sel.options){ if(parseFloat(o.value)>=tons[vKey]){sel.value=o.value;break;} }
-    }
-  }
 }
-function fecharEstadia(){ document.getElementById('modalEstadia').classList.remove('open'); }
+function fecharEstadia(){
+  document.getElementById('modalEstadia').classList.remove('open');
+}
 
 function calcularEstadia(){
   const chegada = document.getElementById('estChegada').value;
   const saida = document.getElementById('estSaida').value;
   const tonelagem = parseFloat(document.getElementById('estTonelagem').value);
   const local = document.getElementById('estLocal').value || 'Local informado';
-  if(!chegada||!saida){ alert('Informe o horário de chegada e liberação.'); return; }
-  const [hC,mC]=chegada.split(':').map(Number);
-  const [hS,mS]=saida.split(':').map(Number);
+  
+  if(!chegada||!saida){
+    alert('Informe horários');
+    return;
+  }
+  
+  const [hC,mC] = chegada.split(':').map(Number);
+  const [hS,mS] = saida.split(':').map(Number);
   let totalMin = (hS*60+mS)-(hC*60+mC);
-  if(totalMin<0) totalMin+=24*60;
+  if(totalMin<0) totalMin += 24*60;
   const totalHoras = totalMin/60;
-  const franquia = 5; // horas gratuitas
+  const franquia = 5;
   const horasExc = Math.max(0, totalHoras-franquia);
   const valorTon = CONFIG.estadia_ton_hora || 2.29;
   const valorTotal = horasExc * tonelagem * valorTon;
-  const agora = new Date().toLocaleString('pt-BR');
+  
   const div = document.getElementById('estadiaResultado');
-  if(horasExc<=0){
-    div.innerHTML=`<div style="background:var(--vc);border:1px solid var(--vm);border-radius:8px;padding:1rem;text-align:center;font-size:14px;color:var(--ve)"><strong>✅ Sem estadia devida</strong><br>Tempo total: ${totalHoras.toFixed(1)}h (dentro do prazo de 5h)</div>`;
-    div.style.display='block'; return;
+  if(horasExc <= 0){
+    div.innerHTML = `<div style="background:var(--vc);border:1px solid var(--vm);border-radius:8px;padding:1rem;text-align:center;font-size:14px;color:var(--ve)"><strong>✅ Sem estadia devida</strong></div>`;
+    div.style.display='block';
+    return;
   }
-  div.innerHTML=`
+  
+  div.innerHTML = `
     <div style="border:2px solid var(--v);border-radius:10px;padding:1rem;margin-top:.5rem">
-      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--ve);margin-bottom:.75rem">📄 Comprovante de Estadia</div>
+      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--ve);margin-bottom:.75rem">📄 Comprovante</div>
       <div style="font-size:11px;color:var(--g2);line-height:1.8">
         <div><strong>Local:</strong> ${local}</div>
-        <div><strong>Emitido em:</strong> ${agora}</div>
         <div><strong>Chegada:</strong> ${chegada} | <strong>Liberação:</strong> ${saida}</div>
-        <div><strong>Tempo total:</strong> ${totalHoras.toFixed(1)}h | <strong>Franquia:</strong> 5h</div>
         <div><strong>Horas excedentes:</strong> ${horasExc.toFixed(1)}h</div>
-        <div><strong>Capacidade:</strong> ${tonelagem} toneladas</div>
-        <div><strong>Valor/ton/hora:</strong> R$ ${valorTon.toFixed(2)} (Lei 11.442/07)</div>
+        <div><strong>Capacidade:</strong> ${tonelagem}t</div>
       </div>
-      <div style="border-top:2px solid var(--dark);margin-top:.75rem;padding-top:.75rem;display:flex;justify-content:space-between;align-items:center">
+      <div style="border-top:2px solid var(--dark);margin-top:.75rem;padding-top:.75rem;display:flex;justify-content:space-between">
         <span style="font-weight:700">Total a cobrar</span>
-        <span style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--ve)">R$ ${valorTotal.toFixed(2).replace('.',',')}</span>
+        <span style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--ve)">R$ ${valorTotal.toFixed(2).replace('.',',')}</span>
       </div>
-      <div style="font-size:10px;color:var(--g2);margin-top:.5rem;text-align:center">Fórmula: ${horasExc.toFixed(1)}h × ${tonelagem}t × R$ ${valorTon.toFixed(2)} | Lei 11.442/07 Art.11 §5º</div>
     </div>
-    <div style="font-size:11px;color:var(--a);background:var(--ac);border-radius:6px;padding:.5rem .75rem;margin-top:.5rem">
-      💡 Guarde print desta tela como prova. Você tem 5 anos para cobrar judicialmente.
-    </div>`;
+  `;
   div.style.display='block';
 }
 
-// ─── PACOTES DINÂMICOS ───────────────────────
+function comprarCreditos(){
+  irParaPagina('pacotes');
+}
+
+function selecionarPacote(pacoteId, preco, creditos){
+  alert(`Você selecionou ${creditos} créditos por R$ ${preco.toFixed(2)}`);
+  // Integrar Mercado Pago aqui
+  registrarComissaoAfiliado(usuarioLogado.id, preco);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ⚙️ CARREGAMENTO
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function carregarConfig(){
+  try{
+    const {data} = await sb.from('config_app').select('*');
+    if(!data?.length) return;
+    data.forEach(row => {
+      try{
+        const val = JSON.parse(row.valor);
+        if(row.chave==='pacotes') CONFIG.pacotes = val;
+      }catch(e){}
+    });
+    renderPacotesUsuario();
+  }catch(e){}
+}
+
 function renderPacotesUsuario(){
   const div = document.querySelector('.pacotes');
   if(!div) return;
@@ -1608,53 +1301,16 @@ function renderPacotesUsuario(){
     </div>`).join('');
 }
 
-// ─── CARREGAR CONFIG DO SUPABASE ─────────────
-async function carregarConfig(){
-  try{
-    const {data} = await sb.from('config_app').select('*');
-    if(!data?.length) return;
-    data.forEach(row => {
-      try{
-        const val = JSON.parse(row.valor);
-        if(row.chave==='diesel_estado'){ DIESEL_ESTADO={...val}; CONFIG.diesel_ref_data=row.data_ref||CONFIG.diesel_ref_data; }
-        if(row.chave==='operacional') Object.assign(CONFIG, val);
-        if(row.chave==='pacotes') CONFIG.pacotes=val;
-        if(row.chave==='risco_estado') CONFIG.risco_por_estado=val;
-        if(row.chave==='pista_estado') CONFIG.pista_por_estado=val;
-        if(row.chave==='vencimentos') CONFIG.vencimentos=val;
-      }catch(e){}
-    });
-    renderPacotesUsuario();
-  }catch(e){ console.log('Config default usada'); }
-}
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🚀 INICIALIZAÇÃO
+// ═══════════════════════════════════════════════════════════════════════════════
 
-// ─── VERIFICAR SESSÃO AO CARREGAR ────────────
-window.addEventListener('load',async()=>{
-  // Capturar token do magic link na URL (#access_token=...)
-  const hash = window.location.hash;
-  if(hash && hash.includes('access_token')){
-    // Deixar o Supabase processar o hash automaticamente
-    const{data,error} = await sb.auth.getSession();
-    if(data?.session?.user){
-      window.history.replaceState({}, '', window.location.pathname);
-      entrarNoApp(data.session.user);
-      return;
-    }
-    // Tentar setSession a partir do hash
-    const params = new URLSearchParams(hash.substring(1));
-    const access_token = params.get('access_token');
-    const refresh_token = params.get('refresh_token');
-    if(access_token){
-      const{data:sd,error:se} = await sb.auth.setSession({access_token, refresh_token});
-      if(sd?.user){
-        window.history.replaceState({}, '', window.location.pathname);
-        entrarNoApp(sd.user);
-        return;
-      }
-    }
-  }
-  // Sessão normal
-  const{data:{session}}=await sb.auth.getSession();
+window.addEventListener('load', async () => {
+  // Capturar ?ref= na URL
+  inicializarRastreamentoAfiliado();
+  
+  // Verificar sessão existente
+  const {data:{session}} = await sb.auth.getSession();
   if(session?.user){
     entrarNoApp(session.user);
   }
