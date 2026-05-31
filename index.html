@@ -9,7 +9,111 @@
 <link rel="apple-touch-icon" sizes="192x192" href="favicon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://sdk.mercadopago.com/js/v2"></script>
+  <script>
+// ═══════════════════════════════════════════════════════════════
+// CONFIGURAÇÃO SUPABASE - SISTEMA DE AFILIADOS
+// ═══════════════════════════════════════════════════════════════
+const SUPABASE_URL = 'https://tkjekntjfcoysteveikc.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_sp2zeS2DBZjf5WM9SRKXow_2w6Ewtx8';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let usuarioLogado = null;
+
+// ═══════════════════════════════════════════════════════════════
+// 🤝 FUNÇÕES DE AFILIADOS
+// ═══════════════════════════════════════════════════════════════
+
+function inicializarRastreamentoAfiliado(){
+  const params = new URLSearchParams(window.location.search);
+  const refAfiliado = params.get('ref');
+  if(refAfiliado){
+    sessionStorage.setItem('origem_afiliado', refAfiliado);
+    registrarCliqueAfiliado(refAfiliado);
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+}
+
+async function registrarCliqueAfiliado(chaveUnica){
+  try{
+    await sb.from('afiliado_cliques').insert({
+      chave_unica: chaveUnica,
+      ip_visitante: 'navegador',
+      user_agent: navigator.userAgent
+    });
+  }catch(e){}
+}
+
+async function registrarConversaoAfiliado(usuarioId){
+  const refAfiliado = sessionStorage.getItem('origem_afiliado');
+  if(!refAfiliado) return;
+  try{
+    const {data:aff} = await sb.from('afiliados').select('id').eq('chave_unica', refAfiliado).single();
+    if(aff){
+      await sb.from('afiliado_conversoes').insert({afiliado_id: aff.id, usuario_novo_id: usuarioId, data_cadastro: new Date()});
+      await sb.from('afiliado_cliques').update({converteu: true, usuario_id_convertido: usuarioId}).eq('chave_unica', refAfiliado).order('data_clique', {ascending: false}).limit(1);
+    }
+  }catch(e){}
+}
+
+async function registrarComissaoAfiliado(usuarioId, valorVenda){
+  try{
+    const {data:conv} = await sb.from('afiliado_conversoes').select('afiliado_id').eq('usuario_novo_id', usuarioId).single();
+    if(!conv) return;
+    const comissao = valorVenda * 0.25;
+    const mesRef = new Date().toISOString().slice(0,7);
+    await sb.from('afiliado_comissoes').insert({afiliado_id: conv.afiliado_id, usuario_comprador_id: usuarioId, valor_venda: valorVenda, comissao_valor: comissao, mes_referencia: mesRef, status: 'creditado'});
+    await sb.from('afiliados').update({saldo_pendente: parseFloat(await sb.from('afiliados').select('saldo_pendente').eq('id', conv.afiliado_id).single().then(r => r.data.saldo_pendente)) + comissao}).eq('id', conv.afiliado_id);
+    await sb.from('afiliado_notificacoes').insert({afiliado_id: conv.afiliado_id, tipo: 'comissao_creditada', titulo: '💰 Você ganhou uma comissão!', mensagem: 'R$ ' + comissao.toFixed(2) + ' foi creditado na sua conta.'});
+  }catch(e){}
+}
+
+async function verificarSeEhAfiliado(){
+  if(!usuarioLogado) return;
+  const {data:aff} = await sb.from('afiliados').select('id, ativo').eq('user_id', usuarioLogado.id).single();
+  if(aff){
+    const navAff = document.getElementById('navAfiliados');
+    if(navAff) navAff.style.display = 'flex';
+  }
+  if(usuarioLogado.email === 'admin@precificafrete.com.br'){
+    const navAdmin = document.getElementById('navAdminAfiliados');
+    if(navAdmin) navAdmin.style.display = 'flex';
+  }
+}
+
+async function carregarPainelAfiliado(){
+  const {data:aff} = await sb.from('afiliados').select('*').eq('user_id', usuarioLogado.id).single();
+  if(!aff){
+    const div = document.getElementById('meus-afiliados');
+    if(div) div.innerHTML = '<p>Você não é um afiliado ainda</p>';
+    return;
+  }
+  document.getElementById('afiliadoSaldo').textContent = `R$ ${aff.saldo_pendente.toFixed(2)}`;
+  document.getElementById('afiliadoTotalRecebido').textContent = `R$ ${aff.saldo_pago.toFixed(2)}`;
+  const link = `${window.location.origin}?ref=${aff.chave_unica}`;
+  document.getElementById('afiliadoLink').value = link;
+  const {count:cliques} = await sb.from('afiliado_cliques').select('*', {count: 'exact'}).eq('chave_unica', aff.chave_unica);
+  const {count:cadastros} = await sb.from('afiliado_conversoes').select('*', {count: 'exact'}).eq('afiliado_id', aff.id);
+  const {count:vendas} = await sb.from('afiliado_comissoes').select('*', {count: 'exact'}).eq('afiliado_id', aff.id);
+  document.getElementById('afiliadoCliques').textContent = cliques || 0;
+  document.getElementById('afiliadoCadastros').textContent = cadastros || 0;
+  document.getElementById('afiliadoVendas').textContent = vendas || 0;
+}
+
+function copiarLink(){
+  const link = document.getElementById('afiliadoLink').value;
+  navigator.clipboard.writeText(link).then(() => { alert('✅ Link copiado!'); });
+}
+
+function irParaPaginaAfiliados(){
+  document.querySelectorAll('[id^="page-"]').forEach(p => p.style.display = 'none');
+  const pag = document.getElementById('page-meus-afiliados');
+  if(pag) pag.style.display = 'block';
+  carregarPainelAfiliado();
+}
+
+// Inicializar rastreamento ao carregar
+window.addEventListener('load', () => { inicializarRastreamentoAfiliado(); });
+</script>
+<script src="https://sdk.mercadopago.com/js/v2"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCTYB8UdE9SE7Sl5KTWsvfWMvooiK_UESo&libraries=places"></script>
 <style>
 :root {
@@ -751,6 +855,8 @@ async function fazerLogin(){
 // ─── ENTRAR NO APP ────────────────────────────
 async function entrarNoApp(user){
   usuarioAtual=user;
+  usuarioLogado = user;
+await verificarSeEhAfiliado();
   // Buscar dados do usuário
   const{data:userData}=await sb.from('usuarios').select('*').eq('id',user.id).single();
   if(userData) usuarioAtual={...user,...userData};
@@ -1660,5 +1766,39 @@ window.addEventListener('load',async()=>{
   }
 });
 </script>
+  <!-- PAINEL AFILIADO -->
+<div id="page-meus-afiliados" style="display:none; padding:20px;">
+  <h2>🤝 Meus Afiliados</h2>
+  <div style="background:#1D9E75; color:white; padding:20px; border-radius:12px; margin-bottom:20px;">
+    <h3 style="margin:0; font-size:14px; opacity:0.9;">Saldo Acumulado</h3>
+    <div style="font-size:32px; font-weight:bold; margin:10px 0;" id="afiliadoSaldo">R$ 0,00</div>
+    <p style="margin:0; font-size:13px;">Já Recebido: <strong id="afiliadoTotalRecebido">R$ 0,00</strong></p>
+  </div>
+  <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:15px; margin-bottom:20px;">
+    <div style="background:#f5f5f5; padding:15px; border-radius:10px; text-align:center;">
+      <div style="font-size:24px; font-weight:bold; color:#1D9E75;" id="afiliadoCliques">0</div>
+      <div style="font-size:12px; color:#666;">Cliques</div>
+    </div>
+    <div style="background:#f5f5f5; padding:15px; border-radius:10px; text-align:center;">
+      <div style="font-size:24px; font-weight:bold; color:#1D9E75;" id="afiliadoCadastros">0</div>
+      <div style="font-size:12px; color:#666;">Cadastros</div>
+    </div>
+    <div style="background:#f5f5f5; padding:15px; border-radius:10px; text-align:center;">
+      <div style="font-size:24px; font-weight:bold; color:#1D9E75;" id="afiliadoVendas">0</div>
+      <div style="font-size:12px; color:#666;">Vendas</div>
+    </div>
+    <div style="background:#f5f5f5; padding:15px; border-radius:10px; text-align:center;">
+      <div style="font-size:24px; font-weight:bold; color:#1D9E75;">25%</div>
+      <div style="font-size:12px; color:#666;">Comissão</div>
+    </div>
+  </div>
+  <div style="background:#f5f5f5; padding:15px; border-radius:10px; margin-bottom:20px;">
+    <label style="font-size:12px; font-weight:bold; color:#666;">📤 Seu Link</label>
+    <div style="display:flex; gap:10px; margin-top:10px;">
+      <input type="text" id="afiliadoLink" readonly style="flex:1; padding:10px; border:1px solid #ddd; border-radius:8px;">
+      <button onclick="copiarLink()" style="padding:10px 20px; background:#1D9E75; color:white; border:none; border-radius:8px; cursor:pointer;">📋 Copiar</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
