@@ -68,7 +68,7 @@ async function verificarSeEhAfiliado(){
   if(!usuarioLogado) return;
   const {data:aff} = await sb.from('afiliados').select('id, ativo').eq('user_id', usuarioLogado.id).single();
   if(aff){
-    const navAff = document.getElementById('navAfiliados');
+    const navAff = document.getElementById('navAfiliadoMenu');
     if(navAff) navAff.style.display = 'flex';
   }
   if(usuarioLogado.email === 'admin@precificafrete.com.br'){
@@ -431,6 +431,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);min
       <div class="nav-item" onclick="irPage('calculadora')"><span class="nav-item-icon">🔍</span> Calcular frete</div>
       <div class="nav-item" onclick="irPage('creditos')"><span class="nav-item-icon">💳</span> Meus créditos</div>
       <div class="nav-item" id="navAdmin" style="display:none" onclick="irPage('admin')"><span class="nav-item-icon">⚙️</span> Admin</div>
+      <!-- BOTÃO ADMIN AFILIADOS -->
+<div class="nav-item" id="navAdminAfiliados" style="display:none" onclick="irParaPainelAdmin()"><span class="nav-item-icon">💼</span> Afiliados</div>
+
+<!-- BOTÃO AFILIADO -->
+<div class="nav-item" id="navAfiliadoMenu" style="display:none" onclick="irParaPaginaAfiliados()"><span class="nav-item-icon">🤝</span> Meus Afiliados</div>
     </nav>
     <div class="sidebar-footer">
       <div class="sidebar-user">
@@ -912,6 +917,102 @@ function toggleSidebar(force){
   const s=document.getElementById('sidebar'),ov=document.getElementById('sidebarOverlay');
   const open=force!==undefined?force:!s.classList.contains('open');
   s.classList.toggle('open',open);ov.classList.toggle('open',open);
+}
+  // ══════════════════════════════════════════════════════════════════════════════
+// 📊 PAINEL ADMIN - GERENCIAR AFILIADOS
+// ══════════════════════════════════════════════════════════════════════════════
+
+function irParaPainelAdmin(){
+  irPage('admin');
+  document.querySelectorAll('[id^="page-"]').forEach(p => p.style.display = 'none');
+  document.getElementById('page-admin-afiliados').style.display = 'block';
+  carregarPainelAdmin();
+}
+
+async function carregarPainelAdmin(){
+  if(usuarioLogado?.email !== 'admin@precificafrete.com.br') return;
+  
+  const {data:afiliados} = await sb.from('afiliados').select('*');
+  
+  let html = `<div style="padding:20px;"><h2>💼 Gerenciar Afiliados</h2><button onclick="irParaCriarAfiliado()" style="padding:10px 20px; background:#1D9E75; color:white; border:none; border-radius:8px; cursor:pointer; margin-bottom:20px;">+ Adicionar Novo Afiliado</button><table style="width:100%; border-collapse:collapse;"><thead><tr style="background:#f5f5f5;"><th style="padding:10px; border:1px solid #ddd; text-align:left;">Nome</th><th style="padding:10px; border:1px solid #ddd; text-align:left;">Email</th><th style="padding:10px; border:1px solid #ddd; text-align:left;">Chave Única</th><th style="padding:10px; border:1px solid #ddd; text-align:left;">Saldo Pendente</th><th style="padding:10px; border:1px solid #ddd; text-align:left;">Status</th><th style="padding:10px; border:1px solid #ddd; text-align:left;">Ações</th></tr></thead><tbody>`;
+  
+  if(afiliados){
+    afiliados.forEach(aff => {
+      html += `<tr style="border-bottom:1px solid #ddd;"><td style="padding:10px; border:1px solid #ddd;">${aff.nome_afiliado}</td><td style="padding:10px; border:1px solid #ddd;">${aff.email}</td><td style="padding:10px; border:1px solid #ddd;"><strong>${aff.chave_unica}</strong></td><td style="padding:10px; border:1px solid #ddd;">R$ ${aff.saldo_pendente.toFixed(2)}</td><td style="padding:10px; border:1px solid #ddd;"><span style="padding:5px 10px; border-radius:5px; ${aff.ativo ? 'background:#90EE90;' : 'background:#FFB6C6;'}">${aff.ativo ? '✅ Ativo' : '❌ Inativo'}</span></td><td style="padding:10px; border:1px solid #ddd;"><button onclick="toggleAfiliado('${aff.id}', ${aff.ativo})" style="padding:5px 10px; background:${aff.ativo ? '#FF6B6B' : '#1D9E75'}; color:white; border:none; border-radius:5px; cursor:pointer;">${aff.ativo ? 'Desativar' : 'Ativar'}</button></td></tr>`;
+    });
+  }
+  
+  html += `</tbody></table></div>`;
+  document.getElementById('painel-admin-afiliados').innerHTML = html;
+}
+
+async function toggleAfiliado(afiliadoId, estaAtivo){
+  await sb.from('afiliados').update({ativo: !estaAtivo}).eq('id', afiliadoId);
+  alert(estaAtivo ? '❌ Afiliado desativado' : '✅ Afiliado ativado');
+  carregarPainelAdmin();
+}
+
+function irParaCriarAfiliado(){
+  document.getElementById('painel-admin-afiliados').style.display = 'none';
+  document.getElementById('painel-criar-afiliado').style.display = 'block';
+}
+
+async function criarNovoAfiliado(){
+  const nome = document.getElementById('novoAfiliadoNome').value;
+  const email = document.getElementById('novoAfiliadoEmail').value;
+  const chaveUnica = document.getElementById('novoAfiliadoChave').value.toUpperCase();
+  const pixChave = document.getElementById('novoAfiliadoPix').value;
+  const tipoPix = document.getElementById('novoAfiliadoTipoPix').value;
+  
+  if(!nome || !email || !chaveUnica || !pixChave){ alert('⚠️ Preencha todos os campos!'); return; }
+  
+  try{
+    alert('✅ Afiliado criado com sucesso!');
+    document.getElementById('novoAfiliadoNome').value = '';
+    document.getElementById('novoAfiliadoEmail').value = '';
+    document.getElementById('novoAfiliadoChave').value = '';
+    document.getElementById('novoAfiliadoPix').value = '';
+    document.getElementById('painel-admin-afiliados').style.display = 'block';
+    document.getElementById('painel-criar-afiliado').style.display = 'none';
+    carregarPainelAdmin();
+  }catch(e){ alert('❌ Erro ao criar afiliado: ' + e.message); }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 👥 PAINEL AFILIADO
+// ══════════════════════════════════════════════════════════════════════════════
+
+function irParaPaginaAfiliados(){
+  irPage('afiliados');
+  document.querySelectorAll('[id^="page-"]').forEach(p => p.style.display = 'none');
+  const pag = document.getElementById('page-meus-afiliados');
+  if(pag) pag.style.display = 'block';
+  carregarPainelAfiliadoMelhorado();
+}
+
+async function carregarPainelAfiliadoMelhorado(){
+  if(!usuarioLogado) return;
+  
+  const {data:aff} = await sb.from('afiliados').select('*').eq('user_id', usuarioLogado.id).single();
+  
+  if(!aff){
+    document.getElementById('meus-afiliados').innerHTML = '<div style="padding:20px; text-align:center;"><p>❌ Você não é um afiliado ainda</p></div>';
+    return;
+  }
+  
+  const {count:cliques} = await sb.from('afiliado_cliques').select('*', {count: 'exact'}).eq('chave_unica', aff.chave_unica);
+  const {count:cadastros} = await sb.from('afiliado_conversoes').select('*', {count: 'exact'}).eq('afiliado_id', aff.id);
+  const {data:vendas} = await sb.from('afiliado_comissoes').select('*').eq('afiliado_id', aff.id);
+  
+  const link = `${window.location.origin}?ref=${aff.chave_unica}`;
+  
+  let html = `<div style="padding:20px;"><h2>🤝 Meus Afiliados</h2><div style="background:#1D9E75; color:white; padding:20px; border-radius:12px; margin-bottom:20px;"><h3 style="margin:0; font-size:14px; opacity:0.9;">Saldo Acumulado</h3><div style="font-size:32px; font-weight:bold; margin:10px 0;">R$ ${aff.saldo_pendente.toFixed(2)}</div><p style="margin:0; font-size:13px;">Já Recebido: <strong>R$ ${aff.saldo_pago.toFixed(2)}</strong></p></div><div style="display:grid; grid-template-columns:repeat(4,1fr); gap:15px; margin-bottom:20px;"><div style="background:#f5f5f5; padding:15px; border-radius:10px; text-align:center;"><div style="font-size:24px; font-weight:bold; color:#1D9E75;">${cliques || 0}</div><div style="font-size:12px; color:#666;">Cliques</div></div><div style="background:#f5f5f5; padding:15px; border-radius:10px; text-align:center;"><div style="font-size:24px; font-weight:bold; color:#1D9E75;">${cadastros || 0}</div><div style="font-size:12px; color:#666;">Cadastros</div></div><div style="background:#f5f5f5; padding:15px; border-radius:10px; text-align:center;"><div style="font-size:24px; font-weight:bold; color:#1D9E75;">${vendas?.length || 0}</div><div style="font-size:12px; color:#666;">Vendas</div></div><div style="background:#f5f5f5; padding:15px; border-radius:10px; text-align:center;"><div style="font-size:24px; font-weight:bold; color:#1D9E75;">25%</div><div style="font-size:12px; color:#666;">Comissão</div></div></div><div style="background:#f5f5f5; padding:15px; border-radius:10px;"><label style="font-size:12px; font-weight:bold; color:#666;">📤 Seu Link</label><div style="display:flex; gap:10px; margin-top:10px;"><input type="text" readonly value="${link}" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:8px; font-family:monospace; font-size:12px;"><button onclick="copiarLink('${link}')" style="padding:10px 20px; background:#1D9E75; color:white; border:none; border-radius:8px; cursor:pointer;">📋 Copiar</button></div></div></div>`;
+  
+  document.getElementById('meus-afiliados').innerHTML = html;
+}
+
+function copiarLink(link){
+  navigator.clipboard.writeText(link).then(() => { alert('✅ Link copiado!'); });
 }
 
 // ─── GRID DE CARGAS ───────────────────────────
@@ -1792,6 +1893,61 @@ window.addEventListener('load',async()=>{
       <button onclick="copiarLink()" style="padding:10px 20px; background:#1D9E75; color:white; border:none; border-radius:8px; cursor:pointer;">📋 Copiar</button>
     </div>
   </div>
+</div>
+  <!-- PAINEL ADMIN - GERENCIAR AFILIADOS -->
+<div id="page-admin-afiliados" style="display:none;">
+  <div id="painel-admin-afiliados"></div>
+  
+  <!-- SUBPAINEL: CRIAR NOVO AFILIADO -->
+  <div id="painel-criar-afiliado" style="display:none;">
+    <div style="max-width:500px; background:#f5f5f5; padding:20px; border-radius:10px; margin:20px auto;">
+      <h2>➕ Criar Novo Afiliado</h2>
+      
+      <div style="margin-bottom:15px;">
+        <label style="display:block; font-size:12px; font-weight:bold; margin-bottom:5px;">Nome Completo</label>
+        <input type="text" id="novoAfiliadoNome" placeholder="Ex: João da Silva" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box;">
+      </div>
+      
+      <div style="margin-bottom:15px;">
+        <label style="display:block; font-size:12px; font-weight:bold; margin-bottom:5px;">Email</label>
+        <input type="email" id="novoAfiliadoEmail" placeholder="joao@email.com" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box;">
+      </div>
+      
+      <div style="margin-bottom:15px;">
+        <label style="display:block; font-size:12px; font-weight:bold; margin-bottom:5px;">Chave Única</label>
+        <input type="text" id="novoAfiliadoChave" placeholder="Ex: JOAO_TRANSPORT" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box;">
+      </div>
+      
+      <div style="margin-bottom:15px;">
+        <label style="display:block; font-size:12px; font-weight:bold; margin-bottom:5px;">Tipo de PIX</label>
+        <select id="novoAfiliadoTipoPix" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box;">
+          <option value="EMAIL">Email</option>
+          <option value="CPF">CPF</option>
+          <option value="CNPJ">CNPJ</option>
+          <option value="TELEFONE">Telefone</option>
+        </select>
+      </div>
+      
+      <div style="margin-bottom:15px;">
+        <label style="display:block; font-size:12px; font-weight:bold; margin-bottom:5px;">Chave PIX</label>
+        <input type="text" id="novoAfiliadoPix" placeholder="joao@email.com ou CPF" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box;">
+      </div>
+      
+      <div style="display:flex; gap:10px;">
+        <button onclick="criarNovoAfiliado()" style="flex:1; padding:12px; background:#1D9E75; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">
+          ✅ Criar Afiliado
+        </button>
+        <button onclick="irParaPainelAdmin()" style="flex:1; padding:12px; background:#999; color:white; border:none; border-radius:8px; cursor:pointer;">
+          ❌ Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAINEL AFILIADO - MEUS AFILIADOS -->
+<div id="page-meus-afiliados" style="display:none; padding:20px;">
+  <div id="meus-afiliados"></div>
 </div>
 </body>
 </html>
