@@ -71,10 +71,12 @@ async function verificarSeEhAfiliado(){
     const navAff = document.getElementById('navAfiliadoMenu');
     if(navAff) navAff.style.display = 'flex';
   }
-  if(usuarioLogado.email === 'admin@precificafrete.com.br'){
+  // Verificar se é admin
+const {data:userData} = await sb.from('usuarios').select('is_admin').eq('id', usuarioLogado.id).single();
+if(userData?.is_admin){
     const navAdmin = document.getElementById('navAdminAfiliados');
     if(navAdmin) navAdmin.style.display = 'flex';
-  }
+}
 }
 
 async function carregarPainelAfiliado(){
