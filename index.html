@@ -917,21 +917,6 @@ function irPage(page){
   // ... conteúdo ...
 } // ← Fecha irPage
 
-// COLE AQUI! ↓
-// ══════════════════════════════════════════════════════════════════════════════
-// 📊 PAINEL ADMIN - GERENCIAR AFILIADOS
-...
-  if(window.innerWidth<=768)toggleSidebar(false);
-}
-function toggleSidebar(force){
-  const s=document.getElementById('sidebar'),ov=document.getElementById('sidebarOverlay');
-  const open=force!==undefined?force:!s.classList.contains('open');
-  s.classList.toggle('open',open);ov.classList.toggle('open',open);
-}
-  // ══════════════════════════════════════════════════════════════════════════════
-// 📊 PAINEL ADMIN - GERENCIAR AFILIADOS
-// ══════════════════════════════════════════════════════════════════════════════
-
 function irParaPainelAdmin(){
   irPage('admin');
   document.querySelectorAll('[id^="page-"]').forEach(p => p.style.display = 'none');
