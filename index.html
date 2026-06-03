@@ -913,10 +913,7 @@ function irPage(page){
     if(usuarioAtual) carregarAdmin();
     else setTimeout(()=>carregarAdmin(), 1500);
   }
-  function irPage(page){
-  // ... conteúdo ...
-} // ← Fecha irPage
-
+ 
 function irParaPainelAdmin(){
   irPage('admin');
   document.querySelectorAll('[id^="page-"]').forEach(p => p.style.display = 'none');
