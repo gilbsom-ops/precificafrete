@@ -434,10 +434,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);min
       <div class="nav-item" onclick="irPage('creditos')"><span class="nav-item-icon">💳</span> Meus créditos</div>
       <div class="nav-item" id="navAdmin" style="display:none" onclick="irPage('admin')"><span class="nav-item-icon">⚙️</span> Admin</div>
       <!-- BOTÃO ADMIN AFILIADOS -->
-<div class="nav-item" id="navAdminAfiliados" style="display:none" onclick="irParaPainelAdmin()"><span class="nav-item-icon">💼</span> Afiliados</div>
+<div class="nav-item" id="navAdminAfiliados" style="display:none" onclick="irPage('admin-afiliados')"><span class="nav-item-icon">💼</span> Afiliados</div>
 
 <!-- BOTÃO AFILIADO -->
-<div class="nav-item" id="navAfiliadoMenu" style="display:none" onclick="irParaPaginaAfiliados()"><span class="nav-item-icon">🤝</span> Meus Afiliados</div>
+<div class="nav-item" id="navAfiliadoMenu" style="display:none" onclick="irPage('meus-afiliados')"><span class="nav-item-icon">🤝</span> Meus Afiliados</div>
     </nav>
     <div class="sidebar-footer">
       <div class="sidebar-user">
@@ -907,11 +907,17 @@ function irPage(page){
   const idx={dashboard:0,calculadora:1,creditos:2,admin:3};
   const navItems=document.querySelectorAll('.nav-item');
   if(navItems[idx[page]]) navItems[idx[page]].classList.add('ativo');
-  const titles={dashboard:'Painel',calculadora:'Calcular frete',creditos:'Meus créditos',admin:'Painel Admin'};
+  const titles={dashboard:'Painel',calculadora:'Calcular frete',creditos:'Meus créditos',admin:'Painel Admin','meus-afiliados':'Meus Afiliados','admin-afiliados':'Gerenciar Afiliados'};
   document.getElementById('topbarTitle').textContent=titles[page]||'';
   if(page==='admin'){
     if(usuarioAtual) carregarAdmin();
     else setTimeout(()=>carregarAdmin(), 1500);
+  }
+  if(page==='meus-afiliados'){
+    carregarPainelAfiliado();
+  }
+  if(page==='admin-afiliados'){
+    carregarPainelAdmin();
   }
  }
 function irParaPainelAdmin(){
@@ -1937,9 +1943,5 @@ window.addEventListener('load',async()=>{
   </div>
 </div>
 
-<!-- PAINEL AFILIADO - MEUS AFILIADOS -->
-<div id="page-meus-afiliados" style="display:none; padding:20px;">
-  <div id="meus-afiliados"></div>
-</div>
 </body>
 </html>
