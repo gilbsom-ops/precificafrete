@@ -73,6 +73,8 @@ async function verificarSeEhAfiliado(){
     if(aff && aff.ativo){
       const navAff = document.getElementById('navAfiliadoMenu');
       if(navAff) navAff.style.display = 'flex';
+      const navAffSaques = document.getElementById('navAfiliadoSaques');
+      if(navAffSaques) navAffSaques.style.display = 'flex';
     }
   } catch(e) {
     console.log('Usuário não é afiliado');
@@ -84,6 +86,8 @@ async function verificarSeEhAfiliado(){
     if(userData?.is_admin === true){
       const navAdmin = document.getElementById('navAdminAfiliados');
       if(navAdmin) navAdmin.style.display = 'flex';
+      const navAdminSaques = document.getElementById('navAdminSaques');
+      if(navAdminSaques) navAdminSaques.style.display = 'flex';
     }
   } catch(e) {
     console.log('Usuário não é admin');
@@ -155,6 +159,7 @@ window.addEventListener('load', () => { inicializarRastreamentoAfiliado(); verif
 </script>
 <script src="https://sdk.mercadopago.com/js/v2"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCTYB8UdE9SE7Sl5KTWsvfWMvooiK_UESo&libraries=places"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
 <style>
 :root {
   --v:#1D9E75;--ve:#0F6E56;--vc:#E1F5EE;--vm:#5DCAA5;
@@ -478,6 +483,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);min
 
 <!-- BOTÃO AFILIADO -->
 <div class="nav-item" id="navAfiliadoMenu" style="display:none" onclick="irPage('meus-afiliados')"><span class="nav-item-icon">🤝</span> Meus Afiliados</div>
+<div class="nav-item" id="navAfiliadoSaques" style="display:none" onclick="irPage('meus-saques')"><span class="nav-item-icon">💳</span> Meus Saques</div>
+<div class="nav-item" id="navAdminSaques" style="display:none" onclick="irPage('admin-saques')"><span class="nav-item-icon">💰</span> Saques Pendentes</div>
     </nav>
     <div class="sidebar-footer">
       <div class="sidebar-user">
@@ -952,7 +959,7 @@ function irPage(page){
   const idx={dashboard:0,calculadora:1,creditos:2,admin:3};
   const navItems=document.querySelectorAll('.nav-item');
   if(navItems[idx[page]]) navItems[idx[page]].classList.add('ativo');
-  const titles={dashboard:'Painel',calculadora:'Calcular frete',creditos:'Meus créditos',admin:'Painel Admin','meus-afiliados':'Meus Afiliados','admin-afiliados':'Gerenciar Afiliados'};
+  const titles={dashboard:'Painel',calculadora:'Calcular frete',creditos:'Meus créditos',admin:'Painel Admin','meus-afiliados':'Meus Afiliados','admin-afiliados':'Gerenciar Afiliados','meus-saques':'Meus Saques','admin-saques':'Saques Pendentes'};
   document.getElementById('topbarTitle').textContent=titles[page]||'';
   if(page==='admin'){
     if(usuarioAtual) carregarAdmin();
@@ -963,6 +970,12 @@ function irPage(page){
   }
   if(page==='admin-afiliados'){
     carregarPainelAdmin();
+  }
+  if(page==='meus-saques'){
+    setTimeout(() => carregarMeusSaques(), 50);
+  }
+  if(page==='admin-saques'){
+    setTimeout(() => carregarSaquesPendentes(), 50);
   }
  }
 function irParaPainelAdmin(){
@@ -1919,6 +1932,238 @@ window.addEventListener('load',async()=>{
     entrarNoApp(session.user);
   }
 });
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 💳 SISTEMA DE SAQUES COM EXCEL
+// ═══════════════════════════════════════════════════════════════════════════
+
+async function carregarMeusSaques(){
+  if(!usuarioLogado) return;
+  
+  try {
+    // Busca o afiliado logado
+    const {data:aff, error:errAff} = await sb.from('afiliados').select('id').eq('user_id', usuarioLogado.id).single();
+    if(!aff || errAff){
+      document.getElementById('meus-saques-conteudo').innerHTML = '<div style="padding:20px; text-align:center;"><p>❌ Você não é um afiliado ativo.</p></div>';
+      return;
+    }
+
+    // Busca saques do afiliado
+    const {data:saques, error:errSaques} = await sb.from('afiliado_pagamentos').select('*').eq('afiliado_id', aff.id).order('data_criacao', {ascending: false});
+    
+    if(!saques || errSaques){
+      document.getElementById('meus-saques-conteudo').innerHTML = '<div style="padding:20px; text-align:center;"><p>Nenhum saque registrado ainda.</p></div>';
+      return;
+    }
+
+    if(saques.length === 0){
+      document.getElementById('meus-saques-conteudo').innerHTML = '<div style="padding:20px; text-align:center;"><p>📭 Você ainda não tem saques.</p></div>';
+      return;
+    }
+
+    // Renderiza tabela de saques
+    const html = `
+      <table style="width:100%; border-collapse:collapse; margin-top:1rem;">
+        <thead>
+          <tr style="background:#f5f5f5; border-bottom:2px solid #ddd;">
+            <th style="padding:12px; text-align:left; font-weight:bold;">Data</th>
+            <th style="padding:12px; text-align:left; font-weight:bold;">Valor</th>
+            <th style="padding:12px; text-align:left; font-weight:bold;">Status</th>
+            <th style="padding:12px; text-align:left; font-weight:bold;">Data Pago</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${saques.map(s => `
+            <tr style="border-bottom:1px solid #eee;">
+              <td style="padding:12px;">${new Date(s.data_criacao).toLocaleDateString('pt-BR')}</td>
+              <td style="padding:12px; font-weight:bold; color:#1D9E75;">R$ ${parseFloat(s.valor).toFixed(2)}</td>
+              <td style="padding:12px;">
+                <span style="padding:4px 12px; border-radius:20px; font-size:12px; font-weight:bold;
+                ${s.status === 'pendente' ? 'background:#FDF6E3; color:#B8860B;' : ''}
+                ${s.status === 'processando' ? 'background:#EAF2FB; color:#1A5276;' : ''}
+                ${s.status === 'pago' ? 'background:#E1F5EE; color:#0F6E56;' : ''}
+                ">
+                  ${s.status === 'pendente' ? '⏳ PENDENTE' : ''}
+                  ${s.status === 'processando' ? '⚙️ PROCESSANDO' : ''}
+                  ${s.status === 'pago' ? '✅ PAGO' : ''}
+                </span>
+              </td>
+              <td style="padding:12px;">${s.data_pagamento ? new Date(s.data_pagamento).toLocaleDateString('pt-BR') : '-'}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+
+    document.getElementById('meus-saques-conteudo').innerHTML = html;
+
+  } catch(e) {
+    console.error('Erro ao carregar saques:', e);
+    document.getElementById('meus-saques-conteudo').innerHTML = '<div style="padding:20px; text-align:center;"><p>❌ Erro ao carregar saques.</p></div>';
+  }
+}
+
+async function carregarSaquesPendentes(){
+  if(!usuarioLogado) return;
+
+  try {
+    // Verifica se é admin
+    const {data:userData} = await sb.from('usuarios').select('is_admin').eq('id', usuarioLogado.id).single();
+    if(!userData?.is_admin){
+      document.getElementById('saques-pendentes-conteudo').innerHTML = '<div style="padding:20px; text-align:center;"><p>❌ Acesso restrito a administradores.</p></div>';
+      return;
+    }
+
+    // Busca saques pendentes e em processamento
+    const {data:saques, error:errSaques} = await sb.from('afiliado_pagamentos').select(`
+      *,
+      afiliados(nome_completo, pix_chave, pix_tipo, email)
+    `).in('status', ['pendente', 'processando']).order('data_criacao', {ascending: true});
+
+    if(!saques || errSaques || saques.length === 0){
+      document.getElementById('saques-pendentes-conteudo').innerHTML = '<div style="padding:20px; text-align:center;"><p>✅ Nenhum saque pendente!</p></div>';
+      return;
+    }
+
+    // Renderiza tabela com botões
+    const html = `
+      <div style="margin-bottom:20px;">
+        <button onclick="baixarPlanilhaExcel()" style="padding:12px 24px; background:#1D9E75; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size:14px;">
+          📊 Baixar Planilha Excel
+        </button>
+      </div>
+      <table style="width:100%; border-collapse:collapse; margin-top:1rem; font-size:13px;">
+        <thead>
+          <tr style="background:#f5f5f5; border-bottom:2px solid #ddd;">
+            <th style="padding:12px; text-align:left; font-weight:bold;">Afiliado</th>
+            <th style="padding:12px; text-align:left; font-weight:bold;">PIX</th>
+            <th style="padding:12px; text-align:left; font-weight:bold;">Valor</th>
+            <th style="padding:12px; text-align:left; font-weight:bold;">Data</th>
+            <th style="padding:12px; text-align:left; font-weight:bold;">Status</th>
+            <th style="padding:12px; text-align:center; font-weight:bold;">Ação</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${saques.map(s => `
+            <tr style="border-bottom:1px solid #eee;">
+              <td style="padding:12px;">${s.afiliados?.nome_completo || 'N/A'}</td>
+              <td style="padding:12px;">
+                <span style="font-family:monospace; font-size:12px; background:#f5f5f5; padding:4px 8px; border-radius:4px;">
+                  ${s.afiliados?.pix_chave || '-'}
+                </span>
+              </td>
+              <td style="padding:12px; font-weight:bold; color:#1D9E75;">R$ ${parseFloat(s.valor).toFixed(2)}</td>
+              <td style="padding:12px; font-size:12px;">${new Date(s.data_criacao).toLocaleDateString('pt-BR')}</td>
+              <td style="padding:12px;">
+                <span style="padding:4px 8px; border-radius:4px; font-size:11px; font-weight:bold;
+                ${s.status === 'pendente' ? 'background:#FDF6E3; color:#B8860B;' : 'background:#EAF2FB; color:#1A5276;'}
+                ">
+                  ${s.status === 'pendente' ? '⏳ PENDENTE' : '⚙️ PROCESSANDO'}
+                </span>
+              </td>
+              <td style="padding:12px; text-align:center;">
+                <button onclick="marcarComoPago('${s.id}')" style="padding:6px 12px; background:#1D9E75; color:white; border:none; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer;">
+                  ✅ Marcar Pago
+                </button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+
+    document.getElementById('saques-pendentes-conteudo').innerHTML = html;
+
+  } catch(e) {
+    console.error('Erro ao carregar saques pendentes:', e);
+    document.getElementById('saques-pendentes-conteudo').innerHTML = '<div style="padding:20px; text-align:center;"><p>❌ Erro ao carregar saques.</p></div>';
+  }
+}
+
+async function baixarPlanilhaExcel(){
+  try {
+    // Busca saques pendentes com dados dos afiliados
+    const {data:saques} = await sb.from('afiliado_pagamentos').select(`
+      id, valor, data_criacao, status,
+      afiliados(nome_completo, pix_tipo, pix_chave, email)
+    `).in('status', ['pendente', 'processando']).order('data_criacao', {ascending: true});
+
+    if(!saques || saques.length === 0){
+      alert('❌ Nenhum saque pendente para baixar.');
+      return;
+    }
+
+    // Prepara dados para Excel
+    const dados = saques.map((s, idx) => ({
+      'Nº': idx + 1,
+      'Nome': s.afiliados?.nome_completo || 'N/A',
+      'Tipo PIX': s.afiliados?.pix_tipo || '-',
+      'Chave PIX': s.afiliados?.pix_chave || '-',
+      'Email': s.afiliados?.email || '-',
+      'Valor (R$)': parseFloat(s.valor).toFixed(2),
+      'Data': new Date(s.data_criacao).toLocaleDateString('pt-BR'),
+      'Status': s.status === 'pendente' ? 'Pendente' : 'Processando'
+    }));
+
+    // Cria workbook
+    const ws = XLSX.utils.json_to_sheet(dados);
+    
+    // Estiliza colunas
+    ws['!cols'] = [
+      {wch: 5},   // Nº
+      {wch: 20},  // Nome
+      {wch: 12},  // Tipo PIX
+      {wch: 25},  // Chave PIX
+      {wch: 25},  // Email
+      {wch: 12},  // Valor
+      {wch: 12},  // Data
+      {wch: 12}   // Status
+    ];
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Saques');
+    
+    // Baixa arquivo
+    XLSX.writeFile(wb, `saques_pendentes_${new Date().toISOString().split('T')[0]}.xlsx`);
+    alert('✅ Planilha baixada com sucesso!');
+
+  } catch(e) {
+    console.error('Erro ao gerar Excel:', e);
+    alert('❌ Erro ao baixar planilha: ' + e.message);
+  }
+}
+
+async function marcarComoPago(saqueId){
+  if(!confirm('Tem certeza que deseja marcar este saque como PAGO?')) return;
+
+  try {
+    // Atualiza status do saque
+    const {data:saque, error:errUpdate} = await sb.from('afiliado_pagamentos').update({
+      status: 'pago',
+      data_pagamento: new Date().toISOString()
+    }).eq('id', saqueId).select().single();
+
+    if(errUpdate) throw errUpdate;
+
+    // Busca dados do afiliado para notificação
+    const {data:afiliado} = await sb.from('afiliados').select('id, nome_completo').eq('id', saque.afiliado_id).single();
+
+    // Notifica o afiliado
+    await sb.from('afiliado_notificacoes').insert({
+      afiliado_id: saque.afiliado_id,
+      tipo: 'saque_pago',
+      titulo: '💰 Seu saque foi aprovado!',
+      mensagem: `R$ ${parseFloat(saque.valor).toFixed(2)} foi transferido para sua conta PIX.`
+    });
+
+    alert('✅ Saque marcado como pago! Afiliado foi notificado.');
+    carregarSaquesPendentes(); // Recarrega tabela
+
+  } catch(e) {
+    console.error('Erro ao marcar como pago:', e);
+    alert('❌ Erro ao atualizar saque: ' + e.message);
+  }
+}
 </script>
   <!-- PAINEL AFILIADO -->
 <div id="page-meus-afiliados" style="display:none; padding:20px;">
@@ -2002,6 +2247,30 @@ window.addEventListener('load',async()=>{
         </button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- PÁGINA: MEUS SAQUES (AFILIADO) -->
+<div id="page-meus-saques" style="display:none; padding:20px;">
+  <h2>💳 Meus Saques</h2>
+  <div style="background:#f5f5f5; padding:20px; border-radius:12px; margin-bottom:20px;">
+    <h3 style="margin-bottom:10px;">📝 Histórico de Saques</h3>
+    <p style="color:#666; font-size:13px; margin:0;">Aqui você pode acompanhar todos os seus saques solicitados. Saques são automaticamente criados no dia 15 de cada mês para afiliados com saldo acumulado igual ou superior a R$ 100.</p>
+  </div>
+  <div id="meus-saques-conteudo" style="background:#fff; border:1px solid #ddd; border-radius:10px; padding:20px;">
+    <p style="text-align:center; color:#999;">Carregando saques...</p>
+  </div>
+</div>
+
+<!-- PÁGINA: SAQUES PENDENTES (ADMIN) -->
+<div id="page-admin-saques" style="display:none; padding:20px;">
+  <h2>💰 Saques Pendentes</h2>
+  <div style="background:#f5f5f5; padding:20px; border-radius:12px; margin-bottom:20px;">
+    <h3 style="margin-bottom:10px;">👥 Gerenciar Saques</h3>
+    <p style="color:#666; font-size:13px; margin:0;">Baixe a planilha com dados PIX dos afiliados, processe os pagamentos no Mercado Pago e marque como pago aqui.</p>
+  </div>
+  <div id="saques-pendentes-conteudo" style="background:#fff; border:1px solid #ddd; border-radius:10px; padding:20px;">
+    <p style="text-align:center; color:#999;">Carregando saques...</p>
   </div>
 </div>
 
