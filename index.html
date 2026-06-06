@@ -941,8 +941,13 @@ async function sair(){
 
 // ─── NAVEGAÇÃO ────────────────────────────────
 function irPage(page){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('ativa'));
-  document.getElementById('page-'+page).classList.add('ativa');
+  document.querySelectorAll('.page').forEach(p=>{
+    p.classList.remove('ativa');
+    p.style.display = 'none';
+  });
+  const pagina = document.getElementById('page-'+page);
+  pagina.classList.add('ativa');
+  pagina.style.display = 'block';
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('ativo'));
   const idx={dashboard:0,calculadora:1,creditos:2,admin:3};
   const navItems=document.querySelectorAll('.nav-item');
