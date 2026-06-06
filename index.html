@@ -68,6 +68,7 @@ async function verificarSeEhAfiliado(){
   if(!usuarioLogado) return;
   
   try {
+    // Verifica se é afiliado
     const {data:aff} = await sb.from('afiliados').select('id, ativo').eq('user_id', usuarioLogado.id).single();
     if(aff && aff.ativo){
       const navAff = document.getElementById('navAfiliadoMenu');
@@ -78,6 +79,7 @@ async function verificarSeEhAfiliado(){
   }
   
   try {
+    // Verifica se é admin (usa a coluna is_admin, não email fixo)
     const {data:userData} = await sb.from('usuarios').select('is_admin').eq('id', usuarioLogado.id).single();
     if(userData?.is_admin === true){
       const navAdmin = document.getElementById('navAdminAfiliados');
@@ -96,38 +98,43 @@ async function carregarPainelAfiliado(){
     
     if(!aff || error){
       const div = document.getElementById('meus-afiliados');
-      if(div) div.innerHTML = '<p>❌ Você não é um afiliado ativo</p>';
+      if(div) div.innerHTML = '<div style="padding:20px; text-align:center;"><p>❌ Você não é um afiliado ativo. Entre em contato com o administrador.</p></div>';
       return;
     }
     
+    // Preenche saldos
     document.getElementById('afiliadoSaldo').textContent = `R$ ${(aff.saldo_pendente || 0).toFixed(2)}`;
     document.getElementById('afiliadoTotalRecebido').textContent = `R$ ${(aff.saldo_pago || 0).toFixed(2)}`;
+    
     const link = `${window.location.origin}?ref=${aff.chave_unica}`;
     document.getElementById('afiliadoLink').value = link;
     
+    // Busca estatísticas com tratamento individual de erro
     let cliques = 0, cadastros = 0, vendas = 0;
     
     try {
       const {count: c} = await sb.from('afiliado_cliques').select('*', {count: 'exact'}).eq('chave_unica', aff.chave_unica);
       cliques = c || 0;
-    } catch(e) { console.warn('Erro cliques:', e); }
+    } catch(e) { console.warn('Erro ao contar cliques:', e); }
     
     try {
       const {count: c} = await sb.from('afiliado_conversoes').select('*', {count: 'exact'}).eq('afiliado_id', aff.id);
       cadastros = c || 0;
-    } catch(e) { console.warn('Erro conversões:', e); }
+    } catch(e) { console.warn('Erro ao contar conversões:', e); }
     
     try {
       const {count: c} = await sb.from('afiliado_comissoes').select('*', {count: 'exact'}).eq('afiliado_id', aff.id);
       vendas = c || 0;
-    } catch(e) { console.warn('Erro comissões:', e); }
+    } catch(e) { console.warn('Erro ao contar comissões:', e); }
     
     document.getElementById('afiliadoCliques').textContent = cliques;
     document.getElementById('afiliadoCadastros').textContent = cadastros;
     document.getElementById('afiliadoVendas').textContent = vendas;
     
   } catch(e) {
-    console.error('Erro ao carregar painel:', e);
+    console.error('Erro ao carregar painel de afiliado:', e);
+    const div = document.getElementById('meus-afiliados');
+    if(div) div.innerHTML = '<div style="padding:20px; text-align:center;"><p>❌ Erro ao carregar dados. Tente novamente.</p></div>';
   }
 }
 
@@ -966,16 +973,17 @@ function irParaPainelAdmin(){
 }
 
 async function carregarPainelAdmin(){
+  // Verifica se o usuário logado é admin usando a coluna is_admin (não email fixo)
   if(!usuarioLogado) return;
   
   try {
     const {data:userData} = await sb.from('usuarios').select('is_admin').eq('id', usuarioLogado.id).single();
     if(!userData?.is_admin) {
-      console.log('Usuário não é admin');
+      console.log('Usuário não tem permissão de admin');
       return;
     }
   } catch(e) {
-    console.error('Erro ao verificar admin:', e);
+    console.error('Erro ao verificar permissão de admin:', e);
     return;
   }
   
@@ -993,7 +1001,8 @@ async function carregarPainelAdmin(){
     html += `</tbody></table></div>`;
     document.getElementById('painel-admin-afiliados').innerHTML = html;
   } catch(e) {
-    console.error('Erro ao carregar afiliados:', e);
+    console.error('Erro ao carregar painel admin de afiliados:', e);
+    document.getElementById('painel-admin-afiliados').innerHTML = '<div style="padding:20px; text-align:center;"><p>❌ Erro ao carregar afiliados. Verifique o console.</p></div>';
   }
 }
 
