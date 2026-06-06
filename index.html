@@ -914,7 +914,7 @@ function irPage(page){
     else setTimeout(()=>carregarAdmin(), 1500);
   }
   if(page==='meus-afiliados'){
-    carregarPainelAfiliado();
+    setTimeout(() => carregarPainelAfiliado(), 50);
   }
   if(page==='admin-afiliados'){
     carregarPainelAdmin();
