@@ -2150,10 +2150,9 @@ async function carregarSaquesPendentes(){
     document.getElementById('saques-pendentes-conteudo').innerHTML = '<div style="padding:20px; text-align:center;"><p>❌ Erro ao carregar saques: ' + e.message + '</p></div>';
   }
 }
- 
-async function baixarPlanilhaExcel(){
+
+ async function baixarPlanilhaExcel(){
   try {
-    // Busca saques pendentes (SEM JOIN)
     const {data:saques} = await sb.from('afiliado_pagamentos').select('*').in('status', ['pendente', 'processando']).order('created_at', {ascending: true});
 
     if(!saques || saques.length === 0){
@@ -2161,43 +2160,40 @@ async function baixarPlanilhaExcel(){
       return;
     }
 
-    // Prepara dados para Excel
-    const dados = saques.map((s, idx) => ({
-      'Nº': idx + 1,
-      'Afiliado ID': s.afiliado_id.substring(0, 8) + '...',
-      'Tipo PIX': s.tipo_pix_pagamento || '-',
-      'Chave PIX': s.chave_pix || '-',
-      'Valor (R$)': parseFloat(s.valor_total).toFixed(2),
-      'Data': new Date(s.created_at).toLocaleDateString('pt-BR'),
-      'Status': s.status === 'pendente' ? 'Pendente' : 'Processando'
-    }));
-
-    // Cria workbook
-    const ws = XLSX.utils.json_to_sheet(dados);
+    let csv = 'Nº,Afiliado ID,Tipo PIX,Chave PIX,Valor (R$),Data,Status\n';
     
-    // Estiliza colunas
-    ws['!cols'] = [
-      {wch: 5},
-      {wch: 15},
-      {wch: 12},
-      {wch: 25},
-      {wch: 12},
-      {wch: 12},
-      {wch: 12}
-    ];
+    saques.forEach((s, idx) => {
+      const linha = [
+        idx + 1,
+        s.afiliado_id.substring(0, 8),
+        s.tipo_pix_pagamento || '-',
+        s.chave_pix || '-',
+        parseFloat(s.valor_total).toFixed(2),
+        new Date(s.created_at).toLocaleDateString('pt-BR'),
+        s.status === 'pendente' ? 'Pendente' : 'Processando'
+      ];
+      csv += linha.join(',') + '\n';
+    });
 
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Saques');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
     
-    // Baixa arquivo
-    XLSX.writeFile(wb, `saques_pendentes_${new Date().toISOString().split('T')[0]}.xlsx`);
-    alert('✅ Planilha baixada com sucesso!');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `saques_pendentes_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    alert('✅ Planilha baixada com sucesso! (formato CSV)');
 
   } catch(e) {
-    console.error('Erro ao gerar Excel:', e);
+    console.error('Erro ao gerar CSV:', e);
     alert('❌ Erro ao baixar planilha: ' + e.message);
   }
-} 
+}
 async function marcarComoPago(saqueId){
   if(!confirm('Tem certeza que deseja marcar este saque como PAGO?')) return;
  
