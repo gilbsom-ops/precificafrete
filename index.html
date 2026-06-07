@@ -2152,55 +2152,51 @@ async function carregarSaquesPendentes(){
  
 async function baixarPlanilhaExcel(){
   try {
-    // Busca saques pendentes com dados dos afiliados
-    const {data:saques} = await sb.from('afiliado_pagamentos').select(`
-      id, valor_total, created_at, status, chave_pix, tipo_pix_pagamento,
-      afiliados(nome_completo)
-    `).in('status', ['pendente', 'processando']).order('created_at', {ascending: true});
- 
+    // Busca saques pendentes (SEM JOIN)
+    const {data:saques} = await sb.from('afiliado_pagamentos').select('*').in('status', ['pendente', 'processando']).order('created_at', {ascending: true});
+
     if(!saques || saques.length === 0){
       alert('❌ Nenhum saque pendente para baixar.');
       return;
     }
- 
+
     // Prepara dados para Excel
     const dados = saques.map((s, idx) => ({
       'Nº': idx + 1,
-      'Nome': s.afiliados?.nome_completo || 'N/A',
+      'Afiliado ID': s.afiliado_id.substring(0, 8) + '...',
       'Tipo PIX': s.tipo_pix_pagamento || '-',
       'Chave PIX': s.chave_pix || '-',
       'Valor (R$)': parseFloat(s.valor_total).toFixed(2),
       'Data': new Date(s.created_at).toLocaleDateString('pt-BR'),
       'Status': s.status === 'pendente' ? 'Pendente' : 'Processando'
     }));
- 
+
     // Cria workbook
     const ws = XLSX.utils.json_to_sheet(dados);
     
     // Estiliza colunas
     ws['!cols'] = [
-      {wch: 5},   // Nº
-      {wch: 20},  // Nome
-      {wch: 12},  // Tipo PIX
-      {wch: 25},  // Chave PIX
-      {wch: 12},  // Valor
-      {wch: 12},  // Data
-      {wch: 12}   // Status
+      {wch: 5},
+      {wch: 15},
+      {wch: 12},
+      {wch: 25},
+      {wch: 12},
+      {wch: 12},
+      {wch: 12}
     ];
- 
+
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Saques');
     
     // Baixa arquivo
     XLSX.writeFile(wb, `saques_pendentes_${new Date().toISOString().split('T')[0]}.xlsx`);
     alert('✅ Planilha baixada com sucesso!');
- 
+
   } catch(e) {
     console.error('Erro ao gerar Excel:', e);
     alert('❌ Erro ao baixar planilha: ' + e.message);
   }
-}
- 
+} 
 async function marcarComoPago(saqueId){
   if(!confirm('Tem certeza que deseja marcar este saque como PAGO?')) return;
  
