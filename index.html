@@ -2078,7 +2078,7 @@ async function carregarMeusSaques(){
  
 async function carregarSaquesPendentes(){
   if(!usuarioLogado) return;
- 
+
   try {
     // Verifica se é admin
     const {data:userData} = await sb.from('usuarios').select('is_admin').eq('id', usuarioLogado.id).single();
@@ -2086,18 +2086,15 @@ async function carregarSaquesPendentes(){
       document.getElementById('saques-pendentes-conteudo').innerHTML = '<div style="padding:20px; text-align:center;"><p>❌ Acesso restrito a administradores.</p></div>';
       return;
     }
- 
-    // Busca saques pendentes e em processamento
-    const {data:saques, error:errSaques} = await sb.from('afiliado_pagamentos').select(`
-      *,
-      afiliados(nome_completo)
-    `).in('status', ['pendente', 'processando']).order('created_at', {ascending: true});
- 
+
+    // Busca saques pendentes (SEM JOIN)
+    const {data:saques, error:errSaques} = await sb.from('afiliado_pagamentos').select('*').in('status', ['pendente', 'processando']).order('created_at', {ascending: true});
+
     if(!saques || errSaques || saques.length === 0){
       document.getElementById('saques-pendentes-conteudo').innerHTML = '<div style="padding:20px; text-align:center;"><p>✅ Nenhum saque pendente!</p></div>';
       return;
     }
- 
+
     // Renderiza tabela com botões
     const html = `
       <div style="margin-bottom:20px;">
@@ -2108,7 +2105,7 @@ async function carregarSaquesPendentes(){
       <table style="width:100%; border-collapse:collapse; margin-top:1rem; font-size:13px;">
         <thead>
           <tr style="background:#f5f5f5; border-bottom:2px solid #ddd;">
-            <th style="padding:12px; text-align:left; font-weight:bold;">Afiliado</th>
+            <th style="padding:12px; text-align:left; font-weight:bold;">Afiliado ID</th>
             <th style="padding:12px; text-align:left; font-weight:bold;">PIX</th>
             <th style="padding:12px; text-align:left; font-weight:bold;">Valor</th>
             <th style="padding:12px; text-align:left; font-weight:bold;">Data</th>
@@ -2119,7 +2116,7 @@ async function carregarSaquesPendentes(){
         <tbody>
           ${saques.map(s => `
             <tr style="border-bottom:1px solid #eee;">
-              <td style="padding:12px;">${s.afiliados?.nome_completo || 'N/A'}</td>
+              <td style="padding:12px;">${s.afiliado_id.substring(0, 8)}...</td>
               <td style="padding:12px;">
                 <span style="font-family:monospace; font-size:12px; background:#f5f5f5; padding:4px 8px; border-radius:4px;">
                   ${s.chave_pix || '-'}
@@ -2144,9 +2141,9 @@ async function carregarSaquesPendentes(){
         </tbody>
       </table>
     `;
- 
+
     document.getElementById('saques-pendentes-conteudo').innerHTML = html;
- 
+
   } catch(e) {
     console.error('Erro ao carregar saques pendentes:', e);
     document.getElementById('saques-pendentes-conteudo').innerHTML = '<div style="padding:20px; text-align:center;"><p>❌ Erro ao carregar saques: ' + e.message + '</p></div>';
