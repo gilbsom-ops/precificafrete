@@ -2201,7 +2201,7 @@ async function marcarComoPago(saqueId){
     // Atualiza status do saque
     const {data:saque, error:errUpdate} = await sb.from('afiliado_pagamentos').update({
       status: 'pago',
-      data_pagamento: new Date().toISOString()
+      data_processamento: new Date().toISOString()
     }).eq('id', saqueId).select().single();
  
     if(errUpdate) throw errUpdate;
