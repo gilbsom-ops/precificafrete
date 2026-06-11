@@ -1337,6 +1337,201 @@ async function buscarRotasReaisMelhorado(origem, destino){
 }
 
 
+// ═══════════════════════════════════════════════════════════════════════════
+// 💳 CÁLCULO DE PEDÁGIO AUTOMÁTICO
+// ═══════════════════════════════════════════════════════════════════════════
+// Substitui a função de pedágio anterior
+// Usa dados cadastrados no Supabase
+
+async function calcularPedagioAutomatico(origem, destino, nroEixos){
+  try {
+    console.log(`🛣️  Calculando pedágio: ${origem} → ${destino} (${nroEixos} eixos)`);
+    
+    // Extrai estados
+    const estadoOrigem = origem.split('/')[1] || '';
+    const estadoDestino = destino.split('/')[1] || '';
+    
+    if(!estadoOrigem || !estadoDestino){
+      console.warn('⚠️  Estados não identificados');
+      return null;
+    }
+    
+    // ═════════════════════════════════════════════════════════════════════
+    // OPÇÃO 1: Buscar praças entre os dois estados (simples)
+    // ═════════════════════════════════════════════════════════════════════
+    
+    // Para rotas de longa distância, pega praças de TODOS os estados intermediários
+    const estados = obterEstadosIntermediarios(estadoOrigem, estadoDestino);
+    
+    console.log(`📍 Estados na rota: ${estados.join(' → ')}`);
+    
+    // Busca todas as praças desses estados
+    const {data: pracas, error} = await sb.from('pedagios_pracas')
+      .select('nome, estado, rodovia, km, ativa')
+      .in('estado', estados)
+      .eq('ativa', true)
+      .order('estado')
+      .order('km');
+    
+    if(error || !pracas || pracas.length === 0){
+      console.warn('⚠️  Nenhuma praça encontrada');
+      return null;
+    }
+    
+    console.log(`✅ Encontradas ${pracas.length} praças`);
+    
+    // ═════════════════════════════════════════════════════════════════════
+    // CALCULA PEDÁGIO
+    // ═════════════════════════════════════════════════════════════════════
+    
+    let pedagioTotal = 0;
+    let pracasUsadas = [];
+    
+    // Coluna dinamicamente escolhida baseada no número de eixos
+    const colunasTarifa = {
+      2: 'tarifa_2eixos',
+      3: 'tarifa_3eixos',
+      4: 'tarifa_4eixos',
+      5: 'tarifa_5eixos',
+      6: 'tarifa_6eixos',
+      7: 'tarifa_7eixos',
+      9: 'tarifa_9eixos'
+    };
+    
+    const colunaTarifa = colunasTarifa[nroEixos] || 'tarifa_5eixos';
+    
+    // Para cada praça, busca a tarifa
+    for(const praca of pracas){
+      const {data: tarifas, error: errTarifa} = await sb.from('pedagios_pracas')
+        .select(colunaTarifa)
+        .eq('nome', praca.nome)
+        .eq('estado', praca.estado)
+        .single();
+      
+      if(tarifas && tarifas[colunaTarifa]){
+        const tarifa = parseFloat(tarifas[colunaTarifa]);
+        pedagioTotal += tarifa;
+        pracasUsadas.push({
+          nome: praca.nome,
+          estado: praca.estado,
+          tarifa: tarifa,
+          total: tarifa * nroEixos
+        });
+      }
+    }
+    
+    console.log(`💰 Pedágio total: R$ ${pedagioTotal.toFixed(2)}`);
+    console.log(`📋 Praças: ${pracasUsadas.map(p => p.nome).join(', ')}`);
+    
+    return {
+      pedagioTotal: pedagioTotal * nroEixos,  // Total com multiplicação de eixos
+      numPracas: pracasUsadas.length,
+      pracas: pracasUsadas,
+      sucesso: true
+    };
+    
+  } catch(e){
+    console.error('❌ Erro ao calcular pedágio:', e);
+    return null;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 📍 FUNÇÃO AUXILIAR: Obter estados intermediários
+// ═══════════════════════════════════════════════════════════════════════════
+
+function obterEstadosIntermediarios(estadoOrigem, estadoDestino){
+  // Mapa de rotas principais Brasil
+  // Retorna array de estados entre origem e destino
+  
+  const rotas = {
+    'SP-RJ': ['SP', 'RJ'],
+    'RJ-SP': ['RJ', 'SP'],
+    'SP-MG': ['SP', 'MG'],
+    'MG-SP': ['MG', 'SP'],
+    'SP-BA': ['SP', 'MG', 'BA'],
+    'BA-SP': ['BA', 'MG', 'SP'],
+    'SP-PE': ['SP', 'MG', 'BA', 'PE'],
+    'PE-SP': ['PE', 'BA', 'MG', 'SP'],
+    'SP-CE': ['SP', 'MG', 'BA', 'PE', 'CE'],
+    'CE-SP': ['CE', 'PE', 'BA', 'MG', 'SP'],
+    'SP-RS': ['SP', 'PR', 'SC', 'RS'],
+    'RS-SP': ['RS', 'SC', 'PR', 'SP'],
+    'MG-BA': ['MG', 'BA'],
+    'BA-MG': ['BA', 'MG'],
+    'MG-RJ': ['MG', 'RJ'],
+    'RJ-MG': ['RJ', 'MG'],
+  };
+  
+  const chave = `${estadoOrigem}-${estadoDestino}`;
+  
+  if(rotas[chave]){
+    return rotas[chave];
+  }
+  
+  // Se não encontrar rota específica, retorna os dois estados
+  console.warn(`⚠️  Rota não mapeada: ${chave}, usando apenas ${estadoOrigem} e ${estadoDestino}`);
+  return [estadoOrigem, estadoDestino];
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 🔄 INTEGRAÇÃO COM CÁLCULO PRINCIPAL
+// ═══════════════════════════════════════════════════════════════════════════
+// SUBSTITUIR na função calcular() onde estava o cálculo antigo de pedágio
+
+/*
+// ANTES (linha ~1320):
+const cPed = r.pedagioReal || dist*veiculo.pedBase*rotaFallback.pedMult;
+
+// DEPOIS:
+let cPed = 0;
+
+// Tenta buscar do novo sistema
+if(rotasResult.sucesso){
+  const resultadoPedagio = await calcularPedagioAutomatico(c_origem, c_destino, veiculo.eixos);
+  if(resultadoPedagio && resultadoPedagio.sucesso){
+    cPed = resultadoPedagio.pedagioTotal;
+    console.log(`✅ Pedágio automático: R$ ${cPed.toFixed(2)}`);
+  } else {
+    // Fallback para Google Maps se não encontrar
+    cPed = r.pedagioReal || dist*veiculo.pedBase*rotaFallback.pedMult;
+    console.log(`⚠️  Usando pedágio Google Maps: R$ ${cPed.toFixed(2)}`);
+  }
+} else {
+  cPed = r.pedagioReal || dist*veiculo.pedBase*rotaFallback.pedMult;
+}
+*/
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 🧪 FUNÇÃO DE TESTE
+// ═══════════════════════════════════════════════════════════════════════════
+
+async function testarPedagio(){
+  console.log('🧪 TESTANDO CÁLCULO DE PEDÁGIO...\n');
+  
+  const testes = [
+    { origem: 'São Paulo/SP', destino: 'Campinas/SP', eixos: 2 },
+    { origem: 'São Paulo/SP', destino: 'Rio de Janeiro/RJ', eixos: 5 },
+    { origem: 'São Paulo/SP', destino: 'Fortaleza/CE', eixos: 5 },
+    { origem: 'São Paulo/SP', destino: 'Belo Horizonte/MG', eixos: 3 },
+  ];
+  
+  for(const teste of testes){
+    console.log(`\n📋 Teste: ${teste.origem} → ${teste.destino} (${teste.eixos} eixos)`);
+    const resultado = await calcularPedagioAutomatico(teste.origem, teste.destino, teste.eixos);
+    
+    if(resultado && resultado.sucesso){
+      console.log(`✅ Pedágio: R$ ${resultado.pedagioTotal.toFixed(2)}`);
+      console.log(`   Praças: ${resultado.numPracas}`);
+    } else {
+      console.log(`❌ Erro ao calcular`);
+    }
+  }
+}
+
+// Para rodar teste manualmente no console:
+// await testarPedagio();
+
 // ─── CALCULAR ────────────────────────────────
 async function calcular(){
   if(!usuarioAtual){alert('Faça login para calcular.');return;}
@@ -1379,7 +1574,23 @@ async function calcular(){
     rotasCalculadas = rotasResult.rotas.map(r => {
       const dist = r.distKm;
       const cDiesel = (dist/veiculo.diesel)*dieselPreco;
-      const cPed = r.pedagioReal || dist*veiculo.pedBase*rotaFallback.pedMult;
+      // ═════════════════════════════════════════════════════════════════
+// CÁLCULO DE PEDÁGIO - NOVO SISTEMA AUTOMÁTICO
+// ═════════════════════════════════════════════════════════════════
+let cPed = 0;
+try {
+  const resultadoPedagio = await calcularPedagioAutomatico(c_origem, c_destino, veiculo.eixos);
+  if(resultadoPedagio && resultadoPedagio.sucesso){
+    cPed = resultadoPedagio.pedagioTotal;
+    console.log(`✅ Pedágio automático (${resultadoPedagio.numPracas} praças): R$ ${cPed.toFixed(2)}`);
+  } else {
+    cPed = r.pedagioReal || dist*veiculo.pedBase*rotaFallback.pedMult;
+    console.log(`⚠️  Pedágio Google Maps: R$ ${cPed.toFixed(2)}`);
+  }
+} catch(e){
+  console.warn(`❌ Erro: ${e.message}`);
+  cPed = r.pedagioReal || dist*veiculo.pedBase*rotaFallback.pedMult;
+}
       const pedagioFonte = r.pedagioReal ? '📍 Google Maps (oficial)' : 'Estimado';
       const cManut = dist*veiculo.manutBase*rotaFallback.manutMult;
       const cAlim = Math.ceil(dist/600)*90;
