@@ -15,7 +15,6 @@
 const SUPABASE_URL = 'https://tkjekntjfcoysteveikc.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_sp2zeS2DBZjf5WM9SRKXow_2w6Ewtx8';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-let usuarioLogado = null;
 
 // ═══════════════════════════════════════════════════════════════
 // 🤝 FUNÇÕES DE AFILIADOS
@@ -66,11 +65,11 @@ async function registrarComissaoAfiliado(usuarioId, valorVenda){
 }
 
 async function verificarSeEhAfiliado(){
-  if(!usuarioLogado) return;
+  if(!usuarioAtual) return;
   
   try {
     // Verifica se é afiliado
-    const {data:aff} = await sb.from('afiliados').select('id, ativo').eq('user_id', usuarioLogado.id).single();
+    const {data:aff} = await sb.from('afiliados').select('id, ativo').eq('user_id', usuarioAtual.id).single();
     if(aff && aff.ativo){
       const navAff = document.getElementById('navAfiliadoMenu');
       if(navAff) navAff.style.display = 'flex';
@@ -83,7 +82,7 @@ async function verificarSeEhAfiliado(){
   
   try {
     // Verifica se é admin (usa a coluna is_admin, não email fixo)
-    const {data:userData} = await sb.from('usuarios').select('is_admin').eq('id', usuarioLogado.id).single();
+    const {data:userData} = await sb.from('usuarios').select('is_admin').eq('id', usuarioAtual.id).single();
     if(userData?.is_admin === true){
       const navAdmin = document.getElementById('navAdminAfiliados');
       if(navAdmin) navAdmin.style.display = 'flex';
@@ -96,10 +95,10 @@ async function verificarSeEhAfiliado(){
 }
 
 async function carregarPainelAfiliado(){
-  if(!usuarioLogado) return;
+  if(!usuarioAtual) return;
   
   try {
-    const {data:aff, error} = await sb.from('afiliados').select('*').eq('user_id', usuarioLogado.id).single();
+    const {data:aff, error} = await sb.from('afiliados').select('*').eq('user_id', usuarioAtual.id).single();
     
     if(!aff || error){
       const div = document.getElementById('meus-afiliados');
@@ -893,17 +892,28 @@ async function fazerLogin(){
   btn.disabled=true;btn.textContent='Entrando...';
   try{
     const{data,error}=await sb.auth.signInWithPassword({email,password:senha});
-    if(error)throw error;
+    if(error){
+      // ✅ NOVO: Tratamento específico de erros
+      if(error.message.includes("Email not confirmed")){
+        mostrarErro('err-login','⚠️ Confirme seu e-mail antes de fazer login. Verifique sua caixa de entrada.');
+      }else if(error.message.includes("Invalid login credentials")){
+        mostrarErro('err-login','❌ E-mail ou senha incorretos.');
+      }else{
+        mostrarErro('err-login',`❌ Erro: ${error.message}`);
+      }
+      return;
+    }
+    console.log('✅ Login bem-sucedido:',data.user.email);
     entrarNoApp(data.user);
   }catch(err){
-    mostrarErro('err-login','E-mail ou senha incorretos.');
+    mostrarErro('err-login',`❌ Erro inesperado: ${err.message}`);
   }finally{btn.disabled=false;btn.textContent='Entrar no app';}
 }
 
 // ─── ENTRAR NO APP ────────────────────────────
 async function entrarNoApp(user){
   usuarioAtual=user;
-  usuarioLogado = user;
+  usuarioAtual = user;
 await verificarSeEhAfiliado();
   // Buscar dados do usuário
   const{data:userData}=await sb.from('usuarios').select('*').eq('id',user.id).single();
@@ -988,10 +998,10 @@ function irParaPainelAdmin(){
 
 async function carregarPainelAdmin(){
   // Verifica se o usuário logado é admin usando a coluna is_admin (não email fixo)
-  if(!usuarioLogado) return;
+  if(!usuarioAtual) return;
   
   try {
-    const {data:userData} = await sb.from('usuarios').select('is_admin').eq('id', usuarioLogado.id).single();
+    const {data:userData} = await sb.from('usuarios').select('is_admin').eq('id', usuarioAtual.id).single();
     if(!userData?.is_admin) {
       console.log('Usuário não tem permissão de admin');
       return;
@@ -1065,9 +1075,9 @@ function irParaPaginaAfiliados(){
 }
 
 async function carregarPainelAfiliadoMelhorado(){
-  if(!usuarioLogado) return;
+  if(!usuarioAtual) return;
   
-  const {data:aff} = await sb.from('afiliados').select('*').eq('user_id', usuarioLogado.id).single();
+  const {data:aff} = await sb.from('afiliados').select('*').eq('user_id', usuarioAtual.id).single();
   
   if(!aff){
     document.getElementById('meus-afiliados').innerHTML = '<div style="padding:20px; text-align:center;"><p>❌ Você não é um afiliado ainda</p></div>';
@@ -2253,11 +2263,11 @@ window.addEventListener('load',async()=>{
 // ═══════════════════════════════════════════════════════════════════════════
 
 async function carregarMeusSaques(){
-  if(!usuarioLogado) return;
+  if(!usuarioAtual) return;
   
   try {
     // Busca o afiliado logado
-    const {data:aff, error:errAff} = await sb.from('afiliados').select('id').eq('user_id', usuarioLogado.id).single();
+    const {data:aff, error:errAff} = await sb.from('afiliados').select('id').eq('user_id', usuarioAtual.id).single();
     if(!aff || errAff){
       document.getElementById('meus-saques-conteudo').innerHTML = '<div style="padding:20px; text-align:center;"><p>❌ Você não é um afiliado ativo.</p></div>';
       return;
@@ -2326,11 +2336,11 @@ async function carregarMeusSaques(){
 // ═══════════════════════════════════════════════════════════════════════════
  
 async function carregarMeusSaques(){
-  if(!usuarioLogado) return;
+  if(!usuarioAtual) return;
   
   try {
     // Busca o afiliado logado
-    const {data:aff, error:errAff} = await sb.from('afiliados').select('id').eq('user_id', usuarioLogado.id).single();
+    const {data:aff, error:errAff} = await sb.from('afiliados').select('id').eq('user_id', usuarioAtual.id).single();
     if(!aff || errAff){
       document.getElementById('meus-saques-conteudo').innerHTML = '<div style="padding:20px; text-align:center;"><p>❌ Você não é um afiliado ativo.</p></div>';
       return;
@@ -2392,11 +2402,11 @@ async function carregarMeusSaques(){
 }
  
 async function carregarSaquesPendentes(){
-  if(!usuarioLogado) return;
+  if(!usuarioAtual) return;
 
   try {
     // Verifica se é admin
-    const {data:userData} = await sb.from('usuarios').select('is_admin').eq('id', usuarioLogado.id).single();
+    const {data:userData} = await sb.from('usuarios').select('is_admin').eq('id', usuarioAtual.id).single();
     if(!userData?.is_admin){
       document.getElementById('saques-pendentes-conteudo').innerHTML = '<div style="padding:20px; text-align:center;"><p>❌ Acesso restrito a administradores.</p></div>';
       return;
