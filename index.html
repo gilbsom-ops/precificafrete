@@ -1046,7 +1046,7 @@ async function criarNovoAfiliado(){
   const chaveUnica = document.getElementById('novoAfiliadoChave').value.toUpperCase().trim();
   const pixChave = document.getElementById('novoAfiliadoPix').value.trim();
   const tipoPix = document.getElementById('novoAfiliadoTipoPix').value;
-  const cpf = document.getElementById('novoAfiliadoCPF')?.value || '000.000.000-00';
+  const cpfCnpj = document.getElementById('novoAfiliadoCPF')?.value || '';
   
   if(!nome || !email || !chaveUnica){ 
     alert('⚠️ Preencha Nome, Email e Chave Única!'); 
@@ -1054,12 +1054,17 @@ async function criarNovoAfiliado(){
   }
   
   try{
-    // Inserir novo afiliado no Supabase usando colunas corretas
+    // Inserir novo afiliado no Supabase com NOMES CORRETOS das colunas
     const {data, error} = await sb.from('afiliados').insert({
-      name: nome,
+      name_afiliado: nome,
       email: email,
-      cpf: cpf,
-      creditos: 3,
+      chave_unica: chaveUnica,
+      tipo_pix: tipoPix,
+      pix_chave: pixChave,
+      cpf_cnpj: cpfCnpj,
+      saldo_pendente: 0,
+      saldo_pago: 0,
+      comissao_percentual: 25,
       ativo: true
     }).select();
     
