@@ -1056,6 +1056,7 @@ async function criarNovoAfiliado(){
   try{
     // Inserir novo afiliado no Supabase com NOMES CORRETOS das colunas
     const {data, error} = await sb.from('afiliados').insert({
+      user_id: usuarioAtual.id,
       nome_afiliado: nome,
       email: email,
       chave_unica: chaveUnica,
