@@ -1046,22 +1046,20 @@ async function criarNovoAfiliado(){
   const chaveUnica = document.getElementById('novoAfiliadoChave').value.toUpperCase().trim();
   const pixChave = document.getElementById('novoAfiliadoPix').value.trim();
   const tipoPix = document.getElementById('novoAfiliadoTipoPix').value;
+  const cpf = document.getElementById('novoAfiliadoCPF')?.value || '000.000.000-00';
   
-  if(!nome || !email || !chaveUnica || !pixChave){ 
-    alert('⚠️ Preencha todos os campos!'); 
+  if(!nome || !email || !chaveUnica){ 
+    alert('⚠️ Preencha Nome, Email e Chave Única!'); 
     return; 
   }
   
   try{
-    // Inserir novo afiliado no Supabase
+    // Inserir novo afiliado no Supabase usando colunas corretas
     const {data, error} = await sb.from('afiliados').insert({
-      nome_afiliado: nome,
+      name: nome,
       email: email,
-      chave_unica: chaveUnica,
-      tipo_pix_pagamento: tipoPix,
-      chave_pix: pixChave,
-      saldo_pendente: 0,
-      saldo_pago: 0,
+      cpf: cpf,
+      creditos: 3,
       ativo: true
     }).select();
     
@@ -1074,6 +1072,7 @@ async function criarNovoAfiliado(){
       document.getElementById('novoAfiliadoEmail').value = '';
       document.getElementById('novoAfiliadoChave').value = '';
       document.getElementById('novoAfiliadoPix').value = '';
+      if(document.getElementById('novoAfiliadoCPF')) document.getElementById('novoAfiliadoCPF').value = '';
       // Voltar para painel
       document.getElementById('painel-admin-afiliados').style.display = 'block';
       document.getElementById('painel-criar-afiliado').style.display = 'none';
