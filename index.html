@@ -1041,24 +1041,51 @@ function irParaCriarAfiliado(){
 }
 
 async function criarNovoAfiliado(){
-  const nome = document.getElementById('novoAfiliadoNome').value;
-  const email = document.getElementById('novoAfiliadoEmail').value;
-  const chaveUnica = document.getElementById('novoAfiliadoChave').value.toUpperCase();
-  const pixChave = document.getElementById('novoAfiliadoPix').value;
+  const nome = document.getElementById('novoAfiliadoNome').value.trim();
+  const email = document.getElementById('novoAfiliadoEmail').value.trim();
+  const chaveUnica = document.getElementById('novoAfiliadoChave').value.toUpperCase().trim();
+  const pixChave = document.getElementById('novoAfiliadoPix').value.trim();
   const tipoPix = document.getElementById('novoAfiliadoTipoPix').value;
   
-  if(!nome || !email || !chaveUnica || !pixChave){ alert('⚠️ Preencha todos os campos!'); return; }
+  if(!nome || !email || !chaveUnica || !pixChave){ 
+    alert('⚠️ Preencha todos os campos!'); 
+    return; 
+  }
   
   try{
-    alert('✅ Afiliado criado com sucesso!');
-    document.getElementById('novoAfiliadoNome').value = '';
-    document.getElementById('novoAfiliadoEmail').value = '';
-    document.getElementById('novoAfiliadoChave').value = '';
-    document.getElementById('novoAfiliadoPix').value = '';
-    document.getElementById('painel-admin-afiliados').style.display = 'block';
-    document.getElementById('painel-criar-afiliado').style.display = 'none';
-    carregarPainelAdmin();
-  }catch(e){ alert('❌ Erro ao criar afiliado: ' + e.message); }
+    // Inserir novo afiliado no Supabase
+    const {data, error} = await sb.from('afiliados').insert({
+      nome_afiliado: nome,
+      email: email,
+      chave_unica: chaveUnica,
+      tipo_pix_pagamento: tipoPix,
+      chave_pix: pixChave,
+      saldo_pendente: 0,
+      saldo_pago: 0,
+      ativo: true
+    }).select();
+    
+    if(error) throw error;
+    
+    if(data && data.length > 0){
+      alert('✅ Afiliado criado com sucesso!');
+      // Limpar formulário
+      document.getElementById('novoAfiliadoNome').value = '';
+      document.getElementById('novoAfiliadoEmail').value = '';
+      document.getElementById('novoAfiliadoChave').value = '';
+      document.getElementById('novoAfiliadoPix').value = '';
+      // Voltar para painel
+      document.getElementById('painel-admin-afiliados').style.display = 'block';
+      document.getElementById('painel-criar-afiliado').style.display = 'none';
+      // Recarregar lista de afiliados
+      await carregarPainelAdmin();
+    } else {
+      alert('❌ Erro ao criar afiliado');
+    }
+  }catch(e){ 
+    console.error('Erro:', e);
+    alert('❌ Erro ao criar afiliado: ' + e.message); 
+  }
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
