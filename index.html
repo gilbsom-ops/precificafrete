@@ -1580,7 +1580,7 @@ async function calcular(){
   // Calcular custo para cada rota
   let rotasCalculadas = [];
   if(rotasResult.sucesso && rotasResult.rotas.length > 0){
-    rotasCalculadas = rotasResult.rotas.map(r => {
+    rotasCalculadas = await Promise.all(rotasResult.rotas.map(async r => {
       const dist = r.distKm;
       const cDiesel = (dist/veiculo.diesel)*dieselPreco;
       // ═════════════════════════════════════════════════════════════════
@@ -1588,7 +1588,7 @@ async function calcular(){
 // ═════════════════════════════════════════════════════════════════
 let cPed = 0;
 try {
-  const resultadoPedagio = await calcularPedagioAutomatico(c_origem, c_destino, veiculo.eixos);
+  const resultadoPedagio = await calcularPedagioAutomatico(origem, destino, veiculo.eixos);
   if(resultadoPedagio && resultadoPedagio.sucesso){
     cPed = resultadoPedagio.pedagioTotal;
     console.log(`✅ Pedágio automático (${resultadoPedagio.numPracas} praças): R$ ${cPed.toFixed(2)}`);
@@ -1609,7 +1609,7 @@ try {
       const lucro = frete-total;
       const piso = dist*veiculo.baseAntt*carga.coef;
       return {...r, cDiesel, cPed, pedagioFonte, cManut, cAlim, cRisco, cAdicCarga, total, lucro, piso, dieselPreco};
-    });
+    }));
     // Ordenar por menor custo total
     rotasCalculadas.sort((a,b) => a.total - b.total);
   }
