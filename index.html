@@ -1214,65 +1214,66 @@ let CONFIG = {
 // ─── BUSCAR MÚLTIPLAS ROTAS COM PEDÁGIOS ─────
 async function buscarRotasReais(origem, destino){
   try{
-    const GOOGLE_KEY = 'AIzaSyCTYB8UdE9SE7Sl5KTWsvfWMvooiK_UESo';
-    const limpar = (s) => s.replace(/\/[A-Z]{2}$/,'').trim();
+    const ORS_KEY = 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6Ijc0YWI5OGZmZmIxNDdhNjg3NGM5MzQ0NTc4N2RlZWYiLCJoYyI6Im11cm11cjY0In0=';
+    
+    // Geocodificar usando OpenRouteService
     const geocode = async (endereco) => {
-      const endLimpo = limpar(endereco);
-      const resp = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(endLimpo + ', Brasil')}&key=${GOOGLE_KEY}&region=br&language=pt-BR`);
+      const resp = await fetch(`https://api.openrouteservice.org/geocode/search?api_key=${ORS_KEY}&text=${encodeURIComponent(endereco + ', Brasil')}`);
       const data = await resp.json();
-      if(data.results && data.results[0]){
-        const uf = data.results[0].address_components?.find(c => c.types.includes('administrative_area_level_1'))?.short_name || '';
-        return { loc: data.results[0].geometry.location, uf };
+      if(data.features && data.features[0]){
+        const coords = data.features[0].geometry.coordinates;
+        return { loc: { lat: coords[1], lng: coords[0] }, uf: 'SP' };
       }
       return null;
     };
+    
     const [gOrigem, gDestino] = await Promise.all([geocode(origem), geocode(destino)]);
-    console.log('🗺️ DEBUG - Geocodificação:');
+    console.log('🗺️ DEBUG - Geocodificação OpenRouteService:');
     console.log('  Origem:', origem, '→ Lat:', gOrigem?.loc.lat, 'Lng:', gOrigem?.loc.lng);
     console.log('  Destino:', destino, '→ Lat:', gDestino?.loc.lat, 'Lng:', gDestino?.loc.lng);
     if(!gOrigem || !gDestino) return {sucesso:false};
-    const routesResp = await fetch('https://routes.googleapis.com/directions/v2:computeRoutes', {
+    
+    // Buscar rotas usando OpenRouteService
+    const routesResp = await fetch('https://api.openrouteservice.org/v2/directions/driving', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Goog-Api-Key': GOOGLE_KEY,
-        'X-Goog-FieldMask': 'routes.distanceMeters,routes.duration,routes.travelAdvisory.tollInfo,routes.polyline.encodedPolyline'
+        'Authorization': ORS_KEY
       },
       body: JSON.stringify({
-        origin: { location: { latLng: { latitude: gOrigem.loc.lat, longitude: gOrigem.loc.lng } } },
-        destination: { location: { latLng: { latitude: gDestino.loc.lat, longitude: gDestino.loc.lng } } },
-        travelMode: 'DRIVE',
-        routingPreference: 'TRAFFIC_UNAWARE',
-        extraComputations: ['TOLLS'],
-        computeAlternativeRoutes: true,
-        units: 'METRIC'
+        coordinates: [
+          [gOrigem.loc.lng, gOrigem.loc.lat],
+          [gDestino.loc.lng, gDestino.loc.lat]
+        ],
+        format: 'json',
+        units: 'km'
       })
     });
+    
     const routesData = await routesResp.json();
-    console.log('Routes API:', JSON.stringify(routesData).slice(0,1000));
+    console.log('📍 OpenRouteService response:', JSON.stringify(routesData).slice(0,500));
+    
     if(!routesData.routes || routesData.routes.length === 0) return {sucesso:false};
+    
     const rotas = routesData.routes.map((route, idx) => {
-      const distKm = Math.round(route.distanceMeters / 1000);
-      console.log(`📍 Rota ${idx + 1}: ${distKm} km, ${route.duration}`);
-      const duracaoSeg = parseInt(route.duration?.replace('s','')) || 0;
+      const distKm = Math.round(route.summary.distance / 1000);
+      const duracaoSeg = Math.round(route.summary.duration);
+      console.log(`📍 Rota ${idx + 1}: ${distKm} km, ${Math.floor(duracaoSeg/3600)}h ${Math.floor((duracaoSeg%3600)/60)}min`);
+      
       const horas = Math.floor(duracaoSeg / 3600);
       const mins = Math.floor((duracaoSeg % 3600) / 60);
       const duracaoText = horas >= 24 
         ? `${Math.floor(horas/24)} dia${Math.floor(horas/24)>1?'s':''} ${horas%24}h`
         : `${horas}h ${mins}min`;
-      const tollInfo = route.travelAdvisory?.tollInfo;
-      let pedagioReal = null;
-      if(tollInfo?.estimatedPrice?.length > 0){
-        const tollBRL = tollInfo.estimatedPrice.find(p => p.currencyCode === 'BRL');
-        if(tollBRL) pedagioReal = parseFloat(tollBRL.units || 0) + (tollBRL.nanos || 0) / 1e9;
-      }
+      
       const labels = ['🛣️ Principal', '🔀 Alternativa 1', '🔀 Alternativa 2', '🔀 Alternativa 3'];
       const desc = labels[idx] || `Rota ${idx+1}`;
-      return { distKm, duracaoText, pedagioReal, desc, idx };
+      return { distKm, duracaoText, pedagioReal: null, desc, idx };
     });
+    
     return { sucesso: true, rotas, estadoOrigem: gOrigem.uf, estadoDestino: gDestino.uf };
   } catch(e){
-    console.error('Routes API error:', e);
+    console.error('OpenRouteService error:', e);
     return {sucesso:false};
   }
 }
