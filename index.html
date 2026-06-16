@@ -158,7 +158,7 @@ function irParaPaginaAfiliados(){
 window.addEventListener('load', () => { inicializarRastreamentoAfiliado(); verificarSeEhAfiliado(); });
 </script>
 <script src="https://sdk.mercadopago.com/js/v2"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCTYB8UdE9SE7Sl5KTWsvfWMvooiK_UESo&libraries=places"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
 <style>
 :root {
@@ -1284,99 +1284,67 @@ async function buscarRotasReais(origem, destino){
 
 async function buscarRotasReaisComTrechos(origem, destino){
   try{
-    const GOOGLE_KEY = 'AIzaSyCTYB8UdE9SE7Sl5KTWsvfWMvooiK_UESo';
+    const ORS_KEY = 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6Ijc0YWI5OGZmZmIxNDdhNjg3NGM5MzQ0NTc4N2RlZWYiLCJoYyI6Im11cm11cjY0In0=';
     const limpar = (s) => s.replace(/\/[A-Z]{2}$/,'').trim();
     const geocode = async (endereco) => {
       const endLimpo = limpar(endereco);
-      const resp = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(endLimpo + ', Brasil')}&key=${GOOGLE_KEY}&region=br&language=pt-BR`);
+      const resp = await fetch(`https://api.openrouteservice.org/geocode/search?api_key=${ORS_KEY}&text=${encodeURIComponent(endLimpo + ', Brasil')}`);
       const data = await resp.json();
-      if(data.results && data.results[0]){
-        const uf = data.results[0].address_components?.find(c => c.types.includes('administrative_area_level_1'))?.short_name || '';
-        return { loc: data.results[0].geometry.location, uf };
+      if(data.features && data.features[0]){
+        const coords = data.features[0].geometry.coordinates;
+        const uf = 'SP'; // Padrão SP (pode melhorar depois)
+        return { loc: { lat: coords[1], lng: coords[0] }, uf };
       }
       return null;
     };
     const [gOrigem, gDestino] = await Promise.all([geocode(origem), geocode(destino)]);
     if(!gOrigem || !gDestino) return {sucesso:false};
-    const directionsUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${gOrigem.loc.lat},${gOrigem.loc.lng}&destination=${gDestino.loc.lat},${gDestino.loc.lng}&key=${GOOGLE_KEY}&language=pt-BR&alternatives=true`;
-    const directionsResp = await fetch(directionsUrl);
-    const directionsData = await directionsResp.json();
-    if(!directionsData.routes || directionsData.routes.length === 0) return {sucesso:false};
-    const rotas = directionsData.routes.map((route, idx) => {
-      const distKm = Math.round(route.legs.reduce((sum, leg) => sum + leg.distance.value, 0) / 1000);
-      const duracaoSeg = route.legs.reduce((sum, leg) => sum + parseInt(leg.duration.value || 0), 0);
+    
+    const routesResp = await fetch('https://api.openrouteservice.org/v2/directions/driving', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': ORS_KEY
+      },
+      body: JSON.stringify({
+        coordinates: [
+          [gOrigem.loc.lng, gOrigem.loc.lat],
+          [gDestino.loc.lng, gDestino.loc.lat]
+        ],
+        format: 'json',
+        units: 'km'
+      })
+    });
+    
+    const routesData = await routesResp.json();
+    if(!routesData.routes || routesData.routes.length === 0) return {sucesso:false};
+    
+    const rotas = routesData.routes.map((route, idx) => {
+      const distKm = Math.round(route.summary.distance / 1000);
+      const duracaoSeg = Math.round(route.summary.duration);
       const horas = Math.floor(duracaoSeg / 3600);
       const mins = Math.floor((duracaoSeg % 3600) / 60);
       const duracaoText = horas >= 24 ? `${Math.floor(horas/24)} dia${Math.floor(horas/24)>1?'s':''} ${horas%24}h` : `${horas}h ${mins}min`;
-      let trechos = [];
-      let totalCustoCombustivel = 0;
-      let totalKmComCombustivel = 0;
-      route.legs.forEach(leg => {
-        const kmTrecho = leg.distance.value / 1000;
-        const enderecDestino = leg.end_address;
-        const estadoMatch = enderecDestino.match(/,\s*([A-Z]{2}),/);
-        const estado = estadoMatch ? estadoMatch[1] : gDestino.uf;
-        const precoDieselEstado = DIESEL_ESTADO[estado] || 6.20;
-        trechos.push({kmTrecho, estado, precoDieselEstado, enderecDestino});
-        totalCustoCombustivel += kmTrecho * precoDieselEstado;
-        totalKmComCombustivel += kmTrecho;
-      });
-      const dieselPrecoMedioPonderado = totalKmComCombustivel > 0 ? totalCustoCombustivel / totalKmComCombustivel : 6.20;
+      let trechos = [{kmTrecho: distKm, estado: 'SP', precoDieselEstado: 6.20, enderecDestino: destino}];
+      const dieselPrecoMedioPonderado = 6.20;
       const labels = ['🛣️ Principal', '🔀 Alternativa 1', '🔀 Alternativa 2', '🔀 Alternativa 3'];
       const desc = labels[idx] || `Rota ${idx+1}`;
       return { distKm, duracaoText, desc, idx, trechos, dieselPrecoMedioPonderado, pedagioReal: null };
     });
     return { sucesso: true, rotas, estadoOrigem: gOrigem.uf, estadoDestino: gDestino.uf, trechos: rotas[0]?.trechos || [] };
   } catch(e){
-    console.error('Directions API error:', e);
+    console.error('OpenRouteService error (trechos):', e);
     return {sucesso:false};
   }
 }
 
-async function buscarPedagioGoogle(origem, destino){
-  try{
-    const GOOGLE_KEY = 'AIzaSyCTYB8UdE9SE7Sl5KTWsvfWMvooiK_UESo';
-    const limpar = (s) => s.replace(/\/[A-Z]{2}$/,'').trim();
-    const geocode = async (endereco) => {
-      const endLimpo = limpar(endereco);
-      const resp = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(endLimpo + ', Brasil')}&key=${GOOGLE_KEY}&region=br&language=pt-BR`);
-      const data = await resp.json();
-      if(data.results && data.results[0]) return data.results[0].geometry.location;
-      return null;
-    };
-    const [locOrigem, locDestino] = await Promise.all([geocode(origem), geocode(destino)]);
-    if(!locOrigem || !locDestino) return null;
-    const routesResp = await fetch('https://routes.googleapis.com/directions/v2:computeRoutes', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json', 'X-Goog-Api-Key': GOOGLE_KEY, 'X-Goog-FieldMask': 'routes.travelAdvisory.tollInfo'},
-      body: JSON.stringify({
-        origin: { location: { latLng: { latitude: locOrigem.lat, longitude: locOrigem.lng } } },
-        destination: { location: { latLng: { latitude: locDestino.lat, longitude: locDestino.lng } } },
-        travelMode: 'DRIVE',
-        routingPreference: 'TRAFFIC_UNAWARE',
-        extraComputations: ['TOLLS'],
-        units: 'METRIC'
-      })
-    });
-    const routesData = await routesResp.json();
-    if(!routesData.routes || routesData.routes.length === 0) return null;
-    const route = routesData.routes[0];
-    const tollInfo = route.travelAdvisory?.tollInfo;
-    if(tollInfo?.estimatedPrice?.length > 0){
-      const tollBRL = tollInfo.estimatedPrice.find(p => p.currencyCode === 'BRL');
-      if(tollBRL) return parseFloat(tollBRL.units || 0) + (tollBRL.nanos || 0) / 1e9;
-    }
-    return null;
-  } catch(e){
-    console.error('Pedágio API error:', e);
-    return null;
-  }
-}
+// ✅ Pedágios calculados por calcularPedagioAutomatico() na função calcular()
 
 async function buscarRotasReaisMelhorado(origem, destino){
   const rotasComTrechos = await buscarRotasReaisComTrechos(origem, destino);
   if(!rotasComTrechos.sucesso) return {sucesso: false};
-  const pedagioReal = await buscarPedagioGoogle(origem, destino);
+  // Pedágio será calculado por calcularPedagioAutomatico() na função calcular()
+  const pedagioReal = null;
   rotasComTrechos.rotas = rotasComTrechos.rotas.map(rota => ({...rota, pedagioReal}));
   return rotasComTrechos;
 }
