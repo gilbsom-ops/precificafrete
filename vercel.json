@@ -1,0 +1,9 @@
+{
+  "functions": {
+    "api/routing.js": {
+      "memory": 1024,
+      "maxDuration": 60
+    }
+  },
+  "buildCommand": "npm run build || true"
+}
