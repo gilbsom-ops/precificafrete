@@ -1214,66 +1214,52 @@ let CONFIG = {
 // ─── BUSCAR MÚLTIPLAS ROTAS COM PEDÁGIOS ─────
 async function buscarRotasReais(origem, destino){
   try{
-    const ORS_KEY = 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6Ijc0YWI5OGZmZmIxNDdhNjg3NGM5MzQ0NTc4N2RlZWYiLCJoYyI6Im11cm11cjY0In0=';
+    console.log('📍 Chamando Supabase Edge Function para calcular rota...');
     
-    // Geocodificar usando OpenRouteService
-    const geocode = async (endereco) => {
-      const resp = await fetch(`https://api.openrouteservice.org/geocode/search?api_key=${ORS_KEY}&text=${encodeURIComponent(endereco + ', Brasil')}`);
-      const data = await resp.json();
-      if(data.features && data.features[0]){
-        const coords = data.features[0].geometry.coordinates;
-        return { loc: { lat: coords[1], lng: coords[0] }, uf: 'SP' };
-      }
-      return null;
-    };
-    
-    const [gOrigem, gDestino] = await Promise.all([geocode(origem), geocode(destino)]);
-    console.log('🗺️ DEBUG - Geocodificação OpenRouteService:');
-    console.log('  Origem:', origem, '→ Lat:', gOrigem?.loc.lat, 'Lng:', gOrigem?.loc.lng);
-    console.log('  Destino:', destino, '→ Lat:', gDestino?.loc.lat, 'Lng:', gDestino?.loc.lng);
-    if(!gOrigem || !gDestino) return {sucesso:false};
-    
-    // Buscar rotas usando OpenRouteService
-    const routesResp = await fetch('https://api.openrouteservice.org/v2/directions/driving', {
+    // Chamar Edge Function do Supabase
+    const response = await fetch('https://tkjekntjfcoysteveikc.supabase.co/functions/v1/calculate-route', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': ORS_KEY
+        'Authorization': 'Bearer sb_publishable_sp2zeS2DBZjf5WM9SRKXow_2w6Ewtx8'
       },
       body: JSON.stringify({
-        coordinates: [
-          [gOrigem.loc.lng, gOrigem.loc.lat],
-          [gDestino.loc.lng, gDestino.loc.lat]
-        ],
-        format: 'json',
-        units: 'km'
+        origem: origem + ', Brasil',
+        destino: destino + ', Brasil'
       })
     });
     
-    const routesData = await routesResp.json();
-    console.log('📍 OpenRouteService response:', JSON.stringify(routesData).slice(0,500));
+    const data = await response.json();
     
-    if(!routesData.routes || routesData.routes.length === 0) return {sucesso:false};
+    if(!data.sucesso){
+      console.error('❌ Erro na Edge Function:', data.erro);
+      return {sucesso:false};
+    }
     
-    const rotas = routesData.routes.map((route, idx) => {
-      const distKm = Math.round(route.summary.distance / 1000);
-      const duracaoSeg = Math.round(route.summary.duration);
-      console.log(`📍 Rota ${idx + 1}: ${distKm} km, ${Math.floor(duracaoSeg/3600)}h ${Math.floor((duracaoSeg%3600)/60)}min`);
-      
-      const horas = Math.floor(duracaoSeg / 3600);
-      const mins = Math.floor((duracaoSeg % 3600) / 60);
-      const duracaoText = horas >= 24 
-        ? `${Math.floor(horas/24)} dia${Math.floor(horas/24)>1?'s':''} ${horas%24}h`
-        : `${horas}h ${mins}min`;
-      
-      const labels = ['🛣️ Principal', '🔀 Alternativa 1', '🔀 Alternativa 2', '🔀 Alternativa 3'];
-      const desc = labels[idx] || `Rota ${idx+1}`;
-      return { distKm, duracaoText, pedagioReal: null, desc, idx };
-    });
+    console.log('✅ Edge Function respondeu:', data);
     
-    return { sucesso: true, rotas, estadoOrigem: gOrigem.uf, estadoDestino: gDestino.uf };
+    // Converter resposta para o formato esperado
+    const distKm = Math.round(data.distancia);
+    const duracaoText = data.duracao;
+    
+    const rotas = [{
+      distKm: distKm,
+      duracaoText: duracaoText,
+      pedagioReal: null,
+      desc: '🛣️ Principal',
+      idx: 0
+    }];
+    
+    console.log(`📍 Rota calculada: ${distKm} km, ${duracaoText}`);
+    
+    return { 
+      sucesso: true, 
+      rotas: rotas, 
+      estadoOrigem: 'SP', 
+      estadoDestino: 'SP'
+    };
   } catch(e){
-    console.error('OpenRouteService error:', e);
+    console.error('❌ Erro ao buscar rota:', e);
     return {sucesso:false};
   }
 }
