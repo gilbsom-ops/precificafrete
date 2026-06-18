@@ -1264,65 +1264,6 @@ async function buscarRotasReais(origem, destino){
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// 🔧 DIRECTIONS API - CÁLCULO DE COMBUSTÍVEL COM MÉDIA PONDERADA POR ESTADO
-// ═══════════════════════════════════════════════════════════════════════════
-
-async function buscarRotasReaisComTrechos(origem, destino){
-  try{
-    const ORS_KEY = 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6Ijc0YWI5OGZmZmIxNDdhNjg3NGM5MzQ0NTc4N2RlZWYiLCJoYyI6Im11cm11cjY0In0=';
-    const limpar = (s) => s.replace(/\/[A-Z]{2}$/,'').trim();
-    const geocode = async (endereco) => {
-      const endLimpo = limpar(endereco);
-      const resp = await fetch(`https://api.openrouteservice.org/geocode/search?api_key=${ORS_KEY}&text=${encodeURIComponent(endLimpo + ', Brasil')}`);
-      const data = await resp.json();
-      if(data.features && data.features[0]){
-        const coords = data.features[0].geometry.coordinates;
-        const uf = 'SP'; // Padrão SP (pode melhorar depois)
-        return { loc: { lat: coords[1], lng: coords[0] }, uf };
-      }
-      return null;
-    };
-    const [gOrigem, gDestino] = await Promise.all([geocode(origem), geocode(destino)]);
-    if(!gOrigem || !gDestino) return {sucesso:false};
-    
-    const routesResp = await fetch('https://api.openrouteservice.org/v2/directions/driving', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': ORS_KEY
-      },
-      body: JSON.stringify({
-        coordinates: [
-          [gOrigem.loc.lng, gOrigem.loc.lat],
-          [gDestino.loc.lng, gDestino.loc.lat]
-        ],
-        format: 'json',
-        units: 'km'
-      })
-    });
-    
-    const routesData = await routesResp.json();
-    if(!routesData.routes || routesData.routes.length === 0) return {sucesso:false};
-    
-    const rotas = routesData.routes.map((route, idx) => {
-      const distKm = Math.round(route.summary.distance / 1000);
-      const duracaoSeg = Math.round(route.summary.duration);
-      const horas = Math.floor(duracaoSeg / 3600);
-      const mins = Math.floor((duracaoSeg % 3600) / 60);
-      const duracaoText = horas >= 24 ? `${Math.floor(horas/24)} dia${Math.floor(horas/24)>1?'s':''} ${horas%24}h` : `${horas}h ${mins}min`;
-      let trechos = [{kmTrecho: distKm, estado: 'SP', precoDieselEstado: 6.20, enderecDestino: destino}];
-      const dieselPrecoMedioPonderado = 6.20;
-      const labels = ['🛣️ Principal', '🔀 Alternativa 1', '🔀 Alternativa 2', '🔀 Alternativa 3'];
-      const desc = labels[idx] || `Rota ${idx+1}`;
-      return { distKm, duracaoText, desc, idx, trechos, dieselPrecoMedioPonderado, pedagioReal: null };
-    });
-    return { sucesso: true, rotas, estadoOrigem: gOrigem.uf, estadoDestino: gDestino.uf, trechos: rotas[0]?.trechos || [] };
-  } catch(e){
-    console.error('OpenRouteService error (trechos):', e);
-    return {sucesso:false};
-  }
-}
 
 // ✅ Pedágios calculados por calcularPedagioAutomatico() na função calcular()
 
