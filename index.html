@@ -1327,7 +1327,7 @@ async function buscarRotasReaisComTrechos(origem, destino){
 // ✅ Pedágios calculados por calcularPedagioAutomatico() na função calcular()
 
 async function buscarRotasReaisMelhorado(origem, destino){
-  const rotasComTrechos = await buscarRotasReaisComTrechos(origem, destino);
+  const rotasComTrechos = await buscarRotasReais(origem, destino);
   if(!rotasComTrechos.sucesso) return {sucesso: false};
   // Pedágio será calculado por calcularPedagioAutomatico() na função calcular()
   const pedagioReal = null;
