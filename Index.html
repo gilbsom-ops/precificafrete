@@ -1142,11 +1142,12 @@ function initCargaGrid(){
   });
 }
 
-// ─── BUSCAR ROTA (tabela fallback - CORRIGIDO) ───────────
-function buscarRotaFallback(o,d){
+// // ─── BUSCAR ROTA FALLBACK (CORRIGIDO) ──────────────────────────────────────
+function buscarRotaFallback(o, d){
   const [cidadeOrigem, estadoOrigem] = o.split('/').map(s => s.trim());
   const [cidadeDestino, estadoDestino] = d.split('/').map(s => s.trim());
   
+  // CASO ESPECIAL: ROTAS DENTRO DE SP
   if(estadoOrigem === estadoDestino && estadoOrigem === 'SP'){
     const distanciasSP = {
       'itápolis': { 'são paulo': 420, 'campinas': 280, 'ribeirão preto': 180, 'santos': 490 },
@@ -1156,7 +1157,7 @@ function buscarRotaFallback(o,d){
       'santos': { 'itápolis': 490, 'são paulo': 80, 'campinas': 190, 'ribeirão preto': 380 },
     };
     
-    const limpar = (s) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const limpar = (s) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
     const c1 = limpar(cidadeOrigem);
     const c2 = limpar(cidadeDestino);
     
@@ -1164,12 +1165,13 @@ function buscarRotaFallback(o,d){
       const dist = distanciasSP[c1][c2];
       return {
         dist: dist,
-        diesel: 6.20,
+        diesel: DIESEL_ESTADO['SP'] || 7.46,
         pedMult: 1.0,
         manutMult: 1.0,
         risco: 'baixo',
         riscoDesc: 'Baixo índice (PRF 2024)',
-        estradaDesc: 'Bom estado geral'
+        estradaDesc: 'Bom estado geral',
+        estado: 'SP'
       };
     }
   }
@@ -1181,11 +1183,27 @@ function buscarRotaFallback(o,d){
   for(const[k,v] of Object.entries(ROTAS)){
     if(k==='default')continue;
     const[co,cd]=k.split('-');
-    if((on.includes(co)||co.includes(on.slice(0,5)))&&(dn.includes(cd)||cd.includes(dn.slice(0,5))))return v;
+    if((on.includes(co)||co.includes(on.slice(0,5)))&&(dn.includes(cd)||cd.includes(dn.slice(0,5)))){
+      return {
+        ...v,
+        diesel: DIESEL_ESTADO[estadoDestino] || v.diesel || 6.20
+      };
+    }
   }
   
   const dist = estimarDistanciaRodoviaria(cidadeOrigem, cidadeDestino);
-  return {...ROTAS['default'], dist: dist, risco: dist > 1000 ? 'medio' : 'baixo'};
+  const estado = estadoDestino || 'SP';
+  
+  return {
+    dist: dist,
+    diesel: DIESEL_ESTADO[estado] || 6.20,
+    pedMult: 0.90,
+    manutMult: 1.0,
+    risco: dist > 1000 ? 'medio' : 'baixo',
+    riscoDesc: dist > 1000 ? 'Risco médio estimado' : 'Baixo risco estimado',
+    estradaDesc: 'Estado estimado',
+    estado: estado
+  };
 }
 
 // ─── PREÇO DIESEL POR ESTADO (ANP média) ─────
@@ -1299,7 +1317,7 @@ async function buscarRotaDireta(origem, destino){
     const [cidadeOrigem, estadoOrigem] = origem.split('/').map(s => s.trim());
     const [cidadeDestino, estadoDestino] = destino.split('/').map(s => s.trim());
     
-    if(estadoOrigem === estadoDestino){
+    if(estadoOrigem === estadoDestino && estadoOrigem === 'SP'){
       const distanciasSP = {
         'itápolis': { 'são paulo': 420, 'campinas': 280, 'ribeirão preto': 180 },
         'são paulo': { 'itápolis': 420, 'campinas': 100, 'ribeirão preto': 320 },
@@ -1307,28 +1325,52 @@ async function buscarRotaDireta(origem, destino){
         'ribeirão preto': { 'itápolis': 180, 'campinas': 220, 'são paulo': 320 },
       };
       
-      const cidadeKey = (cidade) => cidade.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-      const c1 = cidadeKey(cidadeOrigem);
-      const c2 = cidadeKey(cidadeDestino);
+      const limpar = (s) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+      const c1 = limpar(cidadeOrigem);
+      const c2 = limpar(cidadeDestino);
       
       if(distanciasSP[c1] && distanciasSP[c1][c2]){
         const dist = distanciasSP[c1][c2];
         return {
           sucesso: true,
-          rotas: [{distKm: dist, duracaoText: `${Math.round(dist/80)}h ${Math.round((dist%80)/80*60)}min`, desc: '🛣️ Direta'}],
-          estadoOrigem, estadoDestino
+          rotas: [{
+            distKm: dist,
+            duracaoText: `${Math.round(dist/80)}h ${Math.round((dist%80)/80*60)}min`,
+            desc: '🛣️ Direta',
+            dieselPrecoMedioPonderado: DIESEL_ESTADO['SP'] || 7.46
+          }],
+          estadoOrigem: estadoOrigem,
+          estadoDestino: estadoDestino
         };
       }
     }
     
     const dist = estimarDistanciaRodoviaria(cidadeOrigem, cidadeDestino);
+    const estado = estadoDestino || 'SP';
+    
     return {
       sucesso: true,
-      rotas: [{distKm: dist, duracaoText: `${Math.round(dist/80)}h`, desc: '🛣️ Estimada'}],
-      estadoOrigem, estadoDestino
+      rotas: [{
+        distKm: dist,
+        duracaoText: `${Math.round(dist/80)}h`,
+        desc: '🛣️ Estimada',
+        dieselPrecoMedioPonderado: DIESEL_ESTADO[estado] || 6.20
+      }],
+      estadoOrigem: estadoOrigem,
+      estadoDestino: estadoDestino
     };
   } catch(e){
-    return {sucesso: true, rotas: [{distKm: 450, duracaoText: '~5h', desc: '🛣️ Estimada'}], estadoOrigem: 'SP', estadoDestino: 'SP'};
+    return {
+      sucesso: true, 
+      rotas: [{
+        distKm: 420, 
+        duracaoText: '~5h', 
+        desc: '🛣️ Estimada',
+        dieselPrecoMedioPonderado: 7.46
+      }], 
+      estadoOrigem: 'SP', 
+      estadoDestino: 'SP'
+    };
   }
 }
 
@@ -1600,9 +1642,12 @@ async function calcular(){
   const risco=RISCO[rotaFallback.risco];
 
   // Diesel por estado - MÉDIA PONDERADA por km de cada estado
-  const dieselPreco = rotasResult.sucesso 
-    ? rotasResult.rotas[0].dieselPrecoMedioPonderado
-    : rotaFallback.diesel;
+  let dieselPreco;
+if(rotasResult.sucesso && rotasResult.rotas.length > 0 && rotasResult.rotas[0].dieselPrecoMedioPonderado){
+  dieselPreco = rotasResult.rotas[0].dieselPrecoMedioPonderado;
+} else {
+  dieselPreco = rotaFallback.diesel || DIESEL_ESTADO['SP'] || 7.46;
+}
 
   // Calcular custo para cada rota
   let rotasCalculadas = [];
