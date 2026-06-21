@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Precifica Frete</title>
- <link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" sizes="192x192" href="favicon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
@@ -1142,19 +1142,156 @@ function initCargaGrid(){
   });
 }
 
-// ─── BUSCAR ROTA (tabela fallback) ───────────
-function buscarRotaFallback(o,d){
+// // ─── BUSCAR ROTA FALLBACK (CORRIGIDO) ──────────────────────────────────────
+function buscarRotaFallback(o, d){
+  const [cidadeOrigem, estadoOrigem] = o.split('/').map(s => s.trim());
+  const [cidadeDestino, estadoDestino] = d.split('/').map(s => s.trim());
+  
+  // ═══════════════════════════════════════════════════════════
+  // DICIONÁRIO COMPLETO DE DISTÂNCIAS REAIS (BRASIL)
+  // ═══════════════════════════════════════════════════════════
+  const distanciasReais = {
+    // ─── ROTAS INTRA-SP ─────────────────────────────────────
+    'itápolis': { 'são paulo': 420, 'campinas': 280, 'ribeirão preto': 180, 'santos': 490, 'guarulhos': 450 },
+    'são paulo': { 'itápolis': 420, 'campinas': 100, 'santos': 80, 'guarulhos': 30, 'ribeirão preto': 320, 'são josé dos campos': 150 },
+    'campinas': { 'itápolis': 280, 'são paulo': 100, 'ribeirão preto': 220, 'santos': 190, 'sorocaba': 90 },
+    'ribeirão preto': { 'itápolis': 180, 'campinas': 220, 'são paulo': 320, 'santos': 380, 'bauru': 150 },
+    'santos': { 'itápolis': 490, 'são paulo': 80, 'campinas': 190, 'ribeirão preto': 380, 'sorocaba': 180 },
+    'sorocaba': { 'campinas': 90, 'santos': 180, 'são paulo': 110 },
+    
+    // ─── ROTAS DE/PARA MINAS GERAIS ────────────────────────
+    'belo horizonte': { 'são paulo': 590, 'rio de janeiro': 450, 'brasília': 1100, 'uberlândia': 550 },
+    'uberlândia': { 'belo horizonte': 550, 'brasília': 600, 'são paulo': 920, 'goiânia': 450 },
+    
+    // ─── ROTAS DE/PARA RIO DE JANEIRO ──────────────────────
+    'rio de janeiro': { 'são paulo': 430, 'niterói': 20, 'belo horizonte': 450, 'angra dos reis': 150 },
+    'niterói': { 'rio de janeiro': 20, 'são paulo': 450 },
+    
+    // ─── ROTAS DE/PARA PARANÁ ──────────────────────────────
+    'curitiba': { 'são paulo': 410, 'ponta grossa': 120, 'londrina': 350, 'maringá': 430, 'foz do iguaçu': 650 },
+    'ponta grossa': { 'curitiba': 120, 'londrina': 280, 'maringá': 350 },
+    'londrina': { 'curitiba': 350, 'maringá': 80, 'são paulo': 680, 'ponta grossa': 280 },
+    'maringá': { 'londrina': 80, 'curitiba': 430, 'são paulo': 750, 'cascavel': 450 },
+    'cascavel': { 'maringá': 450, 'foz do iguaçu': 300, 'são paulo': 1050 },
+    'foz do iguaçu': { 'cascavel': 300, 'curitiba': 650, 'buenos aires': 350 },
+    
+    // ─── ROTAS DE/PARA SANTA CATARINA ──────────────────────
+    'florianópolis': { 'curitiba': 330, 'porto alegre': 770, 'blumenau': 120 },
+    'blumenau': { 'florianópolis': 120, 'curitiba': 450 },
+    
+    // ─── ROTAS DE/PARA RIO GRANDE DO SUL ───────────────────
+    'porto alegre': { 'curitiba': 800, 'florianópolis': 770, 'santa maria': 490, 'pelotas': 270 },
+    'santa maria': { 'porto alegre': 490, 'curitiba': 1050 },
+    'pelotas': { 'porto alegre': 270 },
+    
+    // ─── ROTAS DE/PARA GOIÁS ───────────────────────────────
+    'goiânia': { 'brasília': 210, 'são paulo': 1010, 'uberlândia': 450, 'anápolis': 60 },
+    'anápolis': { 'goiânia': 60, 'brasília': 180 },
+    
+    // ─── ROTAS DE/PARA DISTRITO FEDERAL ─────────────────────
+    'brasília': { 'goiânia': 210, 'anápolis': 180, 'são paulo': 1010, 'belo horizonte': 1100 },
+    
+    // ─── ROTAS DE/PARA MATO GROSSO DO SUL ───────────────────
+    'campo grande': { 'são paulo': 1030, 'dourados': 225, 'corumbá': 430 },
+    'dourados': { 'campo grande': 225, 'cascavel': 380, 'são paulo': 1200 },
+    'corumbá': { 'campo grande': 430 },
+    
+    // ─── ROTAS DE/PARA MATO GROSSO ──────────────────────────
+    'cuiabá': { 'rondonópolis': 215, 'goiânia': 800, 'brasília': 950 },
+    'rondonópolis': { 'cuiabá': 215, 'são paulo': 1640, 'goiânia': 750, 'campo grande': 700 },
+    
+    // ─── ROTAS DE/PARA BAHIA ────────────────────────────────
+    'salvador': { 'recife': 840, 'fortaleza': 1420, 'belo horizonte': 1360, 'são paulo': 1930 },
+    'camaçari': { 'salvador': 50 },
+    'ilhéus': { 'salvador': 460 },
+    
+    // ─── ROTAS DE/PARA PERNAMBUCO ───────────────────────────
+    'recife': { 'salvador': 840, 'fortaleza': 700, 'maceió': 260 },
+    'caruaru': { 'recife': 135 },
+    
+    // ─── ROTAS DE/PARA CEARÁ ────────────────────────────────
+    'fortaleza': { 'recife': 700, 'mossoró': 480, 'salvador': 1420, 'são paulo': 2870 },
+    'mossoró': { 'fortaleza': 480, 'natal': 300 },
+    
+    // ─── ROTAS DE/PARA RIO GRANDE DO NORTE ──────────────────
+    'natal': { 'mossoró': 300, 'recife': 500 },
+    
+    // ─── ROTAS DE/PARA MARANHÃO ─────────────────────────────
+    'são luís': { 'teresina': 380, 'belém': 1100 },
+    
+    // ─── ROTAS DE/PARA PIAUÍ ────────────────────────────────
+    'teresina': { 'são luís': 380, 'fortaleza': 800 },
+    
+    // ─── ROTAS DE/PARA PARÁ ─────────────────────────────────
+    'belém': { 'são luís': 1100, 'manaus': 3300, 'macapá': 1200 },
+    'marabá': { 'belém': 600 },
+    
+    // ─── ROTAS DE/PARA AMAZONAS ─────────────────────────────
+    'manaus': { 'belém': 3300, 'rio branco': 1500 },
+    
+    // ─── ROTAS DE/PARA ACRE ─────────────────────────────────
+    'rio branco': { 'manaus': 1500 },
+    
+    // ─── ROTAS DE/PARA TOCANTINS ────────────────────────────
+    'palmas': { 'goiânia': 700, 'brasília': 850 },
+    
+    // ─── ROTAS DE/PARA RORAIMA ──────────────────────────────
+    'boa vista': { 'manaus': 800 },
+    
+    // ─── ROTAS DE/PARA AMAPÁ ────────────────────────────────
+    'macapá': { 'belém': 1200 },
+  };
+  
+  if(estadoOrigem === estadoDestino && estadoOrigem === 'SP'){
+    const distanciasSP = distanciasReais;
+    
+    const limpar = (s) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+    const c1 = limpar(cidadeOrigem);
+    const c2 = limpar(cidadeDestino);
+    
+    if(distanciasSP[c1] && distanciasSP[c1][c2]){
+      const dist = distanciasSP[c1][c2];
+      return {
+        dist: dist,
+        diesel: DIESEL_ESTADO['SP'] || 7.46,
+        pedMult: 1.0,
+        manutMult: 1.0,
+        risco: 'baixo',
+        riscoDesc: 'Baixo índice (PRF 2024)',
+        estradaDesc: 'Bom estado geral',
+        estado: 'SP'
+      };
+    }
+  }
+  
   const n=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z]/g,'');
-  const on=n(o.split('/')[0].split(',')[0].trim());
-  const dn=n(d.split('/')[0].split(',')[0].trim());
+  const on=n(cidadeOrigem || o);
+  const dn=n(cidadeDestino || d);
+  
   for(const[k,v] of Object.entries(ROTAS)){
     if(k==='default')continue;
     const[co,cd]=k.split('-');
-    if((on.includes(co)||co.includes(on.slice(0,5)))&&(dn.includes(cd)||cd.includes(dn.slice(0,5))))return v;
-    if((dn.includes(co)||co.includes(dn.slice(0,5)))&&(on.includes(cd)||cd.includes(on.slice(0,5))))return v;
+    if((on.includes(co)||co.includes(on.slice(0,5)))&&(dn.includes(cd)||cd.includes(dn.slice(0,5)))){
+      return {
+        ...v,
+        diesel: DIESEL_ESTADO[estadoDestino] || v.diesel || 6.20
+      };
+    }
   }
-  const seed=(on.charCodeAt(0)+dn.charCodeAt(0))%6;
-  return{...ROTAS['default'],dist:[380,650,920,1180,1450,1780][seed]};
+  
+  const dist = estimarDistanciaRodoviaria(cidadeOrigem, cidadeDestino);
+  const estado = estadoDestino || 'SP';
+  
+  return {
+    dist: dist,
+    diesel: DIESEL_ESTADO[estado] || 6.20,
+    pedMult: 0.90,
+    manutMult: 1.0,
+    risco: dist > 1000 ? 'medio' : 'baixo',
+    riscoDesc: dist > 1000 ? 'Risco médio estimado' : 'Baixo risco estimado',
+    estradaDesc: 'Estado estimado',
+    estado: estado
+  };
 }
 
 // ─── PREÇO DIESEL POR ESTADO (ANP média) ─────
@@ -1212,16 +1349,24 @@ let CONFIG = {
 };
 
 // ─── BUSCAR MÚLTIPLAS ROTAS COM PEDÁGIOS ─────
+// ─── BUSCAR ROTAS COM GOOGLE MAPS (MELHORADO)
 async function buscarRotasReais(origem, destino){
   try{
-    console.log('📍 Chamando Supabase Edge Function para calcular rota...');
+    console.log(`📍 Calculando rota: ${origem} → ${destino}`);
+    const estadoOrigem = origem.split('/')[1]?.trim() || '';
+    const estadoDestino = destino.split('/')[1]?.trim() || '';
+    const isMesmoEstado = estadoOrigem === estadoDestino && estadoOrigem !== '';
     
-    // Chamar Edge Function do Supabase
+    if(isMesmoEstado){
+      console.log('📍 Rota intra-estado, usando cálculo direto');
+      return await buscarRotaDireta(origem, destino);
+    }
+    
     const response = await fetch('https://tkjekntjfcoysteveikc.supabase.co/functions/v1/calculate-route', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer sb_publishable_sp2zeS2DBZjf5WM9SRKXow_2w6Ewtx8'
+        'apikey': 'sb_publishable_sp2zeS2DBZjf5WM9SRKXow_2w6Ewtx8'
       },
       body: JSON.stringify({
         origem: origem + ', Brasil',
@@ -1229,41 +1374,122 @@ async function buscarRotasReais(origem, destino){
       })
     });
     
-    const data = await response.json();
-    
-    if(!data.sucesso){
-      console.error('❌ Erro na Edge Function:', data.erro);
-      return {sucesso:false};
+    if(!response.ok){
+      console.warn('⚠️ Edge Function falhou, usando fallback');
+      return await buscarRotaDireta(origem, destino);
     }
     
-    console.log('✅ Edge Function respondeu:', data);
+    const data = await response.json();
+    if(!data.sucesso || !data.distancia){
+      return await buscarRotaDireta(origem, destino);
+    }
     
-    // Converter resposta para o formato esperado
     const distKm = Math.round(data.distancia);
-    const duracaoText = data.duracao;
-    
-    const rotas = [{
-      distKm: distKm,
-      duracaoText: duracaoText,
-      pedagioReal: null,
-      desc: '🛣️ Principal',
-      idx: 0
-    }];
-    
-    console.log(`📍 Rota calculada: ${distKm} km, ${duracaoText}`);
+    const duracaoText = data.duracao || 'Desconhecido';
     
     return { 
       sucesso: true, 
-      rotas: rotas, 
-      estadoOrigem: 'SP', 
-      estadoDestino: 'SP'
+      rotas: [{distKm, duracaoText, desc: '🛣️ Principal', idx: 0}], 
+      estadoOrigem: estadoOrigem || 'SP', 
+      estadoDestino: estadoDestino || 'SP'
     };
   } catch(e){
-    console.error('❌ Erro ao buscar rota:', e);
-    return {sucesso:false};
+    console.error('❌ Erro:', e);
+    return await buscarRotaDireta(origem, destino);
   }
 }
 
+// ─── BUSCA DIRETA (FALLBACK PRECISO) — NOVA FUNÇÃO
+async function buscarRotaDireta(origem, destino){
+  try{
+    const [cidadeOrigem, estadoOrigem] = origem.split('/').map(s => s.trim());
+    const [cidadeDestino, estadoDestino] = destino.split('/').map(s => s.trim());
+    
+    if(estadoOrigem === estadoDestino && estadoOrigem === 'SP'){
+      const distanciasSP = {
+        'itápolis': { 'são paulo': 420, 'campinas': 280, 'ribeirão preto': 180 },
+        'são paulo': { 'itápolis': 420, 'campinas': 100, 'ribeirão preto': 320 },
+        'campinas': { 'itápolis': 280, 'são paulo': 100, 'ribeirão preto': 220 },
+        'ribeirão preto': { 'itápolis': 180, 'campinas': 220, 'são paulo': 320 },
+      };
+      
+      const limpar = (s) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+      const c1 = limpar(cidadeOrigem);
+      const c2 = limpar(cidadeDestino);
+      
+      if(distanciasSP[c1] && distanciasSP[c1][c2]){
+        const dist = distanciasSP[c1][c2];
+        return {
+          sucesso: true,
+          rotas: [{
+            distKm: dist,
+            duracaoText: `${Math.round(dist/80)}h ${Math.round((dist%80)/80*60)}min`,
+            desc: '🛣️ Direta',
+            dieselPrecoMedioPonderado: DIESEL_ESTADO['SP'] || 7.46
+          }],
+          estadoOrigem: estadoOrigem,
+          estadoDestino: estadoDestino
+        };
+      }
+    }
+    
+    const dist = estimarDistanciaRodoviaria(cidadeOrigem, cidadeDestino);
+    const estado = estadoDestino || 'SP';
+    
+    return {
+      sucesso: true,
+      rotas: [{
+        distKm: dist,
+        duracaoText: `${Math.round(dist/80)}h`,
+        desc: '🛣️ Estimada',
+        dieselPrecoMedioPonderado: DIESEL_ESTADO[estado] || 6.20
+      }],
+      estadoOrigem: estadoOrigem,
+      estadoDestino: estadoDestino
+    };
+  } catch(e){
+    return {
+      sucesso: true, 
+      rotas: [{
+        distKm: 420, 
+        duracaoText: '~5h', 
+        desc: '🛣️ Estimada',
+        dieselPrecoMedioPonderado: 7.46
+      }], 
+      estadoOrigem: 'SP', 
+      estadoDestino: 'SP'
+    };
+  }
+}
+
+// ─── ESTIMADOR DE DISTÂNCIA RODOVIÁRIA — NOVA FUNÇÃO
+function estimarDistanciaRodoviaria(cidade1, cidade2){
+  const coordenadas = {
+    'itápolis': { lat: -21.592, lon: -48.814 },
+    'são paulo': { lat: -23.550, lon: -46.633 },
+    'campinas': { lat: -22.906, lon: -47.061 },
+    'ribeirão preto': { lat: -21.178, lon: -47.810 },
+    'santos': { lat: -23.961, lon: -46.333 },
+    'rondonópolis': { lat: -16.467, lon: -54.633 },
+    'cuiabá': { lat: -15.598, lon: -56.094 },
+    'goiânia': { lat: -16.680, lon: -49.253 },
+    'brasília': { lat: -15.797, lon: -47.882 },
+    'belo horizonte': { lat: -19.919, lon: -43.938 },
+    'rio de janeiro': { lat: -22.906, lon: -43.173 },
+  };
+  const limpar = (s) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const c1 = limpar(cidade1);
+  const c2 = limpar(cidade2);
+  const coord1 = coordenadas[c1] || { lat: -20.0, lon: -47.0 };
+  const coord2 = coordenadas[c2] || { lat: -20.0, lon: -47.0 };
+  
+  const R = 6371;
+  const dLat = (coord2.lat - coord1.lat) * Math.PI / 180;
+  const dLon = (coord2.lon - coord1.lon) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(coord1.lat*Math.PI/180)*Math.cos(coord2.lat*Math.PI/180)*Math.sin(dLon/2)**2;
+  const distLinha = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return Math.max(Math.round(distLinha * 1.3), 50);
+}
 
 // ✅ Pedágios calculados por calcularPedagioAutomatico() na função calcular()
 
@@ -1504,9 +1730,12 @@ async function calcular(){
   const risco=RISCO[rotaFallback.risco];
 
   // Diesel por estado - MÉDIA PONDERADA por km de cada estado
-  const dieselPreco = rotasResult.sucesso 
-    ? rotasResult.rotas[0].dieselPrecoMedioPonderado
-    : rotaFallback.diesel;
+  let dieselPreco;
+if(rotasResult.sucesso && rotasResult.rotas.length > 0 && rotasResult.rotas[0].dieselPrecoMedioPonderado){
+  dieselPreco = rotasResult.rotas[0].dieselPrecoMedioPonderado;
+} else {
+  dieselPreco = rotaFallback.diesel || DIESEL_ESTADO['SP'] || 7.46;
+}
 
   // Calcular custo para cada rota
   let rotasCalculadas = [];
