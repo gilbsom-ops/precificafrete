@@ -1147,15 +1147,103 @@ function buscarRotaFallback(o, d){
   const [cidadeOrigem, estadoOrigem] = o.split('/').map(s => s.trim());
   const [cidadeDestino, estadoDestino] = d.split('/').map(s => s.trim());
   
-  // CASO ESPECIAL: ROTAS DENTRO DE SP
+  // ═══════════════════════════════════════════════════════════
+  // DICIONÁRIO COMPLETO DE DISTÂNCIAS REAIS (BRASIL)
+  // ═══════════════════════════════════════════════════════════
+  const distanciasReais = {
+    // ─── ROTAS INTRA-SP ─────────────────────────────────────
+    'itápolis': { 'são paulo': 420, 'campinas': 280, 'ribeirão preto': 180, 'santos': 490, 'guarulhos': 450 },
+    'são paulo': { 'itápolis': 420, 'campinas': 100, 'santos': 80, 'guarulhos': 30, 'ribeirão preto': 320, 'são josé dos campos': 150 },
+    'campinas': { 'itápolis': 280, 'são paulo': 100, 'ribeirão preto': 220, 'santos': 190, 'sorocaba': 90 },
+    'ribeirão preto': { 'itápolis': 180, 'campinas': 220, 'são paulo': 320, 'santos': 380, 'bauru': 150 },
+    'santos': { 'itápolis': 490, 'são paulo': 80, 'campinas': 190, 'ribeirão preto': 380, 'sorocaba': 180 },
+    'sorocaba': { 'campinas': 90, 'santos': 180, 'são paulo': 110 },
+    
+    // ─── ROTAS DE/PARA MINAS GERAIS ────────────────────────
+    'belo horizonte': { 'são paulo': 590, 'rio de janeiro': 450, 'brasília': 1100, 'uberlândia': 550 },
+    'uberlândia': { 'belo horizonte': 550, 'brasília': 600, 'são paulo': 920, 'goiânia': 450 },
+    
+    // ─── ROTAS DE/PARA RIO DE JANEIRO ──────────────────────
+    'rio de janeiro': { 'são paulo': 430, 'niterói': 20, 'belo horizonte': 450, 'angra dos reis': 150 },
+    'niterói': { 'rio de janeiro': 20, 'são paulo': 450 },
+    
+    // ─── ROTAS DE/PARA PARANÁ ──────────────────────────────
+    'curitiba': { 'são paulo': 410, 'ponta grossa': 120, 'londrina': 350, 'maringá': 430, 'foz do iguaçu': 650 },
+    'ponta grossa': { 'curitiba': 120, 'londrina': 280, 'maringá': 350 },
+    'londrina': { 'curitiba': 350, 'maringá': 80, 'são paulo': 680, 'ponta grossa': 280 },
+    'maringá': { 'londrina': 80, 'curitiba': 430, 'são paulo': 750, 'cascavel': 450 },
+    'cascavel': { 'maringá': 450, 'foz do iguaçu': 300, 'são paulo': 1050 },
+    'foz do iguaçu': { 'cascavel': 300, 'curitiba': 650, 'buenos aires': 350 },
+    
+    // ─── ROTAS DE/PARA SANTA CATARINA ──────────────────────
+    'florianópolis': { 'curitiba': 330, 'porto alegre': 770, 'blumenau': 120 },
+    'blumenau': { 'florianópolis': 120, 'curitiba': 450 },
+    
+    // ─── ROTAS DE/PARA RIO GRANDE DO SUL ───────────────────
+    'porto alegre': { 'curitiba': 800, 'florianópolis': 770, 'santa maria': 490, 'pelotas': 270 },
+    'santa maria': { 'porto alegre': 490, 'curitiba': 1050 },
+    'pelotas': { 'porto alegre': 270 },
+    
+    // ─── ROTAS DE/PARA GOIÁS ───────────────────────────────
+    'goiânia': { 'brasília': 210, 'são paulo': 1010, 'uberlândia': 450, 'anápolis': 60 },
+    'anápolis': { 'goiânia': 60, 'brasília': 180 },
+    
+    // ─── ROTAS DE/PARA DISTRITO FEDERAL ─────────────────────
+    'brasília': { 'goiânia': 210, 'anápolis': 180, 'são paulo': 1010, 'belo horizonte': 1100 },
+    
+    // ─── ROTAS DE/PARA MATO GROSSO DO SUL ───────────────────
+    'campo grande': { 'são paulo': 1030, 'dourados': 225, 'corumbá': 430 },
+    'dourados': { 'campo grande': 225, 'cascavel': 380, 'são paulo': 1200 },
+    'corumbá': { 'campo grande': 430 },
+    
+    // ─── ROTAS DE/PARA MATO GROSSO ──────────────────────────
+    'cuiabá': { 'rondonópolis': 215, 'goiânia': 800, 'brasília': 950 },
+    'rondonópolis': { 'cuiabá': 215, 'são paulo': 1640, 'goiânia': 750, 'campo grande': 700 },
+    
+    // ─── ROTAS DE/PARA BAHIA ────────────────────────────────
+    'salvador': { 'recife': 840, 'fortaleza': 1420, 'belo horizonte': 1360, 'são paulo': 1930 },
+    'camaçari': { 'salvador': 50 },
+    'ilhéus': { 'salvador': 460 },
+    
+    // ─── ROTAS DE/PARA PERNAMBUCO ───────────────────────────
+    'recife': { 'salvador': 840, 'fortaleza': 700, 'maceió': 260 },
+    'caruaru': { 'recife': 135 },
+    
+    // ─── ROTAS DE/PARA CEARÁ ────────────────────────────────
+    'fortaleza': { 'recife': 700, 'mossoró': 480, 'salvador': 1420, 'são paulo': 2870 },
+    'mossoró': { 'fortaleza': 480, 'natal': 300 },
+    
+    // ─── ROTAS DE/PARA RIO GRANDE DO NORTE ──────────────────
+    'natal': { 'mossoró': 300, 'recife': 500 },
+    
+    // ─── ROTAS DE/PARA MARANHÃO ─────────────────────────────
+    'são luís': { 'teresina': 380, 'belém': 1100 },
+    
+    // ─── ROTAS DE/PARA PIAUÍ ────────────────────────────────
+    'teresina': { 'são luís': 380, 'fortaleza': 800 },
+    
+    // ─── ROTAS DE/PARA PARÁ ─────────────────────────────────
+    'belém': { 'são luís': 1100, 'manaus': 3300, 'macapá': 1200 },
+    'marabá': { 'belém': 600 },
+    
+    // ─── ROTAS DE/PARA AMAZONAS ─────────────────────────────
+    'manaus': { 'belém': 3300, 'rio branco': 1500 },
+    
+    // ─── ROTAS DE/PARA ACRE ─────────────────────────────────
+    'rio branco': { 'manaus': 1500 },
+    
+    // ─── ROTAS DE/PARA TOCANTINS ────────────────────────────
+    'palmas': { 'goiânia': 700, 'brasília': 850 },
+    
+    // ─── ROTAS DE/PARA RORAIMA ──────────────────────────────
+    'boa vista': { 'manaus': 800 },
+    
+    // ─── ROTAS DE/PARA AMAPÁ ────────────────────────────────
+    'macapá': { 'belém': 1200 },
+  };
+  
   if(estadoOrigem === estadoDestino && estadoOrigem === 'SP'){
-    const distanciasSP = {
-      'itápolis': { 'são paulo': 420, 'campinas': 280, 'ribeirão preto': 180, 'santos': 490 },
-      'são paulo': { 'itápolis': 420, 'campinas': 100, 'santos': 80, 'guarulhos': 30, 'ribeirão preto': 320 },
-      'campinas': { 'itápolis': 280, 'são paulo': 100, 'ribeirão preto': 220, 'santos': 190 },
-      'ribeirão preto': { 'itápolis': 180, 'campinas': 220, 'são paulo': 320, 'santos': 380 },
-      'santos': { 'itápolis': 490, 'são paulo': 80, 'campinas': 190, 'ribeirão preto': 380 },
-    };
+    const distanciasSP = distanciasReais;
     
     const limpar = (s) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
     const c1 = limpar(cidadeOrigem);
@@ -1278,7 +1366,7 @@ async function buscarRotasReais(origem, destino){
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer sb_publishable_sp2zeS2DBZjf5WM9SRKXow_2w6Ewtx8'
+        'apikey': 'sb_publishable_sp2zeS2DBZjf5WM9SRKXow_2w6Ewtx8'
       },
       body: JSON.stringify({
         origem: origem + ', Brasil',
