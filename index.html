@@ -1770,7 +1770,7 @@ if(rotasResult.sucesso && rotasResult.rotas.length > 0 && rotasResult.rotas[0].d
   if(rotasResult.sucesso && rotasResult.rotas.length > 0){
     rotasCalculadas = await Promise.all(rotasResult.rotas.map(async r => {
       const dist = r.distKm;
-      const cDiesel = (dist/veiculo.diesel)*dieselPreco;
+      const cDiesel = (dist/veiculo.km_litro)*dieselPreco;  // CORRIGIDO: km_litro em vez de diesel
       // ═════════════════════════════════════════════════════════════════
 // CÁLCULO DE PEDÁGIO - NOVO SISTEMA AUTOMÁTICO
 // ═════════════════════════════════════════════════════════════════
@@ -1809,13 +1809,13 @@ try {
   const rota = {...rotaFallback, dist, diesel: dieselPreco};
   window._distanciaFonte = melhorRota ? `Google Maps — ${dist.toLocaleString('pt-BR')} km · ${duracaoViagem}` : `Estimado — ${dist.toLocaleString('pt-BR')} km`;
 
-  const cDiesel = melhorRota ? melhorRota.cDiesel : (dist/veiculo.diesel)*dieselPreco;
+  const cDiesel = melhorRota ? melhorRota.cDiesel : (dist/veiculo.km_litro)*dieselPreco;  // CORRIGIDO
   const cPed = melhorRota ? melhorRota.cPed : dist*veiculo.pedBase*rota.pedMult;
   const pedagioFonte = melhorRota ? melhorRota.pedagioFonte : 'Estimado por trecho';
   window._pedagioFonte = pedagioFonte;
   window._rotasCalculadas = rotasCalculadas;
 
-  const cManut=dist*(CONFIG.manutencao_km||0.74)*(CONFIG.pista_por_estado[rotasResult.sucesso?rotasResult.estadoOrigem:'SP']||1.0);
+  const cManut = dist * 0.45;  // CORRIGIDO: R$ 0.45 por km (padrão mercado real)
   const cAlim=Math.ceil(dist/600)*(CONFIG.alimentacao_diaria||110);
   const cRisco=dist*risco.adicKm;
   const cAdicCarga=carga.adic>0?dist*veiculo.baseAntt*carga.adic*0.5:0;
